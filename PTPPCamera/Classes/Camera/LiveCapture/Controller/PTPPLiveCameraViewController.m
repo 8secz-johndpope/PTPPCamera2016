@@ -9,7 +9,7 @@
 
 #import "PTPPLiveVideoShareViewController.h"
 #import "PTPPNewHomeViewController.h"
-
+#import "ELCImagePickerHeader.h"
 
 #import "PTPPLiveStickerPreviewViewController.h"
 #import "PTPPLiveCameraViewController.h"
@@ -32,7 +32,9 @@
 #define kFilterScrollHeight 130
 #define kFilterDataLength 10
 #define kStickerScale 2
-@interface PTPPLiveCameraViewController ()<DetectFaceDelegate,UIViewControllerTransitioningDelegate, NSXMLParserDelegate, PTPPNewHomeProtocol>
+@interface PTPPLiveCameraViewController ()<DetectFaceDelegate,UIViewControllerTransitioningDelegate, NSXMLParserDelegate, PTPPNewHomeProtocol, ELCImagePickerControllerDelegate>
+@property (nonatomic, strong) ALAssetsLibrary *specialLibrary;
+@property (nonatomic, copy) NSArray *chosenImages;
 @property (strong, nonatomic) DetectFace *detectFaceController;
 @property (nonatomic, strong) UIView *previewView;
 @property (nonatomic, strong) UIView *stickerView;
@@ -721,12 +723,50 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
         [self albumNotUseTapped];
         return;
     }
-    //PTPaiPaiAlbumViewController *cont = [[PTPaiPaiAlbumViewController alloc] initWithFlag:NO];
-    
-    if (self.navigationController) {
-        //[self.navigationController pushViewController:cont animated:YES];
-    }
+
+    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+    self.specialLibrary = library;
+    NSMutableArray *groups = [NSMutableArray array];
+    [_specialLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
+        if (group) {
+            [groups addObject:group];
+        } else {
+            // this is the end
+            [self displayPickerForGroup:[groups objectAtIndex:0]];
+        }
+    } failureBlock:^(NSError *error) {
+        self.chosenImages = nil;
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Album Error: %@ - %@", [error localizedDescription], [error localizedRecoverySuggestion]] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [alert show];
+        
+        NSLog(@"A problem occured %@", [error description]);
+        // an error here means that the asset groups were inaccessable.
+        // Maybe the user or system preferences refused access.
+    }];
+
 }
+
+- (void)displayPickerForGroup:(ALAssetsGroup *)group
+{
+    ELCAssetTablePicker *tablePicker = [[ELCAssetTablePicker alloc] initWithStyle:UITableViewStylePlain];
+    tablePicker.singleSelection = YES;
+    tablePicker.immediateReturn = YES;
+    
+    ELCImagePickerController *elcPicker = [[ELCImagePickerController alloc] initWithRootViewController:tablePicker];
+    elcPicker.maximumImagesCount = 1;
+    elcPicker.imagePickerDelegate = self;
+    elcPicker.returnsOriginalImage = YES; //Only return the fullScreenImage, not the fullResolutionImage
+    elcPicker.returnsImage = YES; //Return UIimage if YES. If NO, only return asset location information
+    elcPicker.onOrder = NO; //For single image selection, do not display and return order of selected images
+    tablePicker.parent = elcPicker;
+    
+    // Move me
+    tablePicker.assetGroup = group;
+    [tablePicker.assetGroup setAssetsFilter:[ALAssetsFilter allAssets]];
+    
+    [self presentViewController:elcPicker animated:YES completion:nil];
+}
+
 
 -(void)albumNotUseTapped
 {
@@ -956,6 +996,38 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     self.transitionManager.transitionTo = INITIAL;
     return (id)self.transitionManager;
 }
+
+#pragma mark ELCImagePickerControllerDelegate Methods
+
+- (void)elcImagePickerController:(ELCImagePickerController *)picker didFinishPickingMediaWithInfo:(NSArray *)info
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+    
+    NSMutableArray *images = [NSMutableArray arrayWithCapacity:[info count]];
+    for (NSDictionary *dict in info) {
+        if ([dict objectForKey:UIImagePickerControllerMediaType] == ALAssetTypePhoto){
+            if ([dict objectForKey:UIImagePickerControllerOriginalImage]){
+                UIImage* image=[dict objectForKey:UIImagePickerControllerOriginalImage];
+                [images addObject:image];
+                
+                UIImageView *imageview = [[UIImageView alloc] initWithImage:image];
+                [imageview setContentMode:UIViewContentModeScaleAspectFit];
+
+            } else {
+                NSLog(@"UIImagePickerControllerReferenceURL = %@", dict);
+            }
+        }
+    }
+    
+    self.chosenImages = images;
+
+}
+
+- (void)elcImagePickerControllerDidCancel:(ELCImagePickerController *)picker
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 
 #pragma mark - Getters/Setters
 
