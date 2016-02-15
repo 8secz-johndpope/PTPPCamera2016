@@ -1,0 +1,328 @@
+{
+    "version": "1",
+    "data": [
+             {
+             "sample_id":"1",
+             "sample_name": "天空之城",
+             "sample_thumbnail": "tt_sp01.jpg",
+             "sample_url": "http://camera.putao.com/time/time/template/?id=1",
+             "scenceElements": [
+                                {
+                                "background": "tt_spBg_iOS_01.jpg",
+                                "img_default": "tt_sp01_poto01.jpg",
+                                "photoElements": [
+                                                  {
+                                                  "left": -132,
+                                                  "top": 313,
+                                                  "background": "s1_bg.png",
+                                                  "foreground": "s1_top.png",
+                                                  "photo_area": [
+                                                                 {
+                                                                 "point_x": 199,
+                                                                 "point_y": 473
+                                                                 },
+                                                                 {
+                                                                 "point_x": 602,
+                                                                 "point_y": 438
+                                                                 },
+                                                                 {
+                                                                 "point_x": 622,
+                                                                 "point_y": 665
+                                                                 },
+                                                                 {
+                                                                 "point_x": 220,
+                                                                 "point_y": 699
+                                                                 }
+                                                                 ]
+                                                  }
+                                                  ]
+                                },
+                                {
+                                "background": "tt_spBg_iOS_02.jpg",
+                                "img_default": "tt_sp01_poto02.jpg",
+                                "photoElements": [
+                                                  {
+                                                  "left": -164,
+                                                  "top": 271,
+                                                  "background": "s2_bg.png",
+                                                  "foreground": "s2_top.png",
+                                                  "photo_area": [
+                                                                 {
+                                                                 "point_x": 368,
+                                                                 "point_y": 323
+                                                                 },
+                                                                 {
+                                                                 "point_x": 565,
+                                                                 "point_y": 385
+                                                                 },
+                                                                 {
+                                                                 "point_x": 482,
+                                                                 "point_y": 686
+                                                                 },
+                                                                 {
+                                                                 "point_x": 430,
+                                                                 "point_y": 718
+                                                                 },
+                                                                 {
+                                                                 "point_x": 267,
+                                                                 "point_y": 665
+                                                                 }
+                                                                 ]
+                                                  }
+                                                  ]
+                                },
+                                {
+                                "background": "tt_spBg_iOS_03.jpg",
+                                "img_default": "tt_sp01_poto03.jpg",
+                                "photoElements": [
+                                                  {
+                                                  "left": -118,
+                                                  "top": 272,
+                                                  "background": "s3_bg.png",
+                                                  "foreground": "s3_top.png",
+                                                  "photo_area": [
+                                                                 {
+                                                                 "point_x": 113,
+                                                                 "point_y": 382
+                                                                 },
+                                                                 {
+                                                                 "point_x": 495,
+                                                                 "point_y": 538
+                                                                 },
+                                                                 {
+                                                                 "point_x": 409,
+                                                                 "point_y": 750
+                                                                 },
+                                                                 {
+                                                                 "point_x": 24,
+                                                                 "point_y": 596
+                                                                 }
+                                                                 ]
+                                                  }
+                                                  ]
+                                },
+                                {
+                                "background": "tt_spBg_iOS_04.jpg",
+                                "img_default": "tt_sp01_poto04.jpg",
+                                "photoElements": [
+                                                  {
+                                                  "left": -118,
+                                                  "top": 272,
+                                                  "background": "s4_bg.png",
+                                                  "foreground": "s4_top.png",
+                                                  "photo_area": [
+                                                                 {
+                                                                 "point_x": 9,
+                                                                 "point_y": 474
+                                                                 },
+                                                                 {
+                                                                 "point_x": 237,
+                                                                 "point_y": 334
+                                                                 },
+                                                                 {
+                                                                 "point_x": 430,
+                                                                 "point_y": 655
+                                                                 },
+                                                                 {
+                                                                 "point_x": 296,
+                                                                 "point_y": 739
+                                                                 },
+                                                                 {
+                                                                 "point_x": 179,
+                                                                 "point_y": 745
+                                                                 }
+                                                                 ]
+                                                  }
+                                                  ]
+                                },
+                                {
+                                "background": "tt_spBg_iOS_05.jpg",
+                                "img_default": "tt_sp01_poto05.jpg",
+                                "photoElements": [
+                                                  {
+                                                  "left": -33,
+                                                  "top": 304,
+                                                  "background": "s5_bg.png",
+                                                  "foreground": "s5_top.png",
+                                                  "photo_area": [
+                                                                 {
+                                                                 "point_x": 243,
+                                                                 "point_y": 485
+                                                                 },
+                                                                 {
+                                                                 "point_x": 591,
+                                                                 "point_y": 423
+                                                                 },
+                                                                 {
+                                                                 "point_x": 627,
+                                                                 "point_y": 620
+                                                                 },
+                                                                 {
+                                                                 "point_x": 276,
+                                                                 "point_y": 680
+                                                                 }
+                                                                 ]
+                                                  }
+                                                  ]
+                                }
+                                ]
+             },
+             {
+             "sample_id":"2",
+             "sample_name": "花开时刻",
+             "sample_thumbnail": "sp04.jpg",
+             "sample_url": "http://camera.putao.com/time/time/template/?id=2",
+             "scenceElements": [
+                                {
+                                "img_default": "FM_cover_photo.jpg",
+                                "photoElements": [
+                                                  {
+                                                  "left": 0,
+                                                  "top": 0,
+                                                  "foreground": "FM_cover_frame.png",
+                                                  "photo_area": [
+                                                                 {
+                                                                 "point_x": 0,
+                                                                 "point_y": 281
+                                                                 },
+                                                                 {
+                                                                 "point_x": 640,
+                                                                 "point_y": 281
+                                                                 },
+                                                                 {
+                                                                 "point_x": 640,
+                                                                 "point_y": 880
+                                                                 },
+                                                                 {
+                                                                 "point_x": 0,
+                                                                 "point_y": 880
+                                                                 }
+                                                                 
+                                                                 ]
+                                                  }
+                                                  ]
+                                },
+                                {
+                                "background": "FM_s01_bg.jpg",
+                                "img_default": "FM_s01_photo.jpg",
+                                "photoElements": [
+                                                  {
+                                                  "left": 0,
+                                                  "top": 231,
+                                                  "foreground": "FM_s01_frame.png",
+                                                  "photo_area": [
+                                                                 {
+                                                                 "point_x": 254,
+                                                                 "point_y": 240
+                                                                 },
+                                                                 {
+                                                                 "point_x": 621,
+                                                                 "point_y": 386
+                                                                 },
+                                                                 {
+                                                                 "point_x": 383,
+                                                                 "point_y": 989
+                                                                 },
+                                                                 {
+                                                                 "point_x": 16,
+                                                                 "point_y": 844
+                                                                 }
+                                                                 ]
+                                                  }
+                                                  ]
+                                },
+                                {
+                                "background": "FM_s02_bg.jpg",
+                                "img_default": "FM_s02_photo.jpg",
+                                "photoElements": [
+                                                  {
+                                                  "left": 8,
+                                                  "top": 335,
+                                                  "foreground": "FM_s02_frame.png",
+                                                  "photo_area": [
+                                                                 {
+                                                                 "point_x": 206,
+                                                                 "point_y": 339
+                                                                 },
+                                                                 {
+                                                                 "point_x": 514,
+                                                                 "point_y": 384
+                                                                 },
+                                                                 {
+                                                                 "point_x": 629,
+                                                                 "point_y": 675
+                                                                 },
+                                                                 {
+                                                                 "point_x": 436,
+                                                                 "point_y": 919
+                                                                 },
+                                                                 {
+                                                                 "point_x": 127,
+                                                                 "point_y": 874
+                                                                 },
+                                                                 {
+                                                                 "point_x": 12,
+                                                                 "point_y": 583
+                                                                 }
+                                                                 ]
+                                                  }
+                                                  ]
+                                },
+                                {
+                                "background": "FM_s03_bg.jpg",
+                                "img_default": "FM_s03_photo.jpg",
+                                "photoElements": [
+                                                  {
+                                                  "left": 9,
+                                                  "top": 61,
+                                                  "foreground": "FM_s03_frame.png",
+                                                  "photo_area": [
+                                                                 {
+                                                                 "point_x": 17,
+                                                                 "point_y": 197
+                                                                 },
+                                                                 {
+                                                                 "point_x": 485,
+                                                                 "point_y": 71
+                                                                 },
+                                                                 {
+                                                                 "point_x": 611,
+                                                                 "point_y": 539
+                                                                 },
+                                                                 {
+                                                                 "point_x": 143,
+                                                                 "point_y": 663
+                                                                 }
+                                                                 ]
+                                                  }
+                                                  ]
+                                },
+                                {
+                                "background": "FM_s04_bg.jpg",
+                                "img_default": "FM_s04_photo.jpg",
+                                "photoElements": [
+                                                  {
+                                                  "left": -122,
+                                                  "top": -19,
+                                                  "foreground": "FM_s04_frame.png",
+                                                  "photo_area": [
+                                                                 {
+                                                                 "point_x": 429,
+                                                                 "point_y": -19
+                                                                 },
+                                                                 {
+                                                                 "point_x": 628,
+                                                                 "point_y": 731
+                                                                 },
+                                                                 {
+                                                                 "point_x": -122,
+                                                                 "point_y": 529
+                                                                 }
+                                                                 ]
+                                                  }
+                                                  ]
+                                }
+                                ]
+             }
+             ]
+}

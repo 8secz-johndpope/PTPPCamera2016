@@ -1,0 +1,22 @@
+//
+//  PrefixHeader.pch
+//  PTPPCamera
+//
+//  Created by CHEN KAIDI on 15/2/2016.
+//  Copyright © 2016 Putao. All rights reserved.
+//
+
+#ifndef PrefixHeader_pch
+#define PrefixHeader_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+#import "PTMacro.h"
+#import "UIColor+Help.h"
+#import "NSObject+Swizzle.h"
+#import "SOKit.h"
+#import "SVProgressHUD.h"
+#import "UIImageView+WebCache.h"
+#import "AFNetworking.h"
+#import "KKNavigationController.h"
+#endif /* PrefixHeader_pch */

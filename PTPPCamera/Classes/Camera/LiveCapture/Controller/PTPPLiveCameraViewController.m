@@ -1,0 +1,1202 @@
+//
+//  PTPPLiveCameraViewController.m
+//  PTPaiPaiCamera
+//
+//  Created by CHEN KAIDI on 7/1/2016.
+//  Copyright © 2016 putao. All rights reserved.
+//
+#import "PTVCTransitionLeftRightManager.h"
+
+#import "PTPPLiveVideoShareViewController.h"
+#import "PTPPNewHomeViewController.h"
+
+
+#import "PTPPLiveStickerPreviewViewController.h"
+#import "PTPPLiveCameraViewController.h"
+#import "PTPPCameraFilterScrollView.h"
+#import "PTPPLiveStickerScrollView.h"
+#import "PTPPCameraSettingPopupView.h"
+#import "PTPPLiveCameraTipsView.h"
+#import "DetectFace.h"
+#import "PTMacro.h"
+#import "AssetHelper.h"
+#import "PTUtilTool.h"
+#import "UIView+Additions.h"
+#import "NoiseFilter.h"
+#import "PTPPStickerXMLParser.h"
+#import "PTPPStickerAnimation.h"
+#import "NSObject+Swizzle.h"
+#import "SVProgressHUD.h"
+#import "SOKit.h"
+
+#define kFilterScrollHeight 130
+#define kFilterDataLength 10
+#define kStickerScale 2
+@interface PTPPLiveCameraViewController ()<DetectFaceDelegate,UIViewControllerTransitioningDelegate, NSXMLParserDelegate, PTPPNewHomeProtocol>
+@property (strong, nonatomic) DetectFace *detectFaceController;
+@property (nonatomic, strong) UIView *previewView;
+@property (nonatomic, strong) UIView *stickerView;
+@property (nonatomic, strong) UIImageView *eyesSticker;
+@property (nonatomic, strong) UIImageView *mouthSticker;
+@property (nonatomic, strong) UIImageView *bottomSticker;
+@property (nonatomic, strong) UIView *leftEye, *rightEye, *mouth;
+@property (nonatomic, strong) UIImageView *filterView;
+@property (nonatomic, assign) CGRect previousFaceRect;
+@property (nonatomic, assign) BOOL cameraCanUse;        //判断相机是否允许使用
+@property (nonatomic, assign) BOOL assetsLibraryCanUse ;//判断相册是否允许使用
+@property (nonatomic, strong) UIView *topControlView;
+@property (nonatomic, strong) UIView *bottomControlView;
+//Top controls
+@property (nonatomic, strong) UIButton *backButton;
+@property (nonatomic, strong) UIButton *flashOptionButton;
+@property (nonatomic, strong) UIButton *cropOptionButton;
+@property (nonatomic, strong) UIButton *timerOptionButton;
+@property (nonatomic, strong) UIButton *tapShootButton;
+@property (nonatomic, strong) UIButton *cameraPositionButton;
+@property (nonatomic, strong) PTPPCameraSettingPopupView *settingPopupView;
+@property (nonatomic, assign) NSInteger shootDelay;
+@property (nonatomic, assign) NSInteger delayCounter;
+@property (nonatomic, strong) NSTimer *cameraTimer;
+@property (nonatomic, strong) NSTimer *flashTimer;
+@property (nonatomic, assign) BOOL flashBlink;
+@property (nonatomic, strong) UILabel *timerLabel;
+//Bottom controls
+@property (nonatomic, strong) UIButton *cameraRollButton;
+@property (nonatomic, strong) UIButton *liveStickerButton;
+@property (nonatomic, strong) UIButton *shootButton;
+@property (nonatomic, strong) UIButton *filterButton;
+@property (nonatomic, strong) UIButton *jigsawButton;
+@property (nonatomic, strong) UIView *cropMaskTop;
+@property (nonatomic, strong) UIView *cropMaskBottom;
+@property (nonatomic, strong) PTPPCameraFilterScrollView *filterScrollView;
+@property (nonatomic, strong) PTPPLiveStickerScrollView *liveStickerScrollView;
+@property (nonatomic, strong) NSArray *filterSet;
+@property (nonatomic, strong) NSMutableDictionary *cameraSettings;
+
+@property (nonatomic, strong) PTPPLiveCameraTipsView *tipsView;
+@property (nonatomic, strong) PTVCTransitionLeftRightManager *transitionManager;
+
+@property (nonatomic, strong) NoiseFilter *leftEyeFilterX, *leftEyeFilterY;
+@property (nonatomic, strong) NoiseFilter *rightEyeFilterX, *rightEyeFilterY;
+@property (nonatomic, strong) NoiseFilter *mouthFilterX, *mouthFilterY;
+@property (nonatomic, strong) NoiseFilter *faceWidthFilter;
+@property (nonatomic, assign) NSInteger invalidDetectionTimeOut;
+@property (nonatomic, strong) PTPPStickerAnimation *mouthAnimation;
+@property (nonatomic, strong) PTPPStickerAnimation *eyeAnimation;
+@property (nonatomic, strong) PTPPStickerAnimation *bottomAnimation;
+@property (nonatomic, strong) NSString *selectedARSticker;
+@end
+
+static NSString *PTPPCameraSettingFlash = @"PTPPCameraSettingFlash";
+static NSString *PTPPCameraSettingCrop = @"PTPPCameraSettingCrop";
+static NSString *PTPPCameraSettingTimer = @"PTPPCameraSettingTimer";
+static NSString *PTPPCameraSettingTapShoot = @"PTPPCameraSettingTapShoot";
+static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosition";
+
+@implementation PTPPLiveCameraViewController
+
+#pragma mark - Life Cycles
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self disableAdjustsScrollView];
+    self.transitionManager = [[PTVCTransitionLeftRightManager alloc]init];
+    [self.view addSubview:self.previewView];
+    [self.view addSubview:self.filterView];
+    [self.view addSubview:self.stickerView];
+    [self.view addSubview:self.cropMaskTop];
+    [self.view addSubview:self.cropMaskBottom];
+    [self.view addSubview:self.topControlView];
+    [self.view addSubview:self.bottomControlView];
+
+    //Start Live camera face detection
+    self.leftEyeFilterX = [[NoiseFilter alloc] initWithDataLength:kFilterDataLength];
+    self.leftEyeFilterY = [[NoiseFilter alloc] initWithDataLength:kFilterDataLength];
+    self.rightEyeFilterX = [[NoiseFilter alloc] initWithDataLength:kFilterDataLength];
+    self.rightEyeFilterY = [[NoiseFilter alloc] initWithDataLength:kFilterDataLength];
+    self.mouthFilterX = [[NoiseFilter alloc] initWithDataLength:kFilterDataLength];
+    self.mouthFilterY = [[NoiseFilter alloc] initWithDataLength:kFilterDataLength];
+    self.faceWidthFilter = [[NoiseFilter alloc] initWithDataLength:kFilterDataLength];
+    [self setupCameraControlPanel];
+    self.cameraCanUse = [self checkCameraCanUse];
+    self.assetsLibraryCanUse = [PTUtilTool checkALAssetsLibraryCanUse];
+
+    self.stickerView.hidden = YES;
+    UITapGestureRecognizer *singleFingerTap =
+    [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap)];
+    [self.previewView addGestureRecognizer:singleFingerTap];
+    BOOL hintShowed = [[NSUserDefaults standardUserDefaults] boolForKey:@"hintShowed"];
+    if (!hintShowed) {
+        [self showTipsView];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"hintShowed"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    
+    //[self loadLiveStickerWithFileName:@"demo"];
+    //[self loadLiveStickerFromXMLFile:@"axfl"];
+    __weak typeof(self) weakSelf = self;
+    
+    self.detectFaceController.finishShoot = ^(UIImage *image){
+        if (weakSelf.detectFaceController.cameraPosition == UIImagePickerControllerCameraDeviceFront) {
+            image = [[UIImage alloc] initWithCGImage: image.CGImage
+                                               scale: 1.0
+                                         orientation: UIImageOrientationUpMirrored];
+        }
+        
+        if (weakSelf.stickerView.alpha == 0 || (self.eyesSticker == nil && self.mouthSticker == nil)) {
+            CGFloat widthRatio = image.size.width/(Screenwidth*[UIScreen mainScreen].scale);
+            CGFloat heightRatio = image.size.height/(Screenheight*[UIScreen mainScreen].scale);
+            //No AR stickers on screen, go to static photo edit process.
+            image = [self croppIngimageByImageName:image toRect:CGRectMake(0, self.cropMaskTop.bottom*heightRatio, Screenwidth*widthRatio, self.cropMaskBottom.top*heightRatio-self.cropMaskTop.bottom*heightRatio)];
+            //PTPaiPaiPhotoEditViewController *editPhotoVC = [[PTPaiPaiPhotoEditViewController alloc] initWithEditableImages:image];
+            if (weakSelf.navigationController) {
+                //[weakSelf.navigationController pushViewController:editPhotoVC animated:YES];
+            }
+        }else{
+            //AR stickers on screen, go to preview video
+            PTPPLiveStickerPreviewViewController *liveStickerVC = [[PTPPLiveStickerPreviewViewController alloc] initWithBasePhoto:image mouthSticker:weakSelf.mouthSticker eyeSticker:weakSelf.eyesSticker bottomSticker:weakSelf.bottomSticker];
+            [liveStickerVC setCropOption:[[weakSelf.cameraSettings objectForKey:PTPPCameraSettingCrop] integerValue]];
+            [weakSelf.navigationController pushViewController:liveStickerVC animated:YES];
+        }
+        
+    };
+    [self.detectFaceController startDetection];
+}
+
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES];
+    
+    if (!self.detectFaceController.session.isRunning) {
+        [self.detectFaceController startRunning];
+    }
+    
+    [self updateTopControlOptions];
+    if (self.assetsLibraryCanUse) {
+        [self updateAlbumWithLatestPhoto];
+    }
+}
+
+-(void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    //    [self.detectFaceController stopDetection];
+    //    self.detectFaceController = nil;
+    [self.detectFaceController stopRunning];
+    self.filterView.hidden = YES;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark Touch Event
+
+-(void)resumeFaceDetector{
+    if (!self.detectFaceController.session.isRunning) {
+        [self.detectFaceController startRunning];
+    }
+}
+
+-(void)showTipsView{
+    [self.view addSubview:self.tipsView];
+    CGPoint stickerOrigin = [self.view convertPoint:self.liveStickerButton.origin fromView:self.bottomControlView];
+    [self.tipsView setAttributeWithBackButtonFrame:self.backButton.frame liveStickerButtonFrame:CGRectMake(stickerOrigin.x, stickerOrigin.y, self.liveStickerButton.width, self.liveStickerButton.height)];
+}
+
+-(void)handleSingleTap{
+    NSLog(@"Tap Shoot");
+    BOOL tapShoot = [[self.cameraSettings objectForKey:PTPPCameraSettingTapShoot] boolValue];
+    if (self.settingPopupView) {
+        [self dismissSettingPopup];
+        if (tapShoot) {
+            return;
+        }
+    }
+    if (self.liveStickerScrollView.finishBlock) {
+        self.liveStickerScrollView.finishBlock();
+        if (tapShoot) {
+            return;
+        }
+    }
+        if (tapShoot) {
+        [self cameraShoot];
+    }
+}
+
+-(void)toggleCameraSetting:(UIButton *)sender{
+    if (self.settingPopupView && self.settingPopupView.tag == sender.tag) {
+        [self dismissSettingPopup];
+        return;
+    }
+    if (self.settingPopupView.tag == 0 || !self.settingPopupView) {
+        self.settingPopupView = [[PTPPCameraSettingPopupView alloc] initWithFrame:CGRectMake(0, sender.bottom+15, sender.width-20, 0)];
+        self.settingPopupView.layer.cornerRadius = 4;
+        self.settingPopupView.layer.masksToBounds = YES;
+        self.settingPopupView.layer.borderColor = [[UIColor whiteColor] colorWithAlphaComponent:0.6].CGColor;
+        self.settingPopupView.layer.borderWidth = 1;
+    }
+    self.settingPopupView.tag = sender.tag;
+    self.settingPopupView.center = CGPointMake(sender.centerX, self.settingPopupView.centerY);
+    __weak typeof(self) weakSelf = self;
+    self.settingPopupView.finishBlock = ^(PTPPCameraSettingPopupView * popupView, NSInteger selectedID){
+        switch (popupView.tag) {
+            case PTCameraSettingFlash:
+                [weakSelf.cameraSettings setObject:[NSNumber numberWithInteger:selectedID] forKey:PTPPCameraSettingFlash];
+                if (selectedID == 0) {
+                    [SOAutoHideMessageView showMessage:@"自动闪光" inView:weakSelf.view];
+                }else if (selectedID == 1){
+                    [SOAutoHideMessageView showMessage:@"闪光灯关闭" inView:weakSelf.view];
+                }else if (selectedID == 2){
+                    [SOAutoHideMessageView showMessage:@"闪光灯开启" inView:weakSelf.view];
+                }else if (selectedID == 3){
+                    [SOAutoHideMessageView showMessage:@"闪光灯常亮" inView:weakSelf.view];
+                }
+                break;
+            case PTCameraSettingCrop:
+                [weakSelf.cameraSettings setObject:[NSNumber numberWithInteger:selectedID] forKey:PTPPCameraSettingCrop];
+                break;
+            case PTCameraSettingTimer:
+                [weakSelf.cameraSettings setObject:[NSNumber numberWithInteger:selectedID] forKey:PTPPCameraSettingTimer];
+                 if (selectedID == 0){
+                    [SOAutoHideMessageView showMessage:@"计时器关闭" inView:weakSelf.view];
+                 }else if (selectedID == 1){
+                     [SOAutoHideMessageView showMessage:@"3秒计时器" inView:weakSelf.view];
+                 }else if (selectedID == 2){
+                     [SOAutoHideMessageView showMessage:@"5秒计时器" inView:weakSelf.view];
+                 }else if (selectedID == 3){
+                     [SOAutoHideMessageView showMessage:@"10秒计时器" inView:weakSelf.view];
+                 }
+                break;
+            default:
+                break;
+        }
+        [weakSelf updateTopControlOptions];
+        weakSelf.settingPopupView.tag = 0;
+        [weakSelf dismissSettingPopup];
+    };
+    NSArray *buttonImages = nil;
+    switch (self.settingPopupView.tag) {
+        case PTCameraSettingFlash:
+            buttonImages = @[[UIImage imageNamed:@"icon_capture_20_01"],[UIImage imageNamed:@"icon_capture_20_02"],[UIImage imageNamed:@"icon_capture_20_03"],[UIImage imageNamed:@"icon_capture_20_04"]];
+            break;
+        case PTCameraSettingCrop:
+            buttonImages = @[[UIImage imageNamed:@"icon_capture_20_05"],[UIImage imageNamed:@"icon_capture_20_06"],[UIImage imageNamed:@"icon_capture_20_07"]];
+            break;
+        case PTCameraSettingTimer:
+            buttonImages = @[[UIImage imageNamed:@"icon_capture_20_08"],[UIImage imageNamed:@"icon_capture_20_09"],[UIImage imageNamed:@"icon_capture_20_10"],[UIImage imageNamed:@"icon_capture_20_11"]];
+            break;
+        default:
+            break;
+    }
+    [self.settingPopupView setAttributeWithButtonImages:buttonImages];
+    [self.view addSubview:self.settingPopupView];
+    self.settingPopupView.alpha = 0.0;
+    self.settingPopupView.center = CGPointMake(self.settingPopupView.centerX, self.settingPopupView.centerY-10);
+    [UIView animateWithDuration:0.2 animations:^{
+        weakSelf.settingPopupView.alpha = 1.0;
+        weakSelf.settingPopupView.center = CGPointMake(self.settingPopupView.centerX, self.settingPopupView.centerY+10);
+    }];
+}
+
+-(void)dismissSettingPopup{
+    __weak typeof(self) weakSelf = self;
+    [UIView animateWithDuration:0.2 animations:^{
+        weakSelf.settingPopupView.center = CGPointMake(weakSelf.settingPopupView.centerX, weakSelf.settingPopupView.centerY-10);
+        weakSelf.settingPopupView.alpha = 0.0;
+    } completion:^(BOOL finished) {
+        [weakSelf.settingPopupView removeFromSuperview];
+        weakSelf.settingPopupView = nil;
+    }];
+}
+
+-(void)toggleTapShoot{
+    BOOL tapShoot = [[self.cameraSettings objectForKey:PTPPCameraSettingTapShoot] boolValue];
+    tapShoot = !tapShoot;
+    if (tapShoot) {
+        [SOAutoHideMessageView showMessage:@"点屏拍摄开启" inView:self.view];
+    }else{
+        [SOAutoHideMessageView showMessage:@"点屏拍摄关闭" inView:self.view];
+    }
+    [self.cameraSettings setObject:[NSNumber numberWithBool:tapShoot] forKey:PTPPCameraSettingTapShoot];
+    [self updateTopControlOptions];
+}
+
+-(void)toggleChangeCameraPosition{
+    NSInteger cameraPosition = [[self.cameraSettings objectForKey:PTPPCameraSettingCameraPosition] integerValue];
+    
+    if (cameraPosition == 0) {
+        //后置摄像头
+        self.detectFaceController.cameraPosition =  UIImagePickerControllerCameraDeviceRear;
+        [self.cameraSettings setObject:[NSNumber numberWithInteger:1] forKey:PTPPCameraSettingCameraPosition];
+        [self.detectFaceController swapCameraPosition:UIImagePickerControllerCameraDeviceRear];
+    }else{
+        //前置摄像头
+        self.detectFaceController.cameraPosition =  UIImagePickerControllerCameraDeviceFront;
+        [self.cameraSettings setObject:[NSNumber numberWithInteger:0] forKey:PTPPCameraSettingCameraPosition];
+        [self.detectFaceController swapCameraPosition:UIImagePickerControllerCameraDeviceFront];
+    }
+    
+    [self updateTopControlOptions];
+}
+
+-(void)cameraShoot{
+    if (self.shootDelay==0 && !self.cameraTimer) {
+        [self.detectFaceController cameraShoot];
+        return;
+    }
+    
+    self.delayCounter = self.shootDelay;
+    if (!self.flashTimer) {
+        self.flashTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(LEDFlashBlink) userInfo:nil repeats:YES];
+        self.flashBlink = YES;
+        [self.flashTimer fire];
+    }
+    if (!self.cameraTimer) {
+        [_shootButton setImage:[UIImage imageNamed:@"btn_capture_dis"] forState:UIControlStateNormal];
+        [self.view addSubview:self.timerLabel];
+        self.timerLabel.frame = CGRectMake(0, self.cropMaskTop.bottom, Screenwidth, Screenheight-self.cropMaskBottom.height-self.cropMaskTop.height);
+        self.timerLabel.text = [NSString stringWithFormat:@"%ld",(long)self.delayCounter];
+        self.cameraTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(cameraShootDelayCountdown) userInfo:nil repeats:YES];
+        [self.cameraTimer fire];
+        
+    }else{
+        NSLog(@"Timer cancelled");
+        [self.cameraTimer invalidate];
+        self.cameraTimer = nil;
+        [self.flashTimer invalidate];
+        self.flashTimer = nil;
+        [self.timerLabel removeFromSuperview];
+        [_shootButton setImage:[UIImage imageNamed:@"btn_capture_nor"] forState:UIControlStateNormal];
+        [self updateTopControlOptions];
+    }
+}
+
+-(void)cameraShootDelayCountdown{
+    if (self.delayCounter == 0) {
+        [self.cameraTimer invalidate];
+        self.cameraTimer = nil;
+        [self.flashTimer invalidate];
+        self.flashTimer = nil;
+        [_shootButton setImage:[UIImage imageNamed:@"btn_capture_nor"] forState:UIControlStateNormal];
+        [self updateTopControlOptions];
+        [self.detectFaceController cameraShoot];
+        [self.timerLabel removeFromSuperview];
+    }else if (self.delayCounter == 1){
+        [self.detectFaceController blinkTorch:NO];
+        [self.flashTimer invalidate];
+        self.flashTimer = nil;
+    }
+    NSLog(@"Time:%ld",(long)self.delayCounter);
+    self.timerLabel.text = [NSString stringWithFormat:@"%ld",(long)self.delayCounter];
+    self.delayCounter--;
+    self.timerLabel.alpha = 1.0;
+    [UIView animateWithDuration:1.0 animations:^{
+        self.timerLabel.alpha = 0.0;
+    }];
+}
+
+-(void)LEDFlashBlink{
+    [self.detectFaceController blinkTorch:self.flashBlink];
+    self.flashBlink = !self.flashBlink;
+}
+
+-(void)toggleFilterOption{
+    __weak typeof(self) weakSelf = self;
+    [self.filterScrollView setAttributeWithFilterSet:self.filterSet];
+    self.filterScrollView.activeFilterID = self.detectFaceController.activeFilterID;
+    self.filterScrollView.filterSelected = ^(NSInteger filterID){
+        weakSelf.detectFaceController.activeFilterID = filterID;
+        
+        if (filterID != 0) {
+            weakSelf.filterView.hidden = NO;
+        }else{
+            weakSelf.filterView.hidden = YES;
+        }
+    };
+    self.filterScrollView.finishBlock = ^{
+        [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
+              initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseIn  animations:^(){
+                  weakSelf.filterScrollView.center = CGPointMake(weakSelf.filterScrollView.centerX, Screenheight+weakSelf.filterScrollView.height/2);
+                  weakSelf.bottomControlView.frame = CGRectMake(0, Screenheight-kBottomControlHeight, weakSelf.bottomControlView.width, weakSelf.bottomControlView.height);
+              } completion:^(BOOL finished) {
+                  [weakSelf.filterScrollView removeFromSuperview];
+                  weakSelf.filterScrollView = nil;
+              }];
+    };
+    
+    [self.view addSubview:self.filterScrollView];
+    self.filterScrollView.frame = CGRectMake(0, Screenheight, self.filterScrollView.width, self.filterScrollView.height);
+    [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
+          initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseIn  animations:^(){
+              weakSelf.filterScrollView.frame = CGRectMake(0, Screenheight-kFilterScrollHeight, weakSelf.filterScrollView.width, weakSelf.filterScrollView.height);
+              weakSelf.bottomControlView.frame = CGRectMake(0, Screenheight, weakSelf.bottomControlView.width, weakSelf.bottomControlView.height);
+          } completion:^(BOOL finished) {}];
+    
+}
+
+-(void)toggleLiveStickerOption{
+    __weak typeof(self) weakSelf = self;
+    self.liveStickerScrollView.stickerSelected = ^(NSString *stickerName, BOOL isFromBundle){
+        weakSelf.eyeAnimation = nil;
+        weakSelf.mouthAnimation = nil;
+        weakSelf.bottomAnimation = nil;
+        [weakSelf.eyesSticker removeFromSuperview];
+        [weakSelf.mouthSticker removeFromSuperview];
+        [weakSelf.bottomSticker removeFromSuperview];
+        weakSelf.eyesSticker = nil;
+        weakSelf.mouthSticker = nil;
+        weakSelf.bottomSticker = nil;
+        if (stickerName != nil) {
+            weakSelf.selectedARSticker = stickerName;
+            if(isFromBundle){
+                [weakSelf loadLiveStickerFromXMLFile:stickerName];
+            }else{
+#warning load from directory
+            }
+            [SOAutoHideMessageView showMessage:@"请将正脸置于取景器内" inView:weakSelf.view];
+        }
+    };
+    self.liveStickerScrollView.selectedStickerName = self.selectedARSticker;
+    self.liveStickerScrollView.finishBlock = ^{
+        [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
+              initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseIn  animations:^(){
+                  weakSelf.liveStickerScrollView.center = CGPointMake(weakSelf.liveStickerScrollView.centerX, Screenheight+weakSelf.liveStickerScrollView.height/2);
+                  weakSelf.bottomControlView.frame = CGRectMake(0, Screenheight-kBottomControlHeight, weakSelf.bottomControlView.width, weakSelf.bottomControlView.height);
+              } completion:^(BOOL finished) {
+                  [weakSelf.liveStickerScrollView removeFromSuperview];
+                  weakSelf.liveStickerScrollView = nil;
+              }];
+
+    };
+    [self.view addSubview:self.liveStickerScrollView];
+    self.liveStickerScrollView.frame = CGRectMake(0, Screenheight, self.liveStickerScrollView.width, self.liveStickerScrollView.height);
+    [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
+          initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseIn  animations:^(){
+              weakSelf.liveStickerScrollView.frame = CGRectMake(0, Screenheight-kFilterScrollHeight, weakSelf.liveStickerScrollView.width, weakSelf.liveStickerScrollView.height);
+              weakSelf.bottomControlView.frame = CGRectMake(0, Screenheight, weakSelf.bottomControlView.width, weakSelf.bottomControlView.height);
+          } completion:^(BOOL finished) {}];
+}
+
+-(void)toggleJigsawTemplate{
+//    PTPaiPaiJigsawTemplateViewController *jigsawVC = [[PTPaiPaiJigsawTemplateViewController alloc] init];
+//    [self.navigationController pushViewController:jigsawVC animated:YES];
+}
+
+#pragma mark Private methods
+//Read Sticker files from local directory
+-(BOOL)loadLiveStickerWithFileName:(NSString *)fileName{
+    NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
+    NSString *xmlFilePath = nil;
+    NSString *downloadFolder = nil;
+    if (fileName) {
+        downloadFolder = [documentsPath stringByAppendingPathComponent:[NSString stringWithFormat:@"ARStickers/%@",fileName]];
+        if (!downloadFolder){
+            NSLog(@"Sticker not existed");
+            return NO;
+        }
+        NSArray* dirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:downloadFolder
+                                                                            error:NULL];
+        [dirs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            NSString *filename = (NSString *)obj;
+            NSString *extension = [[filename pathExtension] lowercaseString];
+            NSLog(@"%@.%@",fileName,extension);
+        }];
+#warning xml filename will be changed in the future!!!
+        xmlFilePath = [NSString stringWithFormat:@"%@/sample.xml",downloadFolder];
+        
+    }else{
+        NSLog(@"Sticker not existed");
+        return NO;
+    }
+    
+    NSDictionary *resultDict = [PTPPStickerXMLParser dictionaryFromXMLFilePath:xmlFilePath];
+    if (!resultDict) {
+        NSLog(@"Sticker not existed");
+        return NO;
+    }
+    [self createStickerAnimationFromDictionarySettings:resultDict downloadFolder:downloadFolder];
+    return YES;
+}
+
+//Read Sticker files directly from NSBundle
+-(BOOL)loadLiveStickerFromXMLFile:(NSString *)xmlFileName{
+    NSString *xmlFilePath = [[NSBundle mainBundle] pathForResource:xmlFileName ofType:@"xml"];
+    NSDictionary *resultDict = [PTPPStickerXMLParser dictionaryFromXMLFilePath:xmlFilePath];
+    if (!resultDict) {
+        NSLog(@"Sticker not existed");
+        return NO;
+    }
+    [self createStickerAnimationFromDictionarySettings:resultDict downloadFolder:nil];
+    return YES;
+}
+
+-(void)createStickerAnimationFromDictionarySettings:(NSDictionary *)resultDict downloadFolder:(NSString *)downloadFolder{
+
+    for(NSString *featureKey in [[resultDict safeObjectForKey:@"animation"] allKeys]){
+        if ([featureKey isEqualToString:@"mouth"]) {
+            self.mouthAnimation = [PTPPStickerAnimation animationWithDictionarySettings:[[resultDict objectForKey:@"animation"] objectForKey:featureKey] feature:featureKey filePath:downloadFolder];
+        }else if ([featureKey isEqualToString:@"eye"]){
+            self.eyeAnimation = [PTPPStickerAnimation animationWithDictionarySettings:[[resultDict objectForKey:@"animation"] objectForKey:featureKey] feature:featureKey filePath:downloadFolder];
+        }else if([featureKey isEqualToString:@"bottom"]){
+            self.bottomAnimation = [PTPPStickerAnimation animationWithDictionarySettings:[[resultDict objectForKey:@"animation"] objectForKey:featureKey] feature:featureKey filePath:downloadFolder];
+        }
+    }
+
+}
+
+-(void)setupCameraControlPanel{
+    [self.topControlView addSubview:self.backButton];
+    [self.topControlView addSubview:self.flashOptionButton];
+    [self.topControlView addSubview:self.cropOptionButton];
+    [self.topControlView addSubview:self.timerOptionButton];
+    [self.topControlView addSubview:self.tapShootButton];
+    [self.topControlView addSubview:self.cameraPositionButton];
+    [self.bottomControlView addSubview:self.cameraRollButton];
+    [self.bottomControlView addSubview:self.liveStickerButton];
+    [self.bottomControlView addSubview:self.shootButton];
+    [self.bottomControlView addSubview:self.filterButton];
+    [self.bottomControlView addSubview:self.jigsawButton];
+    [self.cameraSettings setObject:[NSNumber numberWithInteger:0] forKey:PTPPCameraSettingFlash];
+    [self.cameraSettings setObject:[NSNumber numberWithInteger:0] forKey:PTPPCameraSettingCrop];
+    [self.cameraSettings setObject:[NSNumber numberWithInteger:0] forKey:PTPPCameraSettingTimer];
+    [self.cameraSettings setObject:[NSNumber numberWithBool:NO] forKey:PTPPCameraSettingTapShoot];
+    [self.cameraSettings setObject:[NSNumber numberWithInteger:0] forKey:PTPPCameraSettingCameraPosition];
+    [self updateTopControlOptions];
+}
+
+-(void)updateTopControlOptions{
+    NSInteger cameraPosition = [[self.cameraSettings objectForKey:PTPPCameraSettingCameraPosition] integerValue];
+    NSInteger flashOption = [[self.cameraSettings objectForKey:PTPPCameraSettingFlash] integerValue];
+    NSInteger cropOption = [[self.cameraSettings objectForKey:PTPPCameraSettingCrop] integerValue];
+    NSInteger timerOption = [[self.cameraSettings objectForKey:PTPPCameraSettingTimer] integerValue];
+    BOOL tapShoot = [[self.cameraSettings objectForKey:PTPPCameraSettingTapShoot] boolValue];
+    
+    CGFloat cropMaskTopHeight = 0.0f;
+    CGFloat cropMaskBottomHeight = 0.0f;
+    
+    if (cameraPosition == 1) {
+        //后置摄像头
+        self.flashOptionButton.enabled = YES;
+        self.flashOptionButton.alpha = 1.0;
+    }else{
+        //前置摄像头
+        self.flashOptionButton.enabled = NO;
+        self.flashOptionButton.alpha = 0.5;
+    }
+
+    switch (flashOption) {
+        case 0:
+            [self.flashOptionButton setImage:[UIImage imageNamed:@"icon_capture_20_01"] forState:UIControlStateNormal];
+            break;
+        case 1:
+            [self.flashOptionButton setImage:[UIImage imageNamed:@"icon_capture_20_02"] forState:UIControlStateNormal];
+            break;
+        case 2:
+            [self.flashOptionButton setImage:[UIImage imageNamed:@"icon_capture_20_03"] forState:UIControlStateNormal];
+            break;
+        case 3:
+            [self.flashOptionButton setImage:[UIImage imageNamed:@"icon_capture_20_04"] forState:UIControlStateNormal];
+            break;
+        default:
+            break;
+    }
+    [self.detectFaceController turnTorchOn:flashOption];
+    switch (cropOption) {
+        case 0:
+            [self.cropOptionButton setImage:[UIImage imageNamed:@"icon_capture_20_05"] forState:UIControlStateNormal];
+            cropMaskTopHeight = kTopControlHeight;
+            cropMaskBottomHeight = kBottomControlHeight;
+            break;
+        case 1:
+            [self.cropOptionButton setImage:[UIImage imageNamed:@"icon_capture_20_06"] forState:UIControlStateNormal];
+            cropMaskTopHeight = kTopControlHeight*2;
+            cropMaskBottomHeight = Screenheight - cropMaskTopHeight-Screenwidth;
+            break;
+        case 2:
+            [self.cropOptionButton setImage:[UIImage imageNamed:@"icon_capture_20_07"] forState:UIControlStateNormal];
+            cropMaskTopHeight = 0.0f;
+            cropMaskBottomHeight = 0.0f;
+            break;
+        default:
+            break;
+    }
+    switch (timerOption) {
+        case 0:
+            [self.timerOptionButton setImage:[UIImage imageNamed:@"icon_capture_20_08"] forState:UIControlStateNormal];
+            self.shootDelay = 0;
+            break;
+        case 1:
+            [self.timerOptionButton setImage:[UIImage imageNamed:@"icon_capture_20_09"] forState:UIControlStateNormal];
+            self.shootDelay = 3;
+            break;
+        case 2:
+            [self.timerOptionButton setImage:[UIImage imageNamed:@"icon_capture_20_10"] forState:UIControlStateNormal];
+            self.shootDelay = 5;
+            break;
+        case 3:
+            [self.timerOptionButton setImage:[UIImage imageNamed:@"icon_capture_20_11"] forState:UIControlStateNormal];
+            self.shootDelay = 10;
+            break;
+        default:
+            break;
+    }
+    if (tapShoot) {
+        [self.tapShootButton setImage:[UIImage imageNamed:@"icon_capture_20_13"] forState:UIControlStateNormal];
+    }else{
+        [self.tapShootButton setImage:[UIImage imageNamed:@"icon_capture_20_12"] forState:UIControlStateNormal];
+    }
+    [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
+          initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseIn  animations:^(){
+              self.cropMaskTop.frame = CGRectMake(0, 0, Screenwidth, cropMaskTopHeight);
+              self.cropMaskBottom.frame = CGRectMake(0, Screenheight-cropMaskBottomHeight, Screenwidth, cropMaskBottomHeight);
+          } completion:^(BOOL finished) {
+              
+          }];
+    
+}
+
+-(void)goBack{
+    //[self.navigationController popViewControllerAnimated:YES];
+    [self.detectFaceController stopRunning];
+    PTPPNewHomeViewController *homeVC = [[PTPPNewHomeViewController alloc] init];
+    homeVC.delegate = self;
+    UINavigationController *navi = [[UINavigationController alloc] initWithRootViewController:homeVC];
+    navi.transitioningDelegate = self;
+    navi.modalPresentationStyle = UIModalPresentationCustom;
+    dispatch_async(dispatch_get_main_queue(), ^ {
+        [self presentViewController:navi animated:YES completion:^{
+            
+        }];
+    });
+}
+
+-(BOOL )checkCameraCanUse{
+    BOOL flag = NO;
+    //Capture 捕捉器,Video 视频
+    AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    switch (status) {
+        case AVAuthorizationStatusAuthorized://批准
+            flag=YES;
+            break;
+        case AVAuthorizationStatusRestricted: //Restricted 受限制
+        case AVAuthorizationStatusDenied://拒绝
+            flag=NO;
+            break;
+        case AVAuthorizationStatusNotDetermined: //不确定
+            flag=YES;
+            break;
+    }
+    if (!flag) {
+        NSLog(@"设备不支持或禁用拍照功能,请按照提示打开相机");
+    }
+    return flag;
+}
+
+-(void) updateAlbumWithLatestPhoto {
+    __block UIImage *image=nil;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        ASSETHELPER.bReverse = YES;
+        [ASSETHELPER getGroupList:^(NSArray *assetsGroup) {
+            CGImageRef posterImage      = ((ALAssetsGroup*)assetsGroup[0]).posterImage;
+            size_t height               = CGImageGetHeight(posterImage);
+            float scale                 = height / 120;
+            
+            image  = [UIImage imageWithCGImage:posterImage scale:scale orientation:UIImageOrientationUp];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                /* 在主线程里面显示图片*/
+                if (image != nil){
+                    [self.cameraRollButton setImage:image forState:UIControlStateNormal];
+                } else {
+                    //NSLog(@"从相册中取最后一张图片失败. Nothing to display.");
+                }
+            });
+        }];
+    });
+}
+
+- (void)albumTapped
+{
+    if (!_assetsLibraryCanUse) {
+        [self albumNotUseTapped];
+        return;
+    }
+    //PTPaiPaiAlbumViewController *cont = [[PTPaiPaiAlbumViewController alloc] initWithFlag:NO];
+    
+    if (self.navigationController) {
+        //[self.navigationController pushViewController:cont animated:YES];
+    }
+}
+
+-(void)albumNotUseTapped
+{
+//    PTPaiPaiALAuthorizationStatusDeniedViewController *deniedVC = [[PTPaiPaiALAuthorizationStatusDeniedViewController alloc]init];
+//    if (self.navigationController) {
+//        [self.navigationController pushViewController:deniedVC animated:YES];
+//    }
+}
+
+- (UIImage *)croppIngimageByImageName:(UIImage *)imageToCrop toRect:(CGRect)rect
+{
+    CGImageRef imageRef = CGImageCreateWithImageInRect([imageToCrop CGImage], CGRectMake(rect.origin.x*[UIScreen mainScreen].scale, rect.origin.y*[UIScreen mainScreen].scale, rect.size.width*[UIScreen mainScreen].scale, rect.size.height*[UIScreen mainScreen].scale));
+    UIImage *cropped = [UIImage imageWithCGImage:imageRef scale:imageToCrop.scale orientation:imageToCrop.imageOrientation];
+    CGImageRelease(imageRef);
+    
+    return cropped;
+}
+
+#pragma mark DetectFaceDelegate
+
+- (void)detectedFaceController:(DetectFace *)controller features:(NSArray *)featuresArray forVideoBox:(CGRect)clap withPreviewBox:(CGRect)previewBox processedImage:(UIImage *)processedImage
+{
+    
+    UIImage * landscapeImage = processedImage;
+    if (self.detectFaceController.cameraPosition == UIImagePickerControllerCameraDeviceFront) {
+        self.filterView.image = [[UIImage alloc] initWithCGImage: landscapeImage.CGImage
+                                                           scale: 1.0
+                                                     orientation: UIImageOrientationUpMirrored];
+    }else{
+        self.filterView.image = [[UIImage alloc] initWithCGImage: landscapeImage.CGImage
+                                                           scale: 1.0
+                                                     orientation: landscapeImage.imageOrientation];
+    }
+    
+    
+    if (!self.leftEye) {
+        self.leftEye = [[UIView alloc] init];
+        //[self.view addSubview:self.leftEye];
+    }
+    if (!self.rightEye) {
+        self.rightEye = [[UIView alloc] init];
+        //[self.view addSubview:self.rightEye];
+    }
+    if (!self.mouth) {
+        self.mouth = [[UIView alloc] init];
+        [self.stickerView addSubview:self.mouth];
+    }
+    
+//    self.eyesSticker.hidden = NO;
+//    self.mouthSticker.hidden = NO;
+    self.stickerView.hidden = NO;
+    if (featuresArray.count == 0) {
+        if (self.invalidDetectionTimeOut >= 15) {
+            [UIView animateWithDuration:0.3 animations:^{
+//                self.eyesSticker.alpha = 0.0;
+//                self.mouthSticker.alpha = 0.0;
+                self.stickerView.alpha = 0.0;
+                self.bottomSticker.alpha = 0.0;
+            } completion:^(BOOL finished) {
+                
+//                self.eyesSticker.hidden = YES;
+//                self.mouthSticker.hidden = YES;
+            }];
+            
+        }else{
+            self.invalidDetectionTimeOut++;
+        }
+        return;
+    }else{
+        self.invalidDetectionTimeOut = 0;
+    }
+    
+    [UIView animateWithDuration:0.3 animations:^{
+//        self.eyesSticker.alpha = 1.0;
+//        self.mouthSticker.alpha = 1.0;
+        self.stickerView.alpha = 1.0;
+        self.bottomSticker.alpha = 1.0;
+    } completion:^(BOOL finished) {
+        
+    }];
+    for (CIFaceFeature *ff in featuresArray) {
+        
+        CGRect faceRect = [ff bounds];
+        
+        faceRect = [DetectFace convertFrame:faceRect previewBox:previewBox forVideoBox:clap isMirrored:YES];
+        CGFloat faceWidth = faceRect.size.width;
+        float newFaceWidth = [self.faceWidthFilter noiseFilterWithData:faceWidth];
+        faceWidth = newFaceWidth;
+
+
+        float newCenterX;
+        float newCenterY;
+
+//        self.eyesSticker.hidden = NO;
+//        self.mouthSticker.hidden = NO;
+        self.stickerView.hidden = NO;
+        if(ff.hasLeftEyePosition)
+        {
+            CGRect leftEyeFrame = CGRectMake(ff.leftEyePosition.x-faceWidth*0.15,  ff.leftEyePosition.y-faceWidth*0.15, faceWidth*0.3, faceWidth*0.3);
+            self.leftEye.frame = [DetectFace convertFrame:leftEyeFrame previewBox:previewBox forVideoBox:clap isMirrored:YES];
+            [self.leftEye setBackgroundColor:[[UIColor blueColor] colorWithAlphaComponent:0.3]];
+            self.leftEye.layer.cornerRadius = faceWidth*0.15;
+            newCenterX = [self.leftEyeFilterX noiseFilterWithData:self.leftEye.centerX];
+            newCenterY = [self.leftEyeFilterY noiseFilterWithData:self.leftEye.centerY];
+            self.leftEye.center = CGPointMake(newCenterX, newCenterY);
+        }
+        if(ff.hasRightEyePosition)
+        {
+            CGRect rightEyeFrame = CGRectMake(ff.rightEyePosition.x-faceWidth*0.15, ff.rightEyePosition.y-faceWidth*0.15, faceWidth*0.3, faceWidth*0.3);
+            self.rightEye.frame = [DetectFace convertFrame:rightEyeFrame previewBox:previewBox forVideoBox:clap isMirrored:YES];
+            [self.rightEye setBackgroundColor:[[UIColor blueColor] colorWithAlphaComponent:0.3]];
+            self.rightEye.layer.cornerRadius = faceWidth*0.15;
+            newCenterX = [self.rightEyeFilterX noiseFilterWithData:self.rightEye.centerX];
+            newCenterY = [self.rightEyeFilterY noiseFilterWithData:self.rightEye.centerY];
+            self.rightEye.center = CGPointMake(newCenterX, newCenterY);
+        }
+        
+        if (ff.hasLeftEyePosition && ff.hasRightEyePosition && self.eyeAnimation) {
+            CGFloat stickerWidth = self.eyeAnimation.width;
+            CGFloat stickerHeight = self.eyeAnimation.height;
+            CGFloat stickerDistance = self.eyeAnimation.distance;
+            CGPoint stickerCenter = CGPointMake(self.eyeAnimation.centerX, self.eyeAnimation.centerY);
+            CGFloat frameDuration = self.eyeAnimation.duration;
+            CGFloat actualDistance = [self getDistanceFromPointA:self.leftEye.center pointB:self.rightEye.center]*kStickerScale;
+            CGFloat ratio = actualDistance/stickerDistance;
+            //NSLog(@"ear ratio:%f scale:%f",ratio,[UIScreen mainScreen].scale);
+            if (!self.eyesSticker) {
+                self.eyesSticker = [[UIImageView alloc] init];
+                [self.stickerView addSubview:self.eyesSticker];
+                self.eyesSticker.animationImages = self.eyeAnimation.imageList;
+                self.eyesSticker.animationDuration = frameDuration*self.eyeAnimation.imageList.count;
+                self.eyesSticker.contentMode = UIViewContentModeScaleAspectFit;
+                [self.eyesSticker startAnimating];
+            }
+            
+            CGPoint eyeStickerCenter = CGPointMake((self.rightEye.centerX+self.leftEye.centerX)/2, (self.rightEye.centerY+self.leftEye.centerY)/2-(stickerCenter.y-stickerHeight/2)/kStickerScale);
+            
+            [UIView animateWithDuration:0.1 animations:^{
+                self.eyesSticker.frame = CGRectMake(eyeStickerCenter.x-stickerWidth/2*ratio/2, eyeStickerCenter.y-stickerHeight/2*ratio/2, stickerWidth/2*ratio, stickerHeight/2*ratio);
+               // self.eyesSticker.center = eyeStickerCenter;
+            }];
+        }else{
+            
+            [self.eyesSticker removeFromSuperview];
+            self.eyesSticker = nil;
+        }
+        
+        
+        if (ff.hasMouthPosition && self.mouthAnimation) {
+            CGFloat stickerWidth = self.mouthAnimation.width;
+            CGFloat stickerHeight = self.mouthAnimation.height;
+            CGFloat stickerDistance = self.mouthAnimation.distance;
+            CGPoint stickerCenter = CGPointMake(self.mouthAnimation.centerX, self.mouthAnimation.centerY);
+            CGFloat frameDuration = self.mouthAnimation.duration;
+            CGFloat actualDistance = [self getDistanceFromPointA:self.leftEye.center pointB:self.rightEye.center]*kStickerScale;
+            
+            CGFloat ratio = actualDistance/stickerDistance;
+            CGRect mouthFrame = CGRectMake(ff.mouthPosition.x-stickerWidth*ratio/2, ff.mouthPosition.y-stickerHeight*ratio/2, stickerWidth*ratio, stickerHeight*ratio);
+            if (!self.mouthSticker) {
+                self.mouthSticker = [[UIImageView alloc] init];
+                [self.stickerView addSubview:self.mouthSticker];
+                self.mouthSticker.animationImages = self.mouthAnimation.imageList;
+                self.mouthSticker.animationDuration = frameDuration*self.mouthAnimation.imageList.count;
+                self.mouthSticker.contentMode = UIViewContentModeScaleAspectFit;
+                [self.mouthSticker startAnimating];
+            }
+            self.mouthSticker.frame = [DetectFace convertFrame:mouthFrame previewBox:previewBox forVideoBox:clap isMirrored:YES];
+            newCenterX = [self.mouthFilterX noiseFilterWithData:self.mouthSticker.centerX];
+            newCenterY = [self.mouthFilterY noiseFilterWithData:self.mouthSticker.centerY];
+        
+            self.mouthSticker.center = CGPointMake(newCenterX, newCenterY-(stickerCenter.y-stickerHeight/2)/kStickerScale);
+            
+        }else{
+            
+            [self.mouthSticker removeFromSuperview];
+            self.mouthSticker = nil;
+        }
+        
+        if (self.mouthAnimation || self.eyeAnimation) {
+            if (!self.bottomSticker) {
+                self.bottomSticker = [[UIImageView alloc] initWithFrame:self.view.bounds];
+                [self.view insertSubview:self.bottomSticker belowSubview:self.cropMaskBottom];
+                self.bottomSticker.animationImages = self.bottomAnimation.imageList;
+                self.bottomSticker.animationDuration = self.bottomAnimation.duration*self.bottomAnimation.imageList.count;
+                self.bottomSticker.contentMode = UIViewContentModeScaleAspectFit;
+                [self.bottomSticker startAnimating];
+            }
+        }
+        
+        CGFloat tiltDegrees = [self pointPairToBearingDegrees:self.leftEye.center secondPoint:self.rightEye.center];
+        // NSLog(@"Tilt :%f",tiltDegrees);
+        [UIView animateWithDuration:0.3 animations:^{
+            self.stickerView.transform = CGAffineTransformMakeRotation((tiltDegrees/180.0*M_PI));
+        }];
+        
+    }
+}
+
+- (CGFloat) pointPairToBearingDegrees:(CGPoint)startingPoint secondPoint:(CGPoint) endingPoint
+{
+    CGPoint originPoint = CGPointMake(endingPoint.x - startingPoint.x, endingPoint.y - startingPoint.y); // get origin point to origin by subtracting end from start
+    float bearingRadians = atan2f(originPoint.y, originPoint.x); // get bearing in radians
+    float bearingDegrees = bearingRadians * (180.0 / M_PI); // convert to degrees
+    bearingDegrees = (bearingDegrees > 0.0 ? bearingDegrees : (360.0 + bearingDegrees)); // correct discontinuity
+    return bearingDegrees-180;
+}
+
+-(CGFloat)getDistanceFromPointA:(CGPoint)pointA pointB:(CGPoint)pointB{
+    double dx = (pointB.x-pointA.x);
+    double dy = (pointB.y-pointA.y);
+    double dist = sqrt(dx*dx + dy*dy);
+    return dist;
+}
+
+
+#pragma mark - UIVieControllerTransitioningDelegate -
+
+- (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
+                                                                   presentingController:(UIViewController *)presenting
+                                                                       sourceController:(UIViewController *)source{
+    self.transitionManager.transitionTo = MODAL;
+    return (id)self.transitionManager;
+}
+
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
+{
+    self.transitionManager.transitionTo = INITIAL;
+    return (id)self.transitionManager;
+}
+
+#pragma mark - Getters/Setters
+
+-(NSMutableDictionary *)cameraSettings{
+    if (!_cameraSettings) {
+        _cameraSettings = [[NSMutableDictionary alloc] init];
+    }
+    return _cameraSettings;
+}
+
+-(NSArray *)filterSet{
+    if (!_filterSet) {
+        _filterSet = @[
+                       @"Original",
+                       @"CILinearToSRGBToneCurve",
+                       @"CIPhotoEffectChrome",
+                       @"CIPhotoEffectFade",
+                       @"CIPhotoEffectInstant",
+                       @"CIPhotoEffectMono",
+                       @"CIPhotoEffectNoir",
+                       @"CIPhotoEffectProcess",
+                       @"CIPhotoEffectTonal",
+                       @"CIPhotoEffectTransfer",
+                       @"CISRGBToneCurveToLinear",
+                       @"CIVignetteEffect",
+                       ];
+    }
+    return _filterSet;
+}
+
+-(PTPPLiveCameraTipsView *)tipsView{
+    if (!_tipsView) {
+        _tipsView = [[PTPPLiveCameraTipsView alloc] initWithFrame:self.view.bounds];
+    }
+    return _tipsView;
+}
+
+-(PTPPCameraFilterScrollView *)filterScrollView{
+    if (!_filterScrollView) {
+        _filterScrollView = [[PTPPCameraFilterScrollView alloc] initWithFrame:CGRectMake(0, 0, Screenwidth, kFilterScrollHeight)];
+        _filterScrollView.activeFilterID = 0;
+    }
+    return _filterScrollView;
+}
+
+-(PTPPLiveStickerScrollView *)liveStickerScrollView{
+    if (!_liveStickerScrollView) {
+        _liveStickerScrollView = [[PTPPLiveStickerScrollView alloc] initWithFrame:CGRectMake(0, 0, Screenwidth, kFilterScrollHeight)];
+        [_liveStickerScrollView setAttributeWithFilterSet:@[@"hz",@"cn", @"mhl", @"xm", @"fd", @"kq", @"xhx",@"hy"]]; //Hard coded
+    }
+    return _liveStickerScrollView;
+}
+
+-(DetectFace *)detectFaceController{
+    if (!_detectFaceController) {
+        _detectFaceController = [[DetectFace alloc] init];
+        _detectFaceController.delegate = self;
+        _detectFaceController.filters = self.filterSet;
+        _detectFaceController.previewView = self.previewView;
+        NSInteger cameraPosition = [[self.cameraSettings objectForKey:PTPPCameraSettingCameraPosition] integerValue];
+        if (cameraPosition == 0) {
+            _detectFaceController.cameraPosition = UIImagePickerControllerCameraDeviceFront;
+        }else{
+            _detectFaceController.cameraPosition = UIImagePickerControllerCameraDeviceRear;
+        }
+        
+    }
+    return _detectFaceController;
+}
+
+-(UIView *)previewView{
+    if (!_previewView) {
+        _previewView = [[UIView alloc] initWithFrame:self.view.bounds];
+        _previewView.backgroundColor = [UIColor clearColor];
+    }
+    return _previewView;
+}
+
+-(UIView *)stickerView{
+    if (!_stickerView) {
+        _stickerView = [[UIView alloc] initWithFrame:self.view.bounds];
+        _stickerView.backgroundColor = [UIColor clearColor];
+        _stickerView.userInteractionEnabled = NO;
+    }
+    return _stickerView;
+}
+
+-(UIImageView *)filterView{
+    if (!_filterView) {
+        _filterView = [[UIImageView alloc] initWithFrame:self.view.bounds];
+    }
+    return _filterView;
+}
+
+-(UIView *)topControlView{
+    if (!_topControlView) {
+        _topControlView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, Screenwidth, kTopControlHeight)];
+        _topControlView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
+    }
+    return _topControlView;
+}
+
+-(UIView *)bottomControlView{
+    if (!_bottomControlView) {
+        _bottomControlView = [[UIView alloc] initWithFrame:CGRectMake(0, Screenheight-kBottomControlHeight, Screenwidth, kBottomControlHeight)];
+        _bottomControlView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
+    }
+    return _bottomControlView;
+}
+
+-(UIButton *)backButton{
+    if (!_backButton) {
+        _backButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, Screenwidth/6, kTopControlHeight)];
+        [_backButton setImage:[UIImage imageNamed:@"icon_back_index"] forState:UIControlStateNormal];
+        [_backButton setBackgroundColor:UIColorFromRGB(0x662425)];
+        [_backButton addTarget:self action:@selector(goBack) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _backButton;
+}
+
+-(UIButton *)flashOptionButton{
+    if (!_flashOptionButton) {
+        _flashOptionButton = [[UIButton alloc] initWithFrame:CGRectMake(Screenwidth/6, 0, Screenwidth/6, kTopControlHeight)];
+        [_flashOptionButton setImage:[UIImage imageNamed:@"icon_capture_20_01"] forState:UIControlStateNormal];
+        _flashOptionButton.tag = PTCameraSettingFlash;
+        [_flashOptionButton addTarget:self action:@selector(toggleCameraSetting:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _flashOptionButton;
+}
+
+-(UIButton *)cropOptionButton{
+    if (!_cropOptionButton) {
+        _cropOptionButton = [[UIButton alloc] initWithFrame:CGRectMake(Screenwidth/6*2, 0, Screenwidth/6, kTopControlHeight)];
+        [_cropOptionButton setImage:[UIImage imageNamed:@"icon_capture_20_05"] forState:UIControlStateNormal];
+        _cropOptionButton.tag = PTCameraSettingCrop;
+        [_cropOptionButton addTarget:self action:@selector(toggleCameraSetting:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _cropOptionButton;
+}
+
+-(UIButton *)timerOptionButton{
+    if (!_timerOptionButton) {
+        _timerOptionButton = [[UIButton alloc] initWithFrame:CGRectMake(Screenwidth/6*3, 0, Screenwidth/6, kTopControlHeight)];
+        [_timerOptionButton setImage:[UIImage imageNamed:@"icon_capture_20_08"] forState:UIControlStateNormal];
+        _timerOptionButton.tag = PTCameraSettingTimer;
+        [_timerOptionButton addTarget:self action:@selector(toggleCameraSetting:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _timerOptionButton;
+}
+
+-(UIButton *)tapShootButton{
+    if (!_tapShootButton) {
+        _tapShootButton = [[UIButton alloc] initWithFrame:CGRectMake(Screenwidth/6*4, 0, Screenwidth/6, kTopControlHeight)];
+        [_tapShootButton setImage:[UIImage imageNamed:@"icon_capture_20_12"] forState:UIControlStateNormal];
+        [_tapShootButton addTarget:self action:@selector(toggleTapShoot) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _tapShootButton;
+}
+
+-(UIButton *)cameraPositionButton{
+    if (!_cameraPositionButton) {
+        _cameraPositionButton = [[UIButton alloc] initWithFrame:CGRectMake(Screenwidth/6*5, 0, Screenwidth/6, kTopControlHeight)];
+        [_cameraPositionButton setImage:[UIImage imageNamed:@"icon_capture_20_14"] forState:UIControlStateNormal];
+        [_cameraPositionButton addTarget:self action:@selector(toggleChangeCameraPosition) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _cameraPositionButton;
+}
+
+-(UIButton *)cameraRollButton{
+    if (!_cameraRollButton) {
+        _cameraRollButton = [[UIButton alloc] initWithFrame:CGRectMake(0, (kBottomControlHeight-Screenwidth/5)/2, Screenwidth/5, Screenwidth/5)];
+        _cameraRollButton.imageView.layer.cornerRadius = 4;
+        _cameraRollButton.contentEdgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
+        _cameraRollButton.clipsToBounds = YES;
+        [_cameraRollButton addTarget:self action:@selector(albumTapped) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _cameraRollButton;
+}
+
+-(UIButton *)liveStickerButton{
+    if (!_liveStickerButton) {
+        _liveStickerButton = [[UIButton alloc] initWithFrame:CGRectMake(Screenwidth/5*3, (kBottomControlHeight-Screenwidth/5)/2, Screenwidth/5, Screenwidth/5)];
+        [_liveStickerButton setImage:[UIImage imageNamed:@"icon_capture_20_15"] forState:UIControlStateNormal];
+        [_liveStickerButton addTarget:self action:@selector(toggleLiveStickerOption) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _liveStickerButton;
+}
+
+-(UIButton *)shootButton{
+    if (!_shootButton) {
+        _shootButton = [[UIButton alloc] initWithFrame:CGRectMake(Screenwidth/5*2, (kBottomControlHeight-Screenwidth/5)/2, Screenwidth/5, Screenwidth/5)];
+        [_shootButton setImage:[UIImage imageNamed:@"btn_capture_nor"] forState:UIControlStateNormal];
+        _shootButton.transform = CGAffineTransformMakeScale(1.1, 1.1);
+        [_shootButton addTarget:self action:@selector(cameraShoot) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _shootButton;
+}
+
+-(UIButton *)filterButton{
+    if (!_filterButton) {
+        _filterButton = [[UIButton alloc] initWithFrame:CGRectMake(Screenwidth/5*1, (kBottomControlHeight-Screenwidth/5)/2, Screenwidth/5, Screenwidth/5)];
+        [_filterButton setImage:[UIImage imageNamed:@"icon_capture_20_16"] forState:UIControlStateNormal];
+        [_filterButton addTarget:self action:@selector(toggleFilterOption) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _filterButton;
+}
+
+-(UIButton *)jigsawButton{
+    if (!_jigsawButton) {
+        _jigsawButton = [[UIButton alloc] initWithFrame:CGRectMake(Screenwidth/5*4, (kBottomControlHeight-Screenwidth/5)/2, Screenwidth/5, Screenwidth/5)];
+        [_jigsawButton setImage:[UIImage imageNamed:@"icon_capture_20_17"] forState:UIControlStateNormal];
+        [_jigsawButton addTarget:self action:@selector(toggleJigsawTemplate) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _jigsawButton;
+}
+
+-(UIView *)cropMaskTop{
+    if (!_cropMaskTop) {
+        _cropMaskTop = [[UIView alloc] initWithFrame:CGRectMake(0, 0, Screenwidth, 0)];
+        _cropMaskTop.backgroundColor = [UIColor blackColor];
+    }
+    return _cropMaskTop;
+}
+
+-(UIView *)cropMaskBottom{
+    if (!_cropMaskBottom) {
+        _cropMaskBottom = [[UIView alloc] initWithFrame:CGRectMake(0, Screenheight, Screenwidth, 0)];
+        _cropMaskBottom.backgroundColor = [UIColor blackColor];
+    }
+    return _cropMaskBottom;
+}
+
+-(UILabel *)timerLabel{
+    if (!_timerLabel) {
+        _timerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, Screenwidth, Screenheight)];
+        _timerLabel.textAlignment = NSTextAlignmentCenter;
+        _timerLabel.font = [UIFont systemFontOfSize:250];
+        _timerLabel.textColor = [UIColor whiteColor];
+        
+    }
+    return _timerLabel;
+}
+
+@end
