@@ -130,21 +130,6 @@
 
 -(void)imageSequencePreProcessing{
     CGSize targetSize = CGSizeMake(self.basedPhotoView.frame.size.width, self.bottomCropMask.top-self.topCropMask.bottom);
-//    if (self.mergedDownAnimationFrames.count == 0) {
-//        for (NSInteger x=0; x<2; x++) {
-//            for (NSInteger i=0; i<kFrameCount; i++) {
-//                self.mouthSticker.image = [self.mouthSticker.animationImages safeObjectAtIndex:i];
-//                self.eyeSticker.image = [self.eyeSticker.animationImages safeObjectAtIndex:i];
-//                UIGraphicsBeginImageContext(targetSize);
-//                CGContextRef context = UIGraphicsGetCurrentContext();
-//                CGContextConcatCTM(context, CGAffineTransformMakeTranslation(0,-self.topCropMask.bottom));
-//                [self.basedPhotoView.layer renderInContext:context];
-//                UIImage *screenShot = UIGraphicsGetImageFromCurrentImageContext();
-//                UIGraphicsEndImageContext();
-//                [self.mergedDownAnimationFrames addObject:screenShot];
-//            }
-//        }
-//    }
     __weak typeof(self) weakSelf = self;
     self.converter.finishExport = ^(NSURL *videoURL){
         NSLog(@"Export Complete");
@@ -153,10 +138,7 @@
             [weakSelf.mouthSticker startAnimating];
             [weakSelf.eyeSticker startAnimating];
             [weakSelf.navigationController popViewControllerAnimated:YES];
-//            PTPPLiveVideoShareViewController *videoShareVC = [[PTPPLiveVideoShareViewController alloc] initWithImage:[weakSelf.mergedDownAnimationFrames safeObjectAtIndex:arc4random()%(self.mergedDownAnimationFrames.count-1)] videoPath:videoURL];
-//            [weakSelf.navigationController pushViewController:videoShareVC animated:YES];
         });
-        
     };
     
     [self.converter exportVideoWithImageSequence:self exportSize:targetSize fps:12 totalFrame:kFrameCount];

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C6433C1C1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */; };
+		C6433C1F1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1E1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m */; };
 		C647BA951C717C4700E596EA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C647BA941C717C4700E596EA /* main.m */; };
 		C647BA981C717C4700E596EA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C647BA971C717C4700E596EA /* AppDelegate.m */; };
 		C647BA9E1C717C4700E596EA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C647BA9C1C717C4700E596EA /* Main.storyboard */; };
@@ -1504,6 +1506,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C6433C1A1C72BFC900AF82AD /* PTPPStaticImageEditViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPStaticImageEditViewController.h; sourceTree = "<group>"; };
+		C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPStaticImageEditViewController.m; sourceTree = "<group>"; };
+		C6433C1D1C72C66D00AF82AD /* PTPPStaticImageEditToolBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPStaticImageEditToolBar.h; sourceTree = "<group>"; };
+		C6433C1E1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPStaticImageEditToolBar.m; sourceTree = "<group>"; };
 		C647BA901C717C4700E596EA /* PTPPCamera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PTPPCamera.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C647BA941C717C4700E596EA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C647BA961C717C4700E596EA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -3457,6 +3463,41 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C6433C161C72BF6100AF82AD /* PhotoEdit */ = {
+			isa = PBXGroup;
+			children = (
+				C6433C171C72BF6100AF82AD /* Model */,
+				C6433C181C72BF6100AF82AD /* View */,
+				C6433C191C72BF6100AF82AD /* ViewController */,
+			);
+			path = PhotoEdit;
+			sourceTree = "<group>";
+		};
+		C6433C171C72BF6100AF82AD /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		C6433C181C72BF6100AF82AD /* View */ = {
+			isa = PBXGroup;
+			children = (
+				C6433C1D1C72C66D00AF82AD /* PTPPStaticImageEditToolBar.h */,
+				C6433C1E1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		C6433C191C72BF6100AF82AD /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				C6433C1A1C72BFC900AF82AD /* PTPPStaticImageEditViewController.h */,
+				C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
 		C647BA871C717C4700E596EA = {
 			isa = PBXGroup;
 			children = (
@@ -6070,6 +6111,7 @@
 		C647C8831C71C40200E596EA /* Camera */ = {
 			isa = PBXGroup;
 			children = (
+				C6433C161C72BF6100AF82AD /* PhotoEdit */,
 				C647C8841C71C40200E596EA /* LiveCapture */,
 			);
 			path = Camera;
@@ -6127,12 +6169,12 @@
 				C647C8A01C71C40200E596EA /* PTLoadingRing */,
 				C647C8A71C71C40200E596EA /* PTPPCameraFilterScrollView.h */,
 				C647C8A81C71C40200E596EA /* PTPPCameraFilterScrollView.m */,
+				C647C8AD1C71C40200E596EA /* PTPPLiveStickerScrollView.h */,
+				C647C8AE1C71C40200E596EA /* PTPPLiveStickerScrollView.m */,
 				C647C8A91C71C40200E596EA /* PTPPCameraSettingPopupView.h */,
 				C647C8AA1C71C40200E596EA /* PTPPCameraSettingPopupView.m */,
 				C647C8AB1C71C40200E596EA /* PTPPLiveCameraTipsView.h */,
 				C647C8AC1C71C40200E596EA /* PTPPLiveCameraTipsView.m */,
-				C647C8AD1C71C40200E596EA /* PTPPLiveStickerScrollView.h */,
-				C647C8AE1C71C40200E596EA /* PTPPLiveStickerScrollView.m */,
 				C647C8AF1C71C40200E596EA /* PTRecommendAppBottomView.h */,
 				C647C8B01C71C40200E596EA /* PTRecommendAppBottomView.m */,
 			);
@@ -7377,6 +7419,7 @@
 			files = (
 				C647BFDD1C71BBBB00E596EA /* GPUImageRGBClosingFilter.m in Sources */,
 				C647BDB51C718E5100E596EA /* MJRefreshAutoFooter.m in Sources */,
+				C6433C1C1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m in Sources */,
 				C647BC151C7181BE00E596EA /* SOPopupButtonGroupView.m in Sources */,
 				C647BBCB1C7181BE00E596EA /* AFURLRequestSerialization.m in Sources */,
 				C647C8F21C71CB2F00E596EA /* APRoundedButton.m in Sources */,
@@ -7570,6 +7613,7 @@
 				C647BD0A1C718C4B00E596EA /* PTMJHeader.m in Sources */,
 				C647C0071C71BBBB00E596EA /* GPUImageVideoCamera.m in Sources */,
 				C647BF701C71BBBB00E596EA /* GPUImageBulgeDistortionFilter.m in Sources */,
+				C6433C1F1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m in Sources */,
 				C647BC051C7181BE00E596EA /* SOBaseLabel.m in Sources */,
 				C647BBF81C7181BE00E596EA /* SOGlobal.m in Sources */,
 				C647C8E61C71C9AC00E596EA /* PTPPNewHomeViewController.m in Sources */,

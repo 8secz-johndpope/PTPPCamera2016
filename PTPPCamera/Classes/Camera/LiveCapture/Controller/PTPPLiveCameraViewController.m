@@ -10,7 +10,7 @@
 #import "PTPPLiveVideoShareViewController.h"
 #import "PTPPNewHomeViewController.h"
 #import "ELCImagePickerHeader.h"
-
+#import "PTPPStaticImageEditViewController.h"
 #import "PTPPLiveStickerPreviewViewController.h"
 #import "PTPPLiveCameraViewController.h"
 #import "PTPPCameraFilterScrollView.h"
@@ -150,9 +150,9 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
             CGFloat heightRatio = image.size.height/(Screenheight*[UIScreen mainScreen].scale);
             //No AR stickers on screen, go to static photo edit process.
             image = [self croppIngimageByImageName:image toRect:CGRectMake(0, self.cropMaskTop.bottom*heightRatio, Screenwidth*widthRatio, self.cropMaskBottom.top*heightRatio-self.cropMaskTop.bottom*heightRatio)];
-            //PTPaiPaiPhotoEditViewController *editPhotoVC = [[PTPaiPaiPhotoEditViewController alloc] initWithEditableImages:image];
+            PTPPStaticImageEditViewController *imageEditVC = [[PTPPStaticImageEditViewController alloc] initWithBasePhoto:image];
             if (weakSelf.navigationController) {
-                //[weakSelf.navigationController pushViewController:editPhotoVC animated:YES];
+                [weakSelf.navigationController pushViewController:imageEditVC animated:YES];
             }
         }else{
             //AR stickers on screen, go to preview video
@@ -1020,7 +1020,12 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     }
     
     self.chosenImages = images;
-
+    if ([images safeObjectAtIndex:0]) {
+        PTPPStaticImageEditViewController *imageEditVC = [[PTPPStaticImageEditViewController alloc] initWithBasePhoto:[images safeObjectAtIndex:0]];
+        [self.navigationController pushViewController:imageEditVC animated:YES];
+    }else{
+        [SVProgressHUD showErrorWithStatus:@"暂不支持视频编辑" duration:2.0];
+    }
 }
 
 - (void)elcImagePickerControllerDidCancel:(ELCImagePickerController *)picker
@@ -1203,6 +1208,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
         _cameraRollButton.contentEdgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
         _cameraRollButton.clipsToBounds = YES;
         [_cameraRollButton addTarget:self action:@selector(albumTapped) forControlEvents:UIControlEventTouchUpInside];
+        _cameraRollButton.imageView.backgroundColor = [UIColor colorWithHexString:@"222222"];
     }
     return _cameraRollButton;
 }
