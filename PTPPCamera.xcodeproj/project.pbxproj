@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C60FD16F1C732ABD00F5886B /* PECropRectView.m in Sources */ = {isa = PBXBuildFile; fileRef = C60FD1661C732ABD00F5886B /* PECropRectView.m */; };
+		C60FD1701C732ABD00F5886B /* PECropView.m in Sources */ = {isa = PBXBuildFile; fileRef = C60FD1681C732ABD00F5886B /* PECropView.m */; };
+		C60FD1711C732ABD00F5886B /* PECropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C60FD16A1C732ABD00F5886B /* PECropViewController.m */; };
+		C60FD1721C732ABD00F5886B /* PEResizeControl.m in Sources */ = {isa = PBXBuildFile; fileRef = C60FD16C1C732ABD00F5886B /* PEResizeControl.m */; };
+		C60FD1731C732ABD00F5886B /* UIImage+PECrop.m in Sources */ = {isa = PBXBuildFile; fileRef = C60FD16E1C732ABD00F5886B /* UIImage+PECrop.m */; };
 		C6433C1C1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */; };
 		C6433C1F1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1E1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m */; };
 		C6433C221C72F40300AF82AD /* PTFilterManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C211C72F40300AF82AD /* PTFilterManager.m */; };
@@ -1506,6 +1511,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C60FD1651C732ABD00F5886B /* PECropRectView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PECropRectView.h; sourceTree = "<group>"; };
+		C60FD1661C732ABD00F5886B /* PECropRectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PECropRectView.m; sourceTree = "<group>"; };
+		C60FD1671C732ABD00F5886B /* PECropView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PECropView.h; sourceTree = "<group>"; };
+		C60FD1681C732ABD00F5886B /* PECropView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PECropView.m; sourceTree = "<group>"; };
+		C60FD1691C732ABD00F5886B /* PECropViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PECropViewController.h; sourceTree = "<group>"; };
+		C60FD16A1C732ABD00F5886B /* PECropViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PECropViewController.m; sourceTree = "<group>"; };
+		C60FD16B1C732ABD00F5886B /* PEResizeControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PEResizeControl.h; sourceTree = "<group>"; };
+		C60FD16C1C732ABD00F5886B /* PEResizeControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PEResizeControl.m; sourceTree = "<group>"; };
+		C60FD16D1C732ABD00F5886B /* UIImage+PECrop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+PECrop.h"; sourceTree = "<group>"; };
+		C60FD16E1C732ABD00F5886B /* UIImage+PECrop.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+PECrop.m"; sourceTree = "<group>"; };
 		C6433C1A1C72BFC900AF82AD /* PTPPStaticImageEditViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPStaticImageEditViewController.h; sourceTree = "<group>"; };
 		C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPStaticImageEditViewController.m; sourceTree = "<group>"; };
 		C6433C1D1C72C66D00AF82AD /* PTPPStaticImageEditToolBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPStaticImageEditToolBar.h; sourceTree = "<group>"; };
@@ -3464,6 +3479,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C60FD1641C732ABD00F5886B /* PEPhotoCropEditor */ = {
+			isa = PBXGroup;
+			children = (
+				C60FD1651C732ABD00F5886B /* PECropRectView.h */,
+				C60FD1661C732ABD00F5886B /* PECropRectView.m */,
+				C60FD1671C732ABD00F5886B /* PECropView.h */,
+				C60FD1681C732ABD00F5886B /* PECropView.m */,
+				C60FD1691C732ABD00F5886B /* PECropViewController.h */,
+				C60FD16A1C732ABD00F5886B /* PECropViewController.m */,
+				C60FD16B1C732ABD00F5886B /* PEResizeControl.h */,
+				C60FD16C1C732ABD00F5886B /* PEResizeControl.m */,
+				C60FD16D1C732ABD00F5886B /* UIImage+PECrop.h */,
+				C60FD16E1C732ABD00F5886B /* UIImage+PECrop.m */,
+			);
+			path = PEPhotoCropEditor;
+			sourceTree = "<group>";
+		};
 		C6433C161C72BF6100AF82AD /* PhotoEdit */ = {
 			isa = PBXGroup;
 			children = (
@@ -3596,6 +3628,7 @@
 		C647BAAD1C71802B00E596EA /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
+				C60FD1641C732ABD00F5886B /* PEPhotoCropEditor */,
 				C647C8CC1C71C8EA00E596EA /* DownloadManager */,
 				C647C8C81C71C87D00E596EA /* SHA_1 */,
 				C647BDE91C71BBBA00E596EA /* GPUImage */,
@@ -7438,6 +7471,7 @@
 				C647BC081C7181BE00E596EA /* SOBaseView.m in Sources */,
 				C647BD071C718C4B00E596EA /* PTLoadingView.m in Sources */,
 				C647BF741C71BBBB00E596EA /* GPUImageChromaKeyFilter.m in Sources */,
+				C60FD1731C732ABD00F5886B /* UIImage+PECrop.m in Sources */,
 				C647BCD81C718C4B00E596EA /* PTHTTPPageRequestModel.m in Sources */,
 				C647C00E1C71BBBB00E596EA /* GPUImageZoomBlurFilter.m in Sources */,
 				C647BBCA1C7181BE00E596EA /* AFURLConnectionOperation.m in Sources */,
@@ -7495,6 +7529,7 @@
 				C647C8B41C71C40200E596EA /* PTPPLiveStickerPreviewViewController.m in Sources */,
 				C647BFDE1C71BBBB00E596EA /* GPUImageRGBDilationFilter.m in Sources */,
 				C647BD001C718C4B00E596EA /* PTCustomMenuSliderView.m in Sources */,
+				C60FD1721C732ABD00F5886B /* PEResizeControl.m in Sources */,
 				C647BFE01C71BBBB00E596EA /* GPUImageRGBFilter.m in Sources */,
 				C647BFD41C71BBBB00E596EA /* GPUImagePixellateFilter.m in Sources */,
 				C647BF8D1C71BBBB00E596EA /* GPUImageErosionFilter.m in Sources */,
@@ -7661,6 +7696,7 @@
 				C647BBF11C7181BE00E596EA /* UISearchBar+SOBackgroundView.m in Sources */,
 				C647BFA01C71BBBB00E596EA /* GPUImageHarrisCornerDetectionFilter.m in Sources */,
 				C647BC141C7181BE00E596EA /* SOPopupButtonCell.m in Sources */,
+				C60FD1711C732ABD00F5886B /* PECropViewController.m in Sources */,
 				C647C8D21C71C8EA00E596EA /* DownloadManager.m in Sources */,
 				C647BD051C718C4B00E596EA /* PTHeaderFooterWebView.m in Sources */,
 				C647BBE01C7181BE00E596EA /* UIImage+MultiFormat.m in Sources */,
@@ -7764,6 +7800,7 @@
 				C647BFB81C71BBBB00E596EA /* GPUImageLowPassFilter.m in Sources */,
 				C647BBC81C7181BE00E596EA /* AFNetworkReachabilityManager.m in Sources */,
 				C647C0081C71BBBB00E596EA /* GPUImageView.m in Sources */,
+				C60FD16F1C732ABD00F5886B /* PECropRectView.m in Sources */,
 				C647BFA61C71BBBB00E596EA /* GPUImageHistogramFilter.m in Sources */,
 				C647C8DA1C71C93C00E596EA /* MLTransitionAnimation.m in Sources */,
 				C647BC221C7181BE00E596EA /* SOSegmentButton.m in Sources */,
@@ -7794,6 +7831,7 @@
 				C647BDA91C718E5100E596EA /* ELCAsset.m in Sources */,
 				C647BCE31C718C4B00E596EA /* NSString+HTML.m in Sources */,
 				C647BF9B1C71BBBB00E596EA /* GPUImageGaussianSelectiveBlurFilter.m in Sources */,
+				C60FD1701C732ABD00F5886B /* PECropView.m in Sources */,
 				C647BF891C71BBBB00E596EA /* GPUimageDirectionalSobelEdgeDetectionFilter.m in Sources */,
 				C647BFCC1C71BBBB00E596EA /* GPUImageOpeningFilter.m in Sources */,
 				C647BFF71C71BBBB00E596EA /* GPUImageTextureOutput.m in Sources */,

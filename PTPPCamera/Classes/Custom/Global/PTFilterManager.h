@@ -15,6 +15,7 @@
 
 #define PTFILTERNAME    @"ptfiltername"
 #define PTFILTERIMAGE   @"ptfilterimage"
+#define PTFILTERSUBIMAGE @"ptfiltersubimage"
 
 @interface PTFilterManager : NSObject
 

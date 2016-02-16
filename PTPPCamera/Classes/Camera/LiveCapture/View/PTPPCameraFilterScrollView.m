@@ -46,16 +46,30 @@
         filterControl.tag = i;
         [filterControl addTarget:self action:@selector(didTapFilterControl:) forControlEvents:UIControlEventTouchUpInside];
         filterControl.filterPreivew = [[UIImageView alloc] initWithFrame:CGRectMake(10, 20, 50, 50)];
+        filterControl.filterPreivew.image = [[self.filterSet safeObjectAtIndex:i] safeObjectForKey:PTFILTERIMAGE];
+        filterControl.filterPreivew.layer.borderColor = [UIColor clearColor].CGColor;
         if (i==self.activeFilterID) {
-            filterControl.filterPreivew.layer.borderColor = [UIColor colorWithHexString:@"ff5654"].CGColor;
+            if (!self.iconHightlightMode) {
+                filterControl.filterPreivew.layer.borderColor = [UIColor colorWithHexString:@"ff5654"].CGColor;
+            }else{
+                filterControl.filterPreivew.image = [[self.filterSet safeObjectAtIndex:i] safeObjectForKey:PTFILTERSUBIMAGE];
+            }
         }else{
-            filterControl.filterPreivew.layer.borderColor = self.scrollView.backgroundColor.CGColor;
+            if (!self.iconHightlightMode) {
+                filterControl.filterPreivew.layer.borderColor = self.scrollView.backgroundColor.CGColor;
+            }else{
+                filterControl.filterPreivew.image = [[self.filterSet safeObjectAtIndex:i] safeObjectForKey:PTFILTERIMAGE];
+            }
         }
         
         filterControl.filterPreivew.layer.borderWidth = 1;
         filterControl.filterPreivew.layer.cornerRadius = 4;
-        filterControl.filterPreivew.image = [[self.filterSet safeObjectAtIndex:i] safeObjectForKey:PTFILTERIMAGE];
-        filterControl.filterPreivew.contentMode = UIViewContentModeScaleAspectFill;
+        if (self.iconHightlightMode) {
+            filterControl.filterPreivew.contentMode = UIViewContentModeCenter;
+        }else{
+            filterControl.filterPreivew.contentMode = UIViewContentModeScaleAspectFill;
+        }
+        
         filterControl.filterPreivew.clipsToBounds = YES;
         [filterControl addSubview:filterControl.filterPreivew];
         filterControl.filterLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, filterControl.filterPreivew.bottom, filterControl.width, filterControl.height-filterControl.filterPreivew.bottom)];
@@ -84,8 +98,20 @@
             filterControl.filterPreivew.layer.borderColor = self.scrollView.backgroundColor.CGColor;
             filterControl.filterLabel.textColor = [UIColor colorWithRed:0.7 green:0.7 blue:0.7 alpha:1.0];
             if (index == self.activeFilterID) {
-                filterControl.filterPreivew.layer.borderColor = [UIColor colorWithHexString:@"ff5654"].CGColor;
+                if (!self.iconHightlightMode) {
+                    filterControl.filterPreivew.layer.borderColor = [UIColor colorWithHexString:@"ff5654"].CGColor;
+                }else{
+                    filterControl.filterPreivew.image = [[self.filterSet safeObjectAtIndex:index] safeObjectForKey:PTFILTERSUBIMAGE];
+                }
+
                 filterControl.filterLabel.textColor = [UIColor colorWithHexString:@"ff5654"];
+            }else{
+                if (!self.iconHightlightMode) {
+                    filterControl.filterPreivew.layer.borderColor = self.scrollView.backgroundColor.CGColor;
+                }else{
+                    filterControl.filterPreivew.image = [[self.filterSet safeObjectAtIndex:index] safeObjectForKey:PTFILTERIMAGE];
+                }
+
             }
             index ++;
         }
