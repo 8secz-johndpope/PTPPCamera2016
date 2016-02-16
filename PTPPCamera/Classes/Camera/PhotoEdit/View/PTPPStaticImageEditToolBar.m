@@ -25,6 +25,7 @@
         NSString *settingName = [controlsetting safeObjectForKey:kEditImageControlNameKey];
         NSString *settingIcon = [controlsetting safeObjectForKey:kEditImageControlIconKey];
         SOImageTextControl *control = [[SOImageTextControl alloc] initWithFrame:CGRectMake(i*(self.width/controlSettings.count), 0, self.width/controlSettings.count, self.height)];
+        control.tag = i;
         control.textLabel.text = settingName;
         control.textLabel.textColor = [UIColor whiteColor];
         control.imageView.image = [UIImage imageNamed:settingIcon];
@@ -36,7 +37,14 @@
             control.contentView.backgroundColor = THEME_COLOR;
             control.frame = CGRectMake(control.left+10, control.top, control.width-20, control.height);
         }
+        [control addTarget:self action:@selector(toggleControl:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:control];
+    }
+}
+
+-(void)toggleControl:(SOImageTextControl *)control{
+    if (self.delegate && [self.delegate respondsToSelector:@selector(toolBar:didSelectItemAtIndex:)]) {
+        [self.delegate toolBar:self didSelectItemAtIndex:control.tag];
     }
 }
 

@@ -1024,7 +1024,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
         PTPPStaticImageEditViewController *imageEditVC = [[PTPPStaticImageEditViewController alloc] initWithBasePhoto:[images safeObjectAtIndex:0]];
         [self.navigationController pushViewController:imageEditVC animated:YES];
     }else{
-        [SVProgressHUD showErrorWithStatus:@"暂不支持视频编辑" duration:2.0];
+        //[SVProgressHUD showErrorWithStatus:@"暂不支持视频编辑" duration:2.0];
     }
 }
 

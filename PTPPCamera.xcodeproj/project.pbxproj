@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		C6433C1C1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */; };
 		C6433C1F1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1E1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m */; };
+		C6433C221C72F40300AF82AD /* PTFilterManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C211C72F40300AF82AD /* PTFilterManager.m */; };
 		C647BA951C717C4700E596EA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C647BA941C717C4700E596EA /* main.m */; };
 		C647BA981C717C4700E596EA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C647BA971C717C4700E596EA /* AppDelegate.m */; };
 		C647BA9E1C717C4700E596EA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C647BA9C1C717C4700E596EA /* Main.storyboard */; };
@@ -163,7 +164,6 @@
 		C647BCED1C718C4B00E596EA /* UITabBar+badge.m in Sources */ = {isa = PBXBuildFile; fileRef = C647BC5F1C718C4B00E596EA /* UITabBar+badge.m */; };
 		C647BCEE1C718C4B00E596EA /* UIView+Hints.m in Sources */ = {isa = PBXBuildFile; fileRef = C647BC611C718C4B00E596EA /* UIView+Hints.m */; };
 		C647BCEF1C718C4B00E596EA /* UIView+Tools.m in Sources */ = {isa = PBXBuildFile; fileRef = C647BC631C718C4B00E596EA /* UIView+Tools.m */; };
-		C647BCF91C718C4B00E596EA /* placeholder.md in Sources */ = {isa = PBXBuildFile; fileRef = C647BC811C718C4B00E596EA /* placeholder.md */; };
 		C647BCFB1C718C4B00E596EA /* PTUtilTool.m in Sources */ = {isa = PBXBuildFile; fileRef = C647BC851C718C4B00E596EA /* PTUtilTool.m */; };
 		C647BCFC1C718C4B00E596EA /* UserDefaultsHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C647BC871C718C4B00E596EA /* UserDefaultsHelper.m */; };
 		C647BCFE1C718C4B00E596EA /* placeholder.md in Sources */ = {isa = PBXBuildFile; fileRef = C647BC8B1C718C4B00E596EA /* placeholder.md */; };
@@ -1510,6 +1510,8 @@
 		C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPStaticImageEditViewController.m; sourceTree = "<group>"; };
 		C6433C1D1C72C66D00AF82AD /* PTPPStaticImageEditToolBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPStaticImageEditToolBar.h; sourceTree = "<group>"; };
 		C6433C1E1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPStaticImageEditToolBar.m; sourceTree = "<group>"; };
+		C6433C201C72F40300AF82AD /* PTFilterManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTFilterManager.h; sourceTree = "<group>"; };
+		C6433C211C72F40300AF82AD /* PTFilterManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTFilterManager.m; sourceTree = "<group>"; };
 		C647BA901C717C4700E596EA /* PTPPCamera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PTPPCamera.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C647BA941C717C4700E596EA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C647BA961C717C4700E596EA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -1803,7 +1805,6 @@
 		C647BC611C718C4B00E596EA /* UIView+Hints.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Hints.m"; sourceTree = "<group>"; };
 		C647BC621C718C4B00E596EA /* UIView+Tools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Tools.h"; sourceTree = "<group>"; };
 		C647BC631C718C4B00E596EA /* UIView+Tools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Tools.m"; sourceTree = "<group>"; };
-		C647BC811C718C4B00E596EA /* placeholder.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = placeholder.md; sourceTree = "<group>"; };
 		C647BC841C718C4B00E596EA /* PTUtilTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTUtilTool.h; sourceTree = "<group>"; };
 		C647BC851C718C4B00E596EA /* PTUtilTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTUtilTool.m; sourceTree = "<group>"; };
 		C647BC861C718C4B00E596EA /* UserDefaultsHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDefaultsHelper.h; sourceTree = "<group>"; };
@@ -4093,7 +4094,8 @@
 		C647BC801C718C4B00E596EA /* Global */ = {
 			isa = PBXGroup;
 			children = (
-				C647BC811C718C4B00E596EA /* placeholder.md */,
+				C6433C201C72F40300AF82AD /* PTFilterManager.h */,
+				C6433C211C72F40300AF82AD /* PTFilterManager.m */,
 				C647BC841C718C4B00E596EA /* PTUtilTool.h */,
 				C647BC851C718C4B00E596EA /* PTUtilTool.m */,
 				C647BC861C718C4B00E596EA /* UserDefaultsHelper.h */,
@@ -7444,7 +7446,6 @@
 				C647BF821C71BBBB00E596EA /* GPUImageCropFilter.m in Sources */,
 				C647C8CB1C71C87D00E596EA /* NSString+Hashes.m in Sources */,
 				C647BCDA1C718C4B00E596EA /* placeholder.md in Sources */,
-				C647BCF91C718C4B00E596EA /* placeholder.md in Sources */,
 				C647C0051C71BBBB00E596EA /* GPUImageUnsharpMaskFilter.m in Sources */,
 				C647BBEA1C7181BE00E596EA /* NSObject+SOObject.m in Sources */,
 				C647BD1D1C718C4B00E596EA /* PTGloba.m in Sources */,
@@ -7718,6 +7719,7 @@
 				C647BF951C71BBBB00E596EA /* GPUImageFourInputFilter.m in Sources */,
 				C647BC271C7181BE00E596EA /* SOTitleControl.m in Sources */,
 				C647BD0C1C718C4B00E596EA /* PTShoppingCartNumberIconControl.m in Sources */,
+				C6433C221C72F40300AF82AD /* PTFilterManager.m in Sources */,
 				C647C8E71C71C9AC00E596EA /* PTPPHomeDashboardView.m in Sources */,
 				C647BDAE1C718E5100E596EA /* ELCOverlayImageView.m in Sources */,
 				C647BC1D1C7181BE00E596EA /* SRRefreshView.m in Sources */,

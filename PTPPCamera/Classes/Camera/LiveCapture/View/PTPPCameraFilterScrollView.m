@@ -11,6 +11,7 @@
 #import "UIColor+Help.h"
 #import "NSObject+Swizzle.h"
 #import "FilterControl.h"
+#import "PTFilterManager.h"
 @class FilterControl;
 @interface PTPPCameraFilterScrollView ()
 @property (nonatomic, strong) UIScrollView *scrollView;
@@ -48,14 +49,18 @@
         if (i==self.activeFilterID) {
             filterControl.filterPreivew.layer.borderColor = [UIColor colorWithHexString:@"ff5654"].CGColor;
         }else{
-            filterControl.filterPreivew.layer.borderColor = [UIColor whiteColor].CGColor;
+            filterControl.filterPreivew.layer.borderColor = self.scrollView.backgroundColor.CGColor;
         }
         
         filterControl.filterPreivew.layer.borderWidth = 1;
         filterControl.filterPreivew.layer.cornerRadius = 4;
+        filterControl.filterPreivew.image = [[self.filterSet safeObjectAtIndex:i] safeObjectForKey:PTFILTERIMAGE];
+        filterControl.filterPreivew.contentMode = UIViewContentModeScaleAspectFill;
+        filterControl.filterPreivew.clipsToBounds = YES;
         [filterControl addSubview:filterControl.filterPreivew];
         filterControl.filterLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, filterControl.filterPreivew.bottom, filterControl.width, filterControl.height-filterControl.filterPreivew.bottom)];
-        filterControl.filterLabel.text = [NSString stringWithFormat:@"Filter %ld",(long)i];
+        filterControl.filterLabel.font = [UIFont systemFontOfSize:12];
+        filterControl.filterLabel.text = [[self.filterSet safeObjectAtIndex:i] safeObjectForKey:PTFILTERNAME];
         filterControl.filterLabel.textAlignment = NSTextAlignmentCenter;
         if (i==self.activeFilterID) {
             filterControl.filterLabel.textColor = [UIColor colorWithHexString:@"ff5654"];
@@ -76,7 +81,7 @@
          self.activeFilterID = control.tag;
         NSInteger index = 0;
         for(FilterControl *filterControl in self.filterControlSet){
-            filterControl.filterPreivew.layer.borderColor = [UIColor whiteColor].CGColor;
+            filterControl.filterPreivew.layer.borderColor = self.scrollView.backgroundColor.CGColor;
             filterControl.filterLabel.textColor = [UIColor colorWithRed:0.7 green:0.7 blue:0.7 alpha:1.0];
             if (index == self.activeFilterID) {
                 filterControl.filterPreivew.layer.borderColor = [UIColor colorWithHexString:@"ff5654"].CGColor;
