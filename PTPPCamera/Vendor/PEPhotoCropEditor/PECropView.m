@@ -40,7 +40,7 @@ static const CGFloat MarginLeft = 20.0f;
     self = [super initWithFrame:frame];
     if (self) {
         [self commonInit];
-        [self setBackgroundColor:[UIColor colorWithHexString:@"#c8c7c5"]];
+        [self setBackgroundColor:[UIColor blackColor]];
     }
     
     return self;

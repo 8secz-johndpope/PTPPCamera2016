@@ -7,10 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-typedef void(^FinishBlock)();
+typedef void(^LiveStickerFinishBlock)();
 typedef void (^StickerSelected)(NSString *stickerName, BOOL isFromBundle);
 @interface PTPPLiveStickerScrollView : UIView
-@property (nonatomic, copy) FinishBlock finishBlock;
+@property (nonatomic, copy) LiveStickerFinishBlock finishBlock;
 @property (nonatomic, copy) StickerSelected stickerSelected;
 @property (nonatomic, strong) NSString *selectedStickerName;
 -(void)setAttributeWithFilterSet:(NSArray *)stickerSet;

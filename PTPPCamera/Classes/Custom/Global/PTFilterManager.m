@@ -216,7 +216,7 @@
 }
 
 + (UIImage *)scaleAndRotateImage:(UIImage *)image {
-    int kMaxResolution = 1280; // Or whatever
+    int kMaxResolution = 2048; // Or whatever
     
     CGImageRef imgRef = image.CGImage;
     

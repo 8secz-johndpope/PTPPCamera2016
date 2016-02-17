@@ -10,6 +10,7 @@
 #import "PTPPStaticImageEditToolBar.h"
 #import "PTPPCameraFilterScrollView.h"
 #import "PTFilterManager.h"
+#import "PECropView.h"
 
 #define kFilterScrollHeight 150
 
@@ -26,7 +27,7 @@
 @property (nonatomic, strong) PTPPCameraFilterScrollView *filterScrollView;
 @property (nonatomic, strong) PTPPCameraFilterScrollView *cropScrollView;
 @property (nonatomic, assign) NSInteger activeFilterID;
-
+@property (nonatomic, strong) PECropView *cropView;
 @end
 
 @implementation PTPPStaticImageEditViewController
@@ -162,9 +163,8 @@
 
 #pragma mark - Touch Events
 -(void)handleSingleTap{
-    if (self.filterScrollView.finishBlock) {
-        self.filterScrollView.finishBlock();
-    }
+//    [self.filterScrollView confirm];
+//    [self.cropScrollView confirm];
 }
 
 -(void)goBack{
@@ -180,27 +180,32 @@
 }
 -(void)toggleFilterMenu{
     __weak typeof(self) weakSelf = self;
-    [self.filterScrollView setAttributeWithFilterSet:self.filterSet];
     self.filterScrollView.activeFilterID = self.activeFilterID;
-    self.filterScrollView.filterSelected = ^(NSInteger filterID){
-        weakSelf.activeFilterID = filterID;
-        NSDictionary *filterResult = [weakSelf getFilterResultFromInputImage:weakSelf.basePhoto filterIndex:filterID];
-        UIImageView *tempFilterImage = [[UIImageView alloc] initWithFrame:weakSelf.basePhotoView.frame];
-        UIImage *resultImage = [filterResult safeObjectForKey:PTFILTERIMAGE];
-
-        tempFilterImage.image = resultImage;
-        tempFilterImage.contentMode = UIViewContentModeScaleAspectFit;
-        [weakSelf.canvasView addSubview:tempFilterImage];
-        tempFilterImage.alpha = 0.0;
-        [UIView animateWithDuration:0.2 animations:^{
-            tempFilterImage.alpha = 1.0;
-        } completion:^(BOOL finished) {
-            [tempFilterImage removeFromSuperview];
-            weakSelf.basePhotoView.image = resultImage;
-        }];
+    self.filterScrollView.previousActiveFilterID = self.activeFilterID;
+    [self.filterScrollView setAttributeWithFilterSet:self.filterSet];
+    
+    self.filterScrollView.filterSelected = ^(NSInteger filterID, BOOL animated){
         
+        NSDictionary *filterResult = [weakSelf getFilterResultFromInputImage:weakSelf.basePhoto filterIndex:filterID];
+        UIImage *resultImage = [filterResult safeObjectForKey:PTFILTERIMAGE];
+        if (animated) {
+            UIImageView *tempFilterImage = [[UIImageView alloc] initWithFrame:weakSelf.basePhotoView.frame];
+            tempFilterImage.image = resultImage;
+            tempFilterImage.contentMode = UIViewContentModeScaleAspectFit;
+            [weakSelf.canvasView addSubview:tempFilterImage];
+            tempFilterImage.alpha = 0.0;
+            [UIView animateWithDuration:0.2 animations:^{
+                tempFilterImage.alpha = 1.0;
+            } completion:^(BOOL finished) {
+                [tempFilterImage removeFromSuperview];
+                weakSelf.basePhotoView.image = resultImage;
+            }];
+        }else{
+            weakSelf.basePhotoView.image = resultImage;
+        }
     };
-    self.filterScrollView.finishBlock = ^{
+    self.filterScrollView.finishBlock = ^(BOOL saveChange){
+        weakSelf.activeFilterID = weakSelf.filterScrollView.previousActiveFilterID;
         [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
               initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseOut  animations:^(){
                   weakSelf.filterScrollView.center = CGPointMake(weakSelf.filterScrollView.centerX, Screenheight+weakSelf.filterScrollView.height/2);
@@ -228,17 +233,68 @@
 -(void)toggleCropMenu{
     __weak typeof(self) weakSelf = self;
     [self.cropScrollView setAttributeWithFilterSet:self.cropSet];
-    self.cropScrollView.activeFilterID = 0;
-    self.cropScrollView.filterSelected = ^(NSInteger filterID){
-        weakSelf.activeFilterID = filterID;
+    self.cropScrollView.previousActiveFilterID = 0;
+    self.cropScrollView.filterSelected = ^(NSInteger filterID, BOOL animated){
+
         //Change crop ratio
+        switch (filterID) {
+            case 0:
+                //NSLog(@"---任意尺寸---");
+                weakSelf.cropView.image = weakSelf.basePhoto;
+                break;
+            case 1:
+                //NSLog(@"---9:16尺寸---");
+                weakSelf.cropView.cropAspectRatio = 9.0f / 16.0f;
+                
+               
+                break;
+            case 2:{
+                //NSLog(@"---3:4尺寸---");
+                weakSelf.cropView.cropAspectRatio = 3.0f / 4.0f;
+                
+
+                break;
+            }
+            case 3:{
+                //NSLog(@"---1:1尺寸---");
+                weakSelf.cropView.cropAspectRatio = 1.0f;
+
+                break;
+            }
+            case 4:{
+                //NSLog(@"---16:9尺寸---");
+                //修改切换到 16:9 比例，裁切框出图片范围 bug
+                weakSelf.cropView.cropAspectRatio = 16.0f / 9.0f;
+
+                break;
+            }
+            case 5:{
+                //NSLog(@"---4:3尺寸---");
+                //修改切换到 4:3 比例，裁切框出图片范围 bug
+                weakSelf.cropView.cropAspectRatio = 4.0f / 3.0f;
+
+                break;
+            }
+            default:
+                break;
+        }
         
+
     };
-    self.cropScrollView.finishBlock = ^{
+    self.cropScrollView.finishBlock = ^(BOOL saveChange){
+        if (saveChange) {
+            weakSelf.basePhoto = weakSelf.cropView.croppedImage;
+           
+            NSDictionary *filterResult = [weakSelf getFilterResultFromInputImage:weakSelf.basePhoto filterIndex:weakSelf.activeFilterID];
+            UIImage *resultImage = [filterResult safeObjectForKey:PTFILTERIMAGE];
+             weakSelf.basePhotoView.image = resultImage;
+        }
+        
+        [weakSelf.cropView removeFromSuperview];
         [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
               initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseOut  animations:^(){
                   weakSelf.cropScrollView.center = CGPointMake(weakSelf.filterScrollView.centerX, Screenheight+weakSelf.cropScrollView.height/2);
-                  //[weakSelf displayToolBar:YES];
+                  [weakSelf displayToolBar:YES];
               } completion:^(BOOL finished) {
                   [weakSelf.cropScrollView removeFromSuperview];
                   weakSelf.cropScrollView = nil;
@@ -246,11 +302,13 @@
     };
     
     [self.view addSubview:self.cropScrollView];
+    [self.canvasView addSubview:self.cropView];
+    self.cropView.image = self.basePhoto;
     self.cropScrollView.frame = CGRectMake(0, Screenheight, self.cropScrollView.width, self.cropScrollView.height);
     [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
           initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseOut  animations:^(){
               weakSelf.cropScrollView.frame = CGRectMake(0, Screenheight-kFilterScrollHeight, weakSelf.cropScrollView.width, weakSelf.cropScrollView.height);
-              //[weakSelf displayToolBar:NO];
+              [weakSelf displayToolBar:NO];
           } completion:^(BOOL finished) {}];
 }
 
@@ -262,11 +320,13 @@
     if (state) {
         self.toolBar.frame = CGRectMake(0, Screenheight-self.toolBar.height, self.toolBar.width, self.toolBar.height);
         self.topBar.frame = CGRectMake(self.topBar.left, 0, self.topBar.width, self.topBar.height);
-        self.canvasView.frame = CGRectMake(self.canvasView.left, 0, self.canvasView.width, self.canvasView.height);
+        self.basePhotoView.frame = CGRectMake(0, 0, Screenwidth, Screenheight);
+        self.cropView.frame = self.basePhotoView.frame;
     }else{
         self.toolBar.frame = CGRectMake(0, Screenheight, self.toolBar.width, self.toolBar.height);
         self.topBar.frame = CGRectMake(self.topBar.left, -HEIGHT_NAV, self.topBar.width, self.topBar.height);
-        self.canvasView.frame = CGRectMake(self.canvasView.left, -kFilterScrollHeight/2, self.canvasView.width, self.canvasView.height);
+        self.basePhotoView.frame = CGRectMake(0, 0, Screenwidth, Screenheight-kFilterScrollHeight);
+        self.cropView.frame = self.basePhotoView.frame;
     }
 }
 
@@ -379,7 +439,7 @@
 -(PTPPCameraFilterScrollView *)filterScrollView{
     if (!_filterScrollView) {
         _filterScrollView = [[PTPPCameraFilterScrollView alloc] initWithFrame:CGRectMake(0, 0, Screenwidth, kFilterScrollHeight)];
-        _filterScrollView.activeFilterID = 0;
+       
     }
     return _filterScrollView;
 }
@@ -405,6 +465,13 @@
         _cropSet = [[NSMutableArray alloc] init];
     }
     return _cropSet;
+}
+
+-(PECropView *)cropView{
+    if (!_cropView) {
+        _cropView = [[PECropView alloc] initWithFrame:self.basePhotoView.bounds];
+    }
+    return _cropView;
 }
 
 @end

@@ -15,9 +15,13 @@
 @class FilterControl;
 @interface PTPPCameraFilterScrollView ()
 @property (nonatomic, strong) UIScrollView *scrollView;
-@property (nonatomic, strong) UIButton *dismissButton;
+@property (nonatomic, strong) UIButton *cancelButton;
+@property (nonatomic, strong) UIButton *confirmButton;
+@property (nonatomic, strong) UIView *buttonSplitterLeft;
+@property (nonatomic, strong) UIView *buttonSplitterRight;
 @property (nonatomic, strong) NSArray *filterSet;
 @property (nonatomic, strong) NSMutableArray *filterControlSet;
+
 @end
 
 @implementation PTPPCameraFilterScrollView
@@ -27,7 +31,10 @@
     if (self) {
         self.backgroundColor = [UIColor blackColor];
         [self addSubview:self.scrollView];
-        [self addSubview:self.dismissButton];
+        [self addSubview:self.cancelButton];
+        [self addSubview:self.confirmButton];
+        [self addSubview:self.buttonSplitterLeft];
+        [self addSubview:self.buttonSplitterRight];
     }
     return self;
 }
@@ -48,7 +55,7 @@
         filterControl.filterPreivew = [[UIImageView alloc] initWithFrame:CGRectMake(10, 20, 50, 50)];
         filterControl.filterPreivew.image = [[self.filterSet safeObjectAtIndex:i] safeObjectForKey:PTFILTERIMAGE];
         filterControl.filterPreivew.layer.borderColor = [UIColor clearColor].CGColor;
-        if (i==self.activeFilterID) {
+        if (i==self.previousActiveFilterID) {
             if (!self.iconHightlightMode) {
                 filterControl.filterPreivew.layer.borderColor = [UIColor colorWithHexString:@"ff5654"].CGColor;
             }else{
@@ -76,7 +83,7 @@
         filterControl.filterLabel.font = [UIFont systemFontOfSize:12];
         filterControl.filterLabel.text = [[self.filterSet safeObjectAtIndex:i] safeObjectForKey:PTFILTERNAME];
         filterControl.filterLabel.textAlignment = NSTextAlignmentCenter;
-        if (i==self.activeFilterID) {
+        if (i==self.previousActiveFilterID) {
             filterControl.filterLabel.textColor = [UIColor colorWithHexString:@"ff5654"];
         }else{
             filterControl.filterLabel.textColor = [UIColor colorWithRed:0.7 green:0.7 blue:0.7 alpha:1.0];
@@ -87,7 +94,6 @@
         [self.filterControlSet addObject:filterControl];
     }
 
-    self.dismissButton.frame = CGRectMake(0, self.scrollView.bottom, self.dismissButton.width, self.dismissButton.height);
 }
 
 -(void)didTapFilterControl:(UIControl *)control{
@@ -116,13 +122,23 @@
             index ++;
         }
        
-        self.filterSelected(control.tag);
+        self.filterSelected(control.tag, YES);
     }
 }
 
--(void)dismissMe{
+-(void)cancel{
+    self.filterSelected(self.previousActiveFilterID,NO);
+    [self dismissMe:NO];
+}
+
+-(void)confirm{
+    self.previousActiveFilterID = self.activeFilterID;
+    [self dismissMe:YES];
+}
+
+-(void)dismissMe:(BOOL)saveChange{
     if (self.finishBlock) {
-        self.finishBlock();
+        self.finishBlock(saveChange);
     }
 }
 
@@ -143,15 +159,41 @@
     return _scrollView;
 }
 
--(UIButton *)dismissButton{
-    if (!_dismissButton) {
-        _dismissButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.width, 40)];
-        [_dismissButton setImage:[UIImage imageNamed:@"btn_spread_down"] forState:UIControlStateNormal];
-        [_dismissButton addTarget:self action:@selector(dismissMe) forControlEvents:UIControlEventTouchUpInside];
+-(UIButton *)cancelButton{
+    if (!_cancelButton) {
+        _cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(0, self.scrollView.bottom, 70, self.height-self.scrollView.height)];
+        [_cancelButton setTitle:@"取消" forState:UIControlStateNormal];
+        _cancelButton.titleLabel.font = [UIFont systemFontOfSize:13];
+        [_cancelButton addTarget:self action:@selector(cancel) forControlEvents:UIControlEventTouchUpInside];
     }
-    return _dismissButton;
+    return _cancelButton;
 }
 
+-(UIButton *)confirmButton{
+    if (!_confirmButton) {
+        _confirmButton = [[UIButton alloc] initWithFrame:CGRectMake(self.width - 70, self.scrollView.bottom, 70, self.height-self.scrollView.height)];
+        [_confirmButton setTitle:@"完成" forState:UIControlStateNormal];
+        _confirmButton.titleLabel.font = [UIFont systemFontOfSize:13];
+        [_confirmButton addTarget:self action:@selector(confirm) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _confirmButton;
+}
+
+-(UIView *)buttonSplitterLeft{
+    if (!_buttonSplitterLeft) {
+        _buttonSplitterLeft = [[UIView alloc] initWithFrame:CGRectMake(self.cancelButton.right, self.cancelButton.top + 10, 0.5, self.cancelButton.height-20)];
+        _buttonSplitterLeft.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.5];
+    }
+    return _buttonSplitterLeft;
+}
+
+-(UIView *)buttonSplitterRight{
+    if (!_buttonSplitterRight) {
+        _buttonSplitterRight = [[UIView alloc] initWithFrame:CGRectMake(self.confirmButton.left, self.confirmButton.top + 10, 0.5, self.confirmButton.height-20)];
+        _buttonSplitterRight.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.5];
+    }
+    return _buttonSplitterRight;
+}
 
 @end
 

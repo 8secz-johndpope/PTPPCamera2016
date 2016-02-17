@@ -406,9 +406,9 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 -(void)toggleFilterOption{
     __weak typeof(self) weakSelf = self;
     [self.filterScrollView setAttributeWithFilterSet:self.filterSet];
-    self.filterScrollView.activeFilterID = self.detectFaceController.activeFilterID;
-    self.filterScrollView.filterSelected = ^(NSInteger filterID){
-        weakSelf.detectFaceController.activeFilterID = filterID;
+    self.filterScrollView.previousActiveFilterID = self.detectFaceController.activeFilterID;
+    self.filterScrollView.filterSelected = ^(NSInteger filterID, BOOL animated){
+ 
         
         if (filterID != 0) {
             weakSelf.filterView.hidden = NO;
@@ -416,7 +416,8 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
             weakSelf.filterView.hidden = YES;
         }
     };
-    self.filterScrollView.finishBlock = ^{
+    self.filterScrollView.finishBlock = ^(BOOL saveChange){
+            weakSelf.detectFaceController.activeFilterID = weakSelf.filterScrollView.previousActiveFilterID;
         [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
               initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseIn  animations:^(){
                   weakSelf.filterScrollView.center = CGPointMake(weakSelf.filterScrollView.centerX, Screenheight+weakSelf.filterScrollView.height/2);
@@ -1073,7 +1074,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 -(PTPPCameraFilterScrollView *)filterScrollView{
     if (!_filterScrollView) {
         _filterScrollView = [[PTPPCameraFilterScrollView alloc] initWithFrame:CGRectMake(0, 0, Screenwidth, kFilterScrollHeight)];
-        _filterScrollView.activeFilterID = 0;
+        _filterScrollView.previousActiveFilterID = 0;
     }
     return _filterScrollView;
 }
