@@ -471,7 +471,12 @@ static const CGFloat MarginLeft = 20.0f;
     if (CGRectEqualToRect(self.scrollView.frame, toRect)) {
         return;
     }
-    
+    NSLog(@"Origin Y %f, Crop Y %f",self.scrollView.top,toRect.origin.y);
+    if (self.scrollView.width == toRect.size.width && self.scrollView.height != toRect.size.height) {
+        CGRect tempRext = toRect;
+        tempRext.size.width -= 1;
+        toRect = tempRext;
+    }
     CGFloat width = CGRectGetWidth(toRect);
     CGFloat height = CGRectGetHeight(toRect);
     
