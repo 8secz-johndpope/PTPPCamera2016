@@ -119,7 +119,7 @@
         
         if (self.showsGridMajor) {
             if (i > 0) {
-                [[UIColor whiteColor] set];
+                [THEME_COLOR set];
                 
                 UIRectFill(CGRectMake(roundf(width / 3 * i), borderPadding, 1.0f, roundf(height) - borderPadding * 2));
                 UIRectFill(CGRectMake(borderPadding, roundf(height / 3 * i), roundf(width) - borderPadding * 2, 1.0f));

@@ -303,13 +303,18 @@
     
     [self.view addSubview:self.cropScrollView];
     [self.canvasView addSubview:self.cropView];
+    self.cropView.alpha = 0;
     self.cropView.image = self.basePhoto;
     self.cropScrollView.frame = CGRectMake(0, Screenheight, self.cropScrollView.width, self.cropScrollView.height);
     [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
           initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseOut  animations:^(){
               weakSelf.cropScrollView.frame = CGRectMake(0, Screenheight-kFilterScrollHeight, weakSelf.cropScrollView.width, weakSelf.cropScrollView.height);
               [weakSelf displayToolBar:NO];
-          } completion:^(BOOL finished) {}];
+          } completion:^(BOOL finished) {
+              [UIView animateWithDuration:0.35 animations:^{
+                  self.cropView.alpha = 1.0;
+              }];
+          }];
 }
 
 -(void)toggleRotationMenu{
@@ -318,15 +323,17 @@
 
 -(void)displayToolBar:(BOOL)state{
     if (state) {
+        //Edit mode OFF
         self.toolBar.frame = CGRectMake(0, Screenheight-self.toolBar.height, self.toolBar.width, self.toolBar.height);
         self.topBar.frame = CGRectMake(self.topBar.left, 0, self.topBar.width, self.topBar.height);
         self.basePhotoView.frame = CGRectMake(0, 0, Screenwidth, Screenheight);
         self.cropView.frame = self.basePhotoView.frame;
     }else{
+        //Edit mode ON
         self.toolBar.frame = CGRectMake(0, Screenheight, self.toolBar.width, self.toolBar.height);
         self.topBar.frame = CGRectMake(self.topBar.left, -HEIGHT_NAV, self.topBar.width, self.topBar.height);
-        self.basePhotoView.frame = CGRectMake(0, 0, Screenwidth, Screenheight-kFilterScrollHeight);
-        self.cropView.frame = self.basePhotoView.frame;
+        self.basePhotoView.frame = CGRectMake(20, 37, Screenwidth-40, Screenheight-kFilterScrollHeight-37*2);
+        self.cropView.frame = CGRectMake(0, 0, Screenwidth, Screenheight-kFilterScrollHeight);;
     }
 }
 
