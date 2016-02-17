@@ -405,7 +405,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 
 -(void)toggleFilterOption{
     __weak typeof(self) weakSelf = self;
-    [self.filterScrollView setAttributeWithFilterSet:self.filterSet];
+    [self.filterScrollView setAttributeWithFilterSet:self.filterSet gridSpace:70 immediateEffectApplied:NO];
     self.filterScrollView.previousActiveFilterID = self.detectFaceController.activeFilterID;
     self.filterScrollView.filterSelected = ^(NSInteger filterID, BOOL animated){
  

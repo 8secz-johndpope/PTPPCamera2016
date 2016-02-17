@@ -11,7 +11,7 @@
 typedef void(^FilterSelected)(NSInteger filterID, BOOL animated);
 typedef void(^FinishBlock)(BOOL saveChange);
 @interface PTPPCameraFilterScrollView : UIView
--(void)setAttributeWithFilterSet:(NSArray *)filterSet;
+-(void)setAttributeWithFilterSet:(NSArray *)filterSet gridSpace:(CGFloat)gridSpace immediateEffectApplied:(BOOL)immediateEffectApplied;
 @property (nonatomic, assign) BOOL iconHightlightMode;
 @property (nonatomic, assign) NSInteger activeFilterID;
 @property (nonatomic, assign) NSInteger previousActiveFilterID;

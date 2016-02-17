@@ -47,4 +47,5 @@
 
 //修正Orientation
 + (UIImage *)scaleAndRotateImage:(UIImage *)image;
++ (UIImage *)image:(UIImage *)image rotatedByDegrees:(CGFloat)degrees;
 @end

@@ -15,13 +15,14 @@
 @class FilterControl;
 @interface PTPPCameraFilterScrollView ()
 @property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) UIButton *arrowButton;
 @property (nonatomic, strong) UIButton *cancelButton;
 @property (nonatomic, strong) UIButton *confirmButton;
 @property (nonatomic, strong) UIView *buttonSplitterLeft;
 @property (nonatomic, strong) UIView *buttonSplitterRight;
 @property (nonatomic, strong) NSArray *filterSet;
 @property (nonatomic, strong) NSMutableArray *filterControlSet;
-
+@property (nonatomic, assign) CGFloat gridSpace;
 @end
 
 @implementation PTPPCameraFilterScrollView
@@ -35,12 +36,27 @@
         [self addSubview:self.confirmButton];
         [self addSubview:self.buttonSplitterLeft];
         [self addSubview:self.buttonSplitterRight];
+        [self addSubview:self.arrowButton];
     }
     return self;
 }
 
--(void)setAttributeWithFilterSet:(NSArray *)filterSet{
+-(void)setAttributeWithFilterSet:(NSArray *)filterSet gridSpace:(CGFloat)gridSpace immediateEffectApplied:(BOOL)immediateEffectApplied{
     self.filterSet = filterSet;
+    self.gridSpace = gridSpace;
+    if (immediateEffectApplied) {
+        self.arrowButton.hidden = NO;
+        self.cancelButton.hidden = YES;
+        self.confirmButton.hidden = YES;
+        self.buttonSplitterLeft.hidden = YES;
+        self.buttonSplitterRight.hidden = YES;
+    }else{
+        self.arrowButton.hidden = YES;
+        self.cancelButton.hidden = NO;
+        self.confirmButton.hidden = NO;
+        self.buttonSplitterLeft.hidden = NO;
+        self.buttonSplitterRight.hidden = NO;
+    }
     [self setNeedsLayout];
 }
 
@@ -49,10 +65,10 @@
     [self.scrollView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
     [self.filterControlSet removeAllObjects];
     for (NSInteger i=0; i<self.filterSet.count; i++) {
-        FilterControl *filterControl = [[FilterControl alloc] initWithFrame:CGRectMake(i*70, 0, 70, self.scrollView.height)];
+        FilterControl *filterControl = [[FilterControl alloc] initWithFrame:CGRectMake(i*self.gridSpace, 0, self.gridSpace, self.scrollView.height)];
         filterControl.tag = i;
         [filterControl addTarget:self action:@selector(didTapFilterControl:) forControlEvents:UIControlEventTouchUpInside];
-        filterControl.filterPreivew = [[UIImageView alloc] initWithFrame:CGRectMake(10, 20, 50, 50)];
+        filterControl.filterPreivew = [[UIImageView alloc] initWithFrame:CGRectMake((self.gridSpace-50)/2, (self.scrollView.height-50)/2-10, 50, 50)];
         filterControl.filterPreivew.image = [[self.filterSet safeObjectAtIndex:i] safeObjectForKey:PTFILTERIMAGE];
         filterControl.filterPreivew.layer.borderColor = [UIColor clearColor].CGColor;
         if (i==self.previousActiveFilterID) {
@@ -157,6 +173,15 @@
         _scrollView.showsVerticalScrollIndicator = NO;
     }
     return _scrollView;
+}
+
+-(UIButton *)arrowButton{
+    if (!_arrowButton) {
+        _arrowButton = [[UIButton alloc] initWithFrame:CGRectMake(0, self.scrollView.bottom, self.width, self.height-self.scrollView.height)];
+        [_arrowButton setImage:[UIImage imageNamed:@"btn_spread_down"] forState:UIControlStateNormal];
+        [_arrowButton addTarget:self action:@selector(confirm) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _arrowButton;
 }
 
 -(UIButton *)cancelButton{
