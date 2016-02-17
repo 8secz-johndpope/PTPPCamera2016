@@ -71,8 +71,8 @@ static const CGFloat MarginLeft = 20.0f;
     self.scrollView.maximumZoomScale = 20.0f;
     self.scrollView.showsHorizontalScrollIndicator = NO;
     self.scrollView.showsVerticalScrollIndicator = NO;
-    self.scrollView.bounces = NO;
-    self.scrollView.bouncesZoom = NO;
+    self.scrollView.bounces = YES;
+    self.scrollView.bouncesZoom = YES;
     self.scrollView.clipsToBounds = NO;
     [self addSubview:self.scrollView];
     
@@ -431,14 +431,14 @@ static const CGFloat MarginLeft = 20.0f;
 
 - (void)automaticZoomIfEdgeTouched:(CGRect)cropRect
 {
-    if (CGRectGetMinX(cropRect) < CGRectGetMinX(self.editingRect) - 5.0f ||
-        CGRectGetMaxX(cropRect) > CGRectGetMaxX(self.editingRect) + 5.0f ||
-        CGRectGetMinY(cropRect) < CGRectGetMinY(self.editingRect) - 5.0f ||
-        CGRectGetMaxY(cropRect) > CGRectGetMaxY(self.editingRect) + 5.0f) {
-        [UIView animateWithDuration:1.0 delay:0.0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
-            [self zoomToCropRect:self.cropRectView.frame];
-        } completion:NULL];
-    }
+//    if (CGRectGetMinX(cropRect) < CGRectGetMinX(self.editingRect) - 5.0f ||
+//        CGRectGetMaxX(cropRect) > CGRectGetMaxX(self.editingRect) + 5.0f ||
+//        CGRectGetMinY(cropRect) < CGRectGetMinY(self.editingRect) - 5.0f ||
+//        CGRectGetMaxY(cropRect) > CGRectGetMaxY(self.editingRect) + 5.0f) {
+//        [UIView animateWithDuration:1.0 delay:0.0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+//            [self zoomToCropRect:self.cropRectView.frame];
+//        } completion:NULL];
+//    }
 }
 
 #pragma mark -
@@ -497,8 +497,9 @@ static const CGFloat MarginLeft = 20.0f;
         zoomRect.origin.x = (CGRectGetWidth(imageViewBounds) / 2) - (CGRectGetWidth(zoomRect) / 2);
     }
     
-    [UIView animateWithDuration:0.25 delay:0.0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
-        self.scrollView.bounds = cropRect;
+    [UIView  animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
+           initialSpringVelocity:0.6 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+        self.scrollView.frame = cropRect;
         
         //1、根据 放大图片
         //使用 scrollView 实现图片缩放  zoomRect 缩放后的图片尺寸
@@ -507,6 +508,7 @@ static const CGFloat MarginLeft = 20.0f;
         //2、
         [self layoutCropRectViewWithCropRect:cropRect];
     } completion:NULL];
+    
 }
 
 - (void)zoomToCropRect:(CGRect)toRect
@@ -554,8 +556,8 @@ static const CGFloat MarginLeft = 20.0f;
 
 - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
 {
-    CGPoint contentOffset = scrollView.contentOffset;
-    *targetContentOffset = contentOffset;
+//    CGPoint contentOffset = scrollView.contentOffset;
+//    *targetContentOffset = contentOffset;
 }
 
 @end

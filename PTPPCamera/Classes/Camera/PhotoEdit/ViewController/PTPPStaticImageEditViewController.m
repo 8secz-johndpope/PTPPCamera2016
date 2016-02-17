@@ -240,39 +240,40 @@
         switch (filterID) {
             case 0:
                 //NSLog(@"---任意尺寸---");
-                weakSelf.cropView.image = weakSelf.basePhoto;
+              
+                weakSelf.cropView.keepingCropAspectRatio = NO;
                 break;
             case 1:
                 //NSLog(@"---9:16尺寸---");
                 weakSelf.cropView.cropAspectRatio = 9.0f / 16.0f;
-                
+                weakSelf.cropView.keepingCropAspectRatio = YES;
                
                 break;
             case 2:{
                 //NSLog(@"---3:4尺寸---");
                 weakSelf.cropView.cropAspectRatio = 3.0f / 4.0f;
-                
+                weakSelf.cropView.keepingCropAspectRatio = YES;
 
                 break;
             }
             case 3:{
                 //NSLog(@"---1:1尺寸---");
                 weakSelf.cropView.cropAspectRatio = 1.0f;
-
+                weakSelf.cropView.keepingCropAspectRatio = YES;
                 break;
             }
             case 4:{
                 //NSLog(@"---16:9尺寸---");
                 //修改切换到 16:9 比例，裁切框出图片范围 bug
                 weakSelf.cropView.cropAspectRatio = 16.0f / 9.0f;
-
+                weakSelf.cropView.keepingCropAspectRatio = YES;
                 break;
             }
             case 5:{
                 //NSLog(@"---4:3尺寸---");
                 //修改切换到 4:3 比例，裁切框出图片范围 bug
                 weakSelf.cropView.cropAspectRatio = 4.0f / 3.0f;
-
+                weakSelf.cropView.keepingCropAspectRatio = YES;
                 break;
             }
             default:
