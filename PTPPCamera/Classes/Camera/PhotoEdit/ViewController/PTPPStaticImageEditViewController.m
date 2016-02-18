@@ -78,7 +78,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 }
 
 -(void)updateFrame{
-
+    
     self.topBar.frame = CGRectMake(0, 0, Screenwidth, HEIGHT_NAV);
     self.backButton.frame = CGRectMake(10, 0, 30, 40);
     self.saveButton.frame = CGRectMake(Screenwidth-100, 0, 100, HEIGHT_NAV);
@@ -205,7 +205,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
               self.basePhotoView.image = self.basePhoto;
               self.isRotating = NO;
           }];
-
+    
 }
 
 -(void)animateFlipImage:(UIImage *)image direction:(NSInteger)direction{
@@ -225,14 +225,15 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     t.m34 = 1.0/-500;
     [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
           initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseIn animations:^{
-        animateImageView.layer.transform = t;
-                    }
-                    completion:^(BOOL finish){
-                        [animateImageView removeFromSuperview];
-                        self.basePhotoView.image = self.basePhoto;
-                        self.isRotating = NO;
-                    }];
+              animateImageView.layer.transform = t;
+          }
+                     completion:^(BOOL finish){
+                         [animateImageView removeFromSuperview];
+                         self.basePhotoView.image = self.basePhoto;
+                         self.isRotating = NO;
+                     }];
 }
+
 
 - (UIImage *)image:(UIImage *)image rotatedByDegrees:(CGFloat)degrees
 {
@@ -241,11 +242,11 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     CGAffineTransform t = CGAffineTransformMakeRotation(DegreesToRadians(degrees));
     rotatedViewBox.transform = t;
     CGSize rotatedSize = rotatedViewBox.frame.size;
-//    CGFloat ratio = rotatedSize.height/rotatedSize.width;
-//    NSInteger factorOf16 = rotatedSize.width/16;
-//    NSInteger newWidth = factorOf16*16;
-//    NSInteger newHeight = newWidth*ratio;
-//    rotatedSize = CGSizeMake(newWidth, newHeight);
+    CGFloat ratio = rotatedSize.height/rotatedSize.width;
+    NSInteger factorOf16 = rotatedSize.width/2;
+    NSInteger newWidth = factorOf16*2;
+    NSInteger newHeight = newWidth*ratio;
+    rotatedSize = CGSizeMake(newWidth, newHeight);
     // Create the bitmap context
     UIGraphicsBeginImageContext(rotatedSize);
     CGContextRef bitmap = UIGraphicsGetCurrentContext();
@@ -282,10 +283,12 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     CGContextDrawImage(ctx, CGRectMake(0, 0, CGImageGetWidth(inImage), CGImageGetHeight(inImage)), inImage);
     
     if (flipDirection == 0) {
+        // Horizontal flip
         CGAffineTransform transform = CGAffineTransformMakeTranslation(image.size.width, 0.0);
         transform = CGAffineTransformScale(transform, -1.0, 1.0);
         CGContextConcatCTM(ctx, transform);
     }else{
+        // Vertical flip
         CGAffineTransform transform = CGAffineTransformMakeTranslation(0.0, image.size.height);
         transform = CGAffineTransformScale(transform, 1.0, -1.0);
         CGContextConcatCTM(ctx, transform);
@@ -321,8 +324,8 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 
 #pragma mark - Touch Events
 -(void)handleSingleTap{
-//    [self.filterScrollView confirm];
-//    [self.cropScrollView confirm];
+    //    [self.filterScrollView confirm];
+    //    [self.cropScrollView confirm];
 }
 
 -(void)goBack{
@@ -334,7 +337,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 }
 
 -(void)toggleStaticStickerMenu{
-
+    
 }
 -(void)toggleFilterMenu{
     __weak typeof(self) weakSelf = self;
@@ -381,11 +384,11 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
               weakSelf.filterScrollView.frame = CGRectMake(0, Screenheight-weakSelf.filterScrollView.height, weakSelf.filterScrollView.width, weakSelf.filterScrollView.height);
               [weakSelf displayToolBar:NO basePhotoViewHeight:self.filterScrollView.height];
           } completion:^(BOOL finished) {}];
-
+    
 }
 
 -(void)toggleARStickerMenu{
-
+    
 }
 
 -(void)toggleCropMenu{
@@ -393,7 +396,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     [self.cropScrollView setAttributeWithFilterSet:self.cropSet gridSpace:70 immediateEffectApplied:NO];
     self.cropScrollView.previousActiveFilterID = 0;
     self.cropScrollView.filterSelected = ^(NSInteger filterID, BOOL animated){
-
+        
         //Change crop ratio
         switch (filterID) {
             case 0:
@@ -404,13 +407,13 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
                 //NSLog(@"---9:16尺寸---");
                 weakSelf.cropView.cropAspectRatio = 9.0f / 16.0f;
                 weakSelf.cropView.keepingCropAspectRatio = YES;
-               
+                
                 break;
             case 2:{
                 //NSLog(@"---3:4尺寸---");
                 weakSelf.cropView.cropAspectRatio = 3.0f / 4.0f;
                 weakSelf.cropView.keepingCropAspectRatio = YES;
-
+                
                 break;
             }
             case 3:{
@@ -440,10 +443,10 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     self.cropScrollView.finishBlock = ^(BOOL saveChange){
         if (saveChange) {
             weakSelf.basePhoto = weakSelf.cropView.croppedImage;
-           
+            
             NSDictionary *filterResult = [weakSelf getFilterResultFromInputImage:weakSelf.basePhoto filterIndex:weakSelf.activeFilterID];
             UIImage *resultImage = [filterResult safeObjectForKey:PTFILTERIMAGE];
-             weakSelf.basePhotoView.image = resultImage;
+            weakSelf.basePhotoView.image = resultImage;
         }
         
         [weakSelf.cropView removeFromSuperview];
@@ -501,7 +504,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
         
     };
     self.rotateSrollView.finishBlock = ^(BOOL saveChange){
-
+        
         NSDictionary *filterResult = [weakSelf getFilterResultFromInputImage:weakSelf.basePhoto filterIndex:weakSelf.activeFilterID];
         UIImage *resultImage = [filterResult safeObjectForKey:PTFILTERIMAGE];
         weakSelf.basePhotoView.image = resultImage;
@@ -515,7 +518,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
                   weakSelf.rotateSrollView = nil;
               }];
     };
-     self.basePhotoView.image = self.basePhoto;
+    self.basePhotoView.image = self.basePhoto;
     [self.view addSubview:self.rotateSrollView];
     self.rotateSrollView.frame = CGRectMake(0, Screenheight, self.rotateSrollView.width, self.cropScrollView.height);
     [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
@@ -523,7 +526,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
               weakSelf.rotateSrollView.frame = CGRectMake(0, Screenheight-weakSelf.rotateSrollView.height, weakSelf.rotateSrollView.width, weakSelf.rotateSrollView.height);
               [weakSelf displayToolBar:NO basePhotoViewHeight:self.rotateSrollView.height];
           } completion:^(BOOL finished) {
-    }];
+          }];
 }
 
 
@@ -636,7 +639,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 -(PTPPCameraFilterScrollView *)filterScrollView{
     if (!_filterScrollView) {
         _filterScrollView = [[PTPPCameraFilterScrollView alloc] initWithFrame:CGRectMake(0, 0, Screenwidth, kFilterScrollHeight)];
-       
+        
     }
     return _filterScrollView;
 }
