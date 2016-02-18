@@ -1508,6 +1508,7 @@
 		C647C8F21C71CB2F00E596EA /* APRoundedButton.m in Sources */ = {isa = PBXBuildFile; fileRef = C647C8F11C71CB2F00E596EA /* APRoundedButton.m */; };
 		C647C8FF1C71CF2B00E596EA /* placeholder.md in Sources */ = {isa = PBXBuildFile; fileRef = C647C8FE1C71CF2B00E596EA /* placeholder.md */; };
 		C647C9021C71CF3400E596EA /* AssetHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C647C9011C71CF3400E596EA /* AssetHelper.m */; };
+		C6669B0B1C75A508009291C4 /* PTPPLiveStickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = C6669B0A1C75A508009291C4 /* PTPPLiveStickerView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -3436,6 +3437,8 @@
 		C647C8FE1C71CF2B00E596EA /* placeholder.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = placeholder.md; sourceTree = "<group>"; };
 		C647C9001C71CF3400E596EA /* AssetHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AssetHelper.h; sourceTree = "<group>"; };
 		C647C9011C71CF3400E596EA /* AssetHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AssetHelper.m; sourceTree = "<group>"; };
+		C6669B091C75A508009291C4 /* PTPPLiveStickerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPLiveStickerView.h; sourceTree = "<group>"; };
+		C6669B0A1C75A508009291C4 /* PTPPLiveStickerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPLiveStickerView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -6197,6 +6200,8 @@
 		C647C89B1C71C40200E596EA /* View */ = {
 			isa = PBXGroup;
 			children = (
+				C6669B091C75A508009291C4 /* PTPPLiveStickerView.h */,
+				C6669B0A1C75A508009291C4 /* PTPPLiveStickerView.m */,
 				C647C89C1C71C40200E596EA /* FilterControl.h */,
 				C647C89D1C71C40200E596EA /* FilterControl.m */,
 				C647C89E1C71C40200E596EA /* PTLiveStickerPickerCell.h */,
@@ -7466,6 +7471,7 @@
 				C647BCEB1C718C4B00E596EA /* UIImageView+PTCopy.m in Sources */,
 				C647BC021C7181BE00E596EA /* SOBaseButton.m in Sources */,
 				C647BFA81C71BBBB00E596EA /* GPUImageHoughTransformLineDetector.m in Sources */,
+				C6669B0B1C75A508009291C4 /* PTPPLiveStickerView.m in Sources */,
 				C647BCD71C718C4B00E596EA /* placeholder.md in Sources */,
 				C647BFB91C71BBBB00E596EA /* GPUImageLuminanceRangeFilter.m in Sources */,
 				C647BC081C7181BE00E596EA /* SOBaseView.m in Sources */,

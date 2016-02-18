@@ -6,7 +6,7 @@
 //  Copyright © 2016 putao. All rights reserved.
 //
 #import "PTVCTransitionLeftRightManager.h"
-
+#import "PTPPLiveStickerView.h"
 #import "PTPPLiveVideoShareViewController.h"
 #import "PTPPNewHomeViewController.h"
 #import "ELCImagePickerHeader.h"
@@ -37,11 +37,7 @@
 @property (nonatomic, copy) NSArray *chosenImages;
 @property (strong, nonatomic) DetectFace *detectFaceController;
 @property (nonatomic, strong) UIView *previewView;
-@property (nonatomic, strong) UIView *stickerView;
-@property (nonatomic, strong) UIImageView *eyesSticker;
-@property (nonatomic, strong) UIImageView *mouthSticker;
-@property (nonatomic, strong) UIImageView *bottomSticker;
-@property (nonatomic, strong) UIView *leftEye, *rightEye, *mouth;
+
 @property (nonatomic, strong) UIImageView *filterView;
 @property (nonatomic, assign) CGRect previousFaceRect;
 @property (nonatomic, assign) BOOL cameraCanUse;        //判断相机是否允许使用
@@ -78,14 +74,8 @@
 @property (nonatomic, strong) PTPPLiveCameraTipsView *tipsView;
 @property (nonatomic, strong) PTVCTransitionLeftRightManager *transitionManager;
 
-@property (nonatomic, strong) NoiseFilter *leftEyeFilterX, *leftEyeFilterY;
-@property (nonatomic, strong) NoiseFilter *rightEyeFilterX, *rightEyeFilterY;
-@property (nonatomic, strong) NoiseFilter *mouthFilterX, *mouthFilterY;
-@property (nonatomic, strong) NoiseFilter *faceWidthFilter;
+@property (nonatomic, strong) PTPPLiveStickerView *liveStickerView;
 @property (nonatomic, assign) NSInteger invalidDetectionTimeOut;
-@property (nonatomic, strong) PTPPStickerAnimation *mouthAnimation;
-@property (nonatomic, strong) PTPPStickerAnimation *eyeAnimation;
-@property (nonatomic, strong) PTPPStickerAnimation *bottomAnimation;
 @property (nonatomic, strong) NSString *selectedARSticker;
 @end
 
@@ -105,25 +95,18 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     self.transitionManager = [[PTVCTransitionLeftRightManager alloc]init];
     [self.view addSubview:self.previewView];
     [self.view addSubview:self.filterView];
-    [self.view addSubview:self.stickerView];
+    [self.view addSubview:self.liveStickerView];
     [self.view addSubview:self.cropMaskTop];
     [self.view addSubview:self.cropMaskBottom];
     [self.view addSubview:self.topControlView];
     [self.view addSubview:self.bottomControlView];
 
     //Start Live camera face detection
-    self.leftEyeFilterX = [[NoiseFilter alloc] initWithDataLength:kFilterDataLength];
-    self.leftEyeFilterY = [[NoiseFilter alloc] initWithDataLength:kFilterDataLength];
-    self.rightEyeFilterX = [[NoiseFilter alloc] initWithDataLength:kFilterDataLength];
-    self.rightEyeFilterY = [[NoiseFilter alloc] initWithDataLength:kFilterDataLength];
-    self.mouthFilterX = [[NoiseFilter alloc] initWithDataLength:kFilterDataLength];
-    self.mouthFilterY = [[NoiseFilter alloc] initWithDataLength:kFilterDataLength];
-    self.faceWidthFilter = [[NoiseFilter alloc] initWithDataLength:kFilterDataLength];
     [self setupCameraControlPanel];
     self.cameraCanUse = [self checkCameraCanUse];
     self.assetsLibraryCanUse = [PTUtilTool checkALAssetsLibraryCanUse];
 
-    self.stickerView.hidden = YES;
+    self.liveStickerView.hidden = YES;
     UITapGestureRecognizer *singleFingerTap =
     [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap)];
     [self.previewView addGestureRecognizer:singleFingerTap];
@@ -145,7 +128,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
                                          orientation: UIImageOrientationUpMirrored];
         }
         
-        if (weakSelf.stickerView.alpha == 0 || (self.eyesSticker == nil && self.mouthSticker == nil)) {
+        if (weakSelf.liveStickerView.alpha == 0 || (weakSelf.liveStickerView.eyeSticker.isHidden && weakSelf.liveStickerView.mouthSticker.isHidden)) {
             CGFloat widthRatio = image.size.width/(Screenwidth*[UIScreen mainScreen].scale);
             CGFloat heightRatio = image.size.height/(Screenheight*[UIScreen mainScreen].scale);
             //No AR stickers on screen, go to static photo edit process.
@@ -156,7 +139,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
             }
         }else{
             //AR stickers on screen, go to preview video
-            PTPPLiveStickerPreviewViewController *liveStickerVC = [[PTPPLiveStickerPreviewViewController alloc] initWithBasePhoto:image mouthSticker:weakSelf.mouthSticker eyeSticker:weakSelf.eyesSticker bottomSticker:weakSelf.bottomSticker];
+            PTPPLiveStickerPreviewViewController *liveStickerVC = [[PTPPLiveStickerPreviewViewController alloc] initWithBasePhoto:image mouthSticker:weakSelf.liveStickerView.mouthSticker eyeSticker:weakSelf.liveStickerView.eyeSticker bottomSticker:weakSelf.liveStickerView.bottomSticker];
             [liveStickerVC setCropOption:[[weakSelf.cameraSettings objectForKey:PTPPCameraSettingCrop] integerValue]];
             [weakSelf.navigationController pushViewController:liveStickerVC animated:YES];
         }
@@ -441,15 +424,13 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 -(void)toggleLiveStickerOption{
     __weak typeof(self) weakSelf = self;
     self.liveStickerScrollView.stickerSelected = ^(NSString *stickerName, BOOL isFromBundle){
-        weakSelf.eyeAnimation = nil;
-        weakSelf.mouthAnimation = nil;
-        weakSelf.bottomAnimation = nil;
-        [weakSelf.eyesSticker removeFromSuperview];
-        [weakSelf.mouthSticker removeFromSuperview];
-        [weakSelf.bottomSticker removeFromSuperview];
-        weakSelf.eyesSticker = nil;
-        weakSelf.mouthSticker = nil;
-        weakSelf.bottomSticker = nil;
+        weakSelf.liveStickerView.eyeAnimation = nil;
+        weakSelf.liveStickerView.mouthAnimation = nil;
+        weakSelf.liveStickerView.bottomAnimation = nil;
+        weakSelf.liveStickerView.eyeSticker.animationImages = nil;
+        weakSelf.liveStickerView.mouthSticker.animationImages = nil;
+        weakSelf.liveStickerView.bottomSticker.animationImages = nil;
+
         if (stickerName != nil) {
             weakSelf.selectedARSticker = stickerName;
             if(isFromBundle){
@@ -535,17 +516,19 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 }
 
 -(void)createStickerAnimationFromDictionarySettings:(NSDictionary *)resultDict downloadFolder:(NSString *)downloadFolder{
-
+    PTPPStickerAnimation *mouthAnimation;
+    PTPPStickerAnimation *eyeAnimation;
+    PTPPStickerAnimation *bottomAnimation;
     for(NSString *featureKey in [[resultDict safeObjectForKey:@"animation"] allKeys]){
         if ([featureKey isEqualToString:@"mouth"]) {
-            self.mouthAnimation = [PTPPStickerAnimation animationWithDictionarySettings:[[resultDict objectForKey:@"animation"] objectForKey:featureKey] feature:featureKey filePath:downloadFolder];
+            mouthAnimation = [PTPPStickerAnimation animationWithDictionarySettings:[[resultDict objectForKey:@"animation"] objectForKey:featureKey] feature:featureKey filePath:downloadFolder];
         }else if ([featureKey isEqualToString:@"eye"]){
-            self.eyeAnimation = [PTPPStickerAnimation animationWithDictionarySettings:[[resultDict objectForKey:@"animation"] objectForKey:featureKey] feature:featureKey filePath:downloadFolder];
+            eyeAnimation = [PTPPStickerAnimation animationWithDictionarySettings:[[resultDict objectForKey:@"animation"] objectForKey:featureKey] feature:featureKey filePath:downloadFolder];
         }else if([featureKey isEqualToString:@"bottom"]){
-            self.bottomAnimation = [PTPPStickerAnimation animationWithDictionarySettings:[[resultDict objectForKey:@"animation"] objectForKey:featureKey] feature:featureKey filePath:downloadFolder];
+            bottomAnimation = [PTPPStickerAnimation animationWithDictionarySettings:[[resultDict objectForKey:@"animation"] objectForKey:featureKey] feature:featureKey filePath:downloadFolder];
         }
     }
-
+    [self.liveStickerView setAttributeWithMouthAnimation:mouthAnimation eyeAnimation:eyeAnimation bottomAnimation:bottomAnimation];
 }
 
 -(void)setupCameraControlPanel{
@@ -803,35 +786,12 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     }
     
     
-    if (!self.leftEye) {
-        self.leftEye = [[UIView alloc] init];
-        //[self.view addSubview:self.leftEye];
-    }
-    if (!self.rightEye) {
-        self.rightEye = [[UIView alloc] init];
-        //[self.view addSubview:self.rightEye];
-    }
-    if (!self.mouth) {
-        self.mouth = [[UIView alloc] init];
-        [self.stickerView addSubview:self.mouth];
-    }
-    
-//    self.eyesSticker.hidden = NO;
-//    self.mouthSticker.hidden = NO;
-    self.stickerView.hidden = NO;
+    self.liveStickerView.hidden = NO;
     if (featuresArray.count == 0) {
         if (self.invalidDetectionTimeOut >= 15) {
             [UIView animateWithDuration:0.3 animations:^{
-//                self.eyesSticker.alpha = 0.0;
-//                self.mouthSticker.alpha = 0.0;
-                self.stickerView.alpha = 0.0;
-                self.bottomSticker.alpha = 0.0;
-            } completion:^(BOOL finished) {
-                
-//                self.eyesSticker.hidden = YES;
-//                self.mouthSticker.hidden = YES;
-            }];
-            
+                self.liveStickerView.alpha = 0.0;
+            } completion:^(BOOL finished) {}];
         }else{
             self.invalidDetectionTimeOut++;
         }
@@ -839,131 +799,10 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     }else{
         self.invalidDetectionTimeOut = 0;
     }
-    
     [UIView animateWithDuration:0.3 animations:^{
-//        self.eyesSticker.alpha = 1.0;
-//        self.mouthSticker.alpha = 1.0;
-        self.stickerView.alpha = 1.0;
-        self.bottomSticker.alpha = 1.0;
-    } completion:^(BOOL finished) {
-        
-    }];
-    for (CIFaceFeature *ff in featuresArray) {
-        
-        CGRect faceRect = [ff bounds];
-        
-        faceRect = [DetectFace convertFrame:faceRect previewBox:previewBox forVideoBox:clap isMirrored:YES];
-        CGFloat faceWidth = faceRect.size.width;
-        float newFaceWidth = [self.faceWidthFilter noiseFilterWithData:faceWidth];
-        faceWidth = newFaceWidth;
-
-
-        float newCenterX;
-        float newCenterY;
-
-//        self.eyesSticker.hidden = NO;
-//        self.mouthSticker.hidden = NO;
-        self.stickerView.hidden = NO;
-        if(ff.hasLeftEyePosition)
-        {
-            CGRect leftEyeFrame = CGRectMake(ff.leftEyePosition.x-faceWidth*0.15,  ff.leftEyePosition.y-faceWidth*0.15, faceWidth*0.3, faceWidth*0.3);
-            self.leftEye.frame = [DetectFace convertFrame:leftEyeFrame previewBox:previewBox forVideoBox:clap isMirrored:YES];
-            [self.leftEye setBackgroundColor:[[UIColor blueColor] colorWithAlphaComponent:0.3]];
-            self.leftEye.layer.cornerRadius = faceWidth*0.15;
-            newCenterX = [self.leftEyeFilterX noiseFilterWithData:self.leftEye.centerX];
-            newCenterY = [self.leftEyeFilterY noiseFilterWithData:self.leftEye.centerY];
-            self.leftEye.center = CGPointMake(newCenterX, newCenterY);
-        }
-        if(ff.hasRightEyePosition)
-        {
-            CGRect rightEyeFrame = CGRectMake(ff.rightEyePosition.x-faceWidth*0.15, ff.rightEyePosition.y-faceWidth*0.15, faceWidth*0.3, faceWidth*0.3);
-            self.rightEye.frame = [DetectFace convertFrame:rightEyeFrame previewBox:previewBox forVideoBox:clap isMirrored:YES];
-            [self.rightEye setBackgroundColor:[[UIColor blueColor] colorWithAlphaComponent:0.3]];
-            self.rightEye.layer.cornerRadius = faceWidth*0.15;
-            newCenterX = [self.rightEyeFilterX noiseFilterWithData:self.rightEye.centerX];
-            newCenterY = [self.rightEyeFilterY noiseFilterWithData:self.rightEye.centerY];
-            self.rightEye.center = CGPointMake(newCenterX, newCenterY);
-        }
-        
-        if (ff.hasLeftEyePosition && ff.hasRightEyePosition && self.eyeAnimation) {
-            CGFloat stickerWidth = self.eyeAnimation.width;
-            CGFloat stickerHeight = self.eyeAnimation.height;
-            CGFloat stickerDistance = self.eyeAnimation.distance;
-            CGPoint stickerCenter = CGPointMake(self.eyeAnimation.centerX, self.eyeAnimation.centerY);
-            CGFloat frameDuration = self.eyeAnimation.duration;
-            CGFloat actualDistance = [self getDistanceFromPointA:self.leftEye.center pointB:self.rightEye.center]*kStickerScale;
-            CGFloat ratio = actualDistance/stickerDistance;
-            //NSLog(@"ear ratio:%f scale:%f",ratio,[UIScreen mainScreen].scale);
-            if (!self.eyesSticker) {
-                self.eyesSticker = [[UIImageView alloc] init];
-                [self.stickerView addSubview:self.eyesSticker];
-                self.eyesSticker.animationImages = self.eyeAnimation.imageList;
-                self.eyesSticker.animationDuration = frameDuration*self.eyeAnimation.imageList.count;
-                self.eyesSticker.contentMode = UIViewContentModeScaleAspectFit;
-                [self.eyesSticker startAnimating];
-            }
-            
-            CGPoint eyeStickerCenter = CGPointMake((self.rightEye.centerX+self.leftEye.centerX)/2, (self.rightEye.centerY+self.leftEye.centerY)/2-(stickerCenter.y-stickerHeight/2)/kStickerScale);
-            
-            [UIView animateWithDuration:0.1 animations:^{
-                self.eyesSticker.frame = CGRectMake(eyeStickerCenter.x-stickerWidth/2*ratio/2, eyeStickerCenter.y-stickerHeight/2*ratio/2, stickerWidth/2*ratio, stickerHeight/2*ratio);
-               // self.eyesSticker.center = eyeStickerCenter;
-            }];
-        }else{
-            
-            [self.eyesSticker removeFromSuperview];
-            self.eyesSticker = nil;
-        }
-        
-        
-        if (ff.hasMouthPosition && self.mouthAnimation) {
-            CGFloat stickerWidth = self.mouthAnimation.width;
-            CGFloat stickerHeight = self.mouthAnimation.height;
-            CGFloat stickerDistance = self.mouthAnimation.distance;
-            CGPoint stickerCenter = CGPointMake(self.mouthAnimation.centerX, self.mouthAnimation.centerY);
-            CGFloat frameDuration = self.mouthAnimation.duration;
-            CGFloat actualDistance = [self getDistanceFromPointA:self.leftEye.center pointB:self.rightEye.center]*kStickerScale;
-            
-            CGFloat ratio = actualDistance/stickerDistance;
-            CGRect mouthFrame = CGRectMake(ff.mouthPosition.x-stickerWidth*ratio/2, ff.mouthPosition.y-stickerHeight*ratio/2, stickerWidth*ratio, stickerHeight*ratio);
-            if (!self.mouthSticker) {
-                self.mouthSticker = [[UIImageView alloc] init];
-                [self.stickerView addSubview:self.mouthSticker];
-                self.mouthSticker.animationImages = self.mouthAnimation.imageList;
-                self.mouthSticker.animationDuration = frameDuration*self.mouthAnimation.imageList.count;
-                self.mouthSticker.contentMode = UIViewContentModeScaleAspectFit;
-                [self.mouthSticker startAnimating];
-            }
-            self.mouthSticker.frame = [DetectFace convertFrame:mouthFrame previewBox:previewBox forVideoBox:clap isMirrored:YES];
-            newCenterX = [self.mouthFilterX noiseFilterWithData:self.mouthSticker.centerX];
-            newCenterY = [self.mouthFilterY noiseFilterWithData:self.mouthSticker.centerY];
-        
-            self.mouthSticker.center = CGPointMake(newCenterX, newCenterY-(stickerCenter.y-stickerHeight/2)/kStickerScale);
-            
-        }else{
-            
-            [self.mouthSticker removeFromSuperview];
-            self.mouthSticker = nil;
-        }
-        
-        if (self.mouthAnimation || self.eyeAnimation) {
-            if (!self.bottomSticker) {
-                self.bottomSticker = [[UIImageView alloc] initWithFrame:self.view.bounds];
-                [self.view insertSubview:self.bottomSticker belowSubview:self.cropMaskBottom];
-                self.bottomSticker.animationImages = self.bottomAnimation.imageList;
-                self.bottomSticker.animationDuration = self.bottomAnimation.duration*self.bottomAnimation.imageList.count;
-                self.bottomSticker.contentMode = UIViewContentModeScaleAspectFit;
-                [self.bottomSticker startAnimating];
-            }
-        }
-        
-        CGFloat tiltDegrees = [self pointPairToBearingDegrees:self.leftEye.center secondPoint:self.rightEye.center];
-        // NSLog(@"Tilt :%f",tiltDegrees);
-        [UIView animateWithDuration:0.3 animations:^{
-            self.stickerView.transform = CGAffineTransformMakeRotation((tiltDegrees/180.0*M_PI));
-        }];
-        
-    }
+        self.liveStickerView.alpha = 1.0;
+    } completion:^(BOOL finished) {}];
+    [self.liveStickerView updateLiveStickerFrameWithFaceFeatures:featuresArray forVideoBox:clap withPreviewBox:previewBox];
 }
 
 - (CGFloat) pointPairToBearingDegrees:(CGPoint)startingPoint secondPoint:(CGPoint) endingPoint
@@ -1036,6 +875,13 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 
 
 #pragma mark - Getters/Setters
+
+-(PTPPLiveStickerView *)liveStickerView{
+    if (!_liveStickerView) {
+        _liveStickerView = [[PTPPLiveStickerView alloc] initWithFrame:self.previewView.bounds];
+    }
+    return _liveStickerView;
+}
 
 -(NSMutableDictionary *)cameraSettings{
     if (!_cameraSettings) {
@@ -1112,14 +958,6 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     return _previewView;
 }
 
--(UIView *)stickerView{
-    if (!_stickerView) {
-        _stickerView = [[UIView alloc] initWithFrame:self.view.bounds];
-        _stickerView.backgroundColor = [UIColor clearColor];
-        _stickerView.userInteractionEnabled = NO;
-    }
-    return _stickerView;
-}
 
 -(UIImageView *)filterView{
     if (!_filterView) {
