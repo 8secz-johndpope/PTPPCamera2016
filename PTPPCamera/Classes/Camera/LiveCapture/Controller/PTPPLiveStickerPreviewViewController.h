@@ -18,6 +18,6 @@
 @property (nonatomic, strong) UIView *topCropMask;
 @property (nonatomic, strong) UIImageView *basedPhotoView;
 
--(instancetype)initWithBasePhoto:(UIImage *)image mouthSticker:(UIImageView *)mouthSticker eyeSticker:(UIImageView *)eyeSticker bottomSticker:(UIImageView *)bottomSticker;
+-(instancetype)initWithBasePhoto:(UIImage *)image mouthSticker:(UIImageView *)mouthSticker eyeSticker:(UIImageView *)eyeSticker bottomSticker:(UIImageView *)bottomSticker faceAngle:(CGFloat)faceAngle;
 -(void)setCropOption:(NSInteger)cropOption;
 @end

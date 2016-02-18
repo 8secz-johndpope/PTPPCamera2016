@@ -16,8 +16,9 @@
 @property (nonatomic, strong) PTPPStickerAnimation *mouthAnimation;
 @property (nonatomic, strong) PTPPStickerAnimation *eyeAnimation;
 @property (nonatomic, strong) PTPPStickerAnimation *bottomAnimation;
+@property (nonatomic, assign) CGFloat faceAngle;
 
 -(void)setAttributeWithMouthAnimation:(PTPPStickerAnimation *)mouthAnimation eyeAnimation:(PTPPStickerAnimation *)eyeAnimation bottomAnimation:(PTPPStickerAnimation *)bottomAnimation;
 -(void)updateLiveStickerFrameWithFaceFeatures:(NSArray *)featuresArray forVideoBox:(CGRect)clap withPreviewBox:(CGRect)previewBox;
-
+-(void)fixRotationForStaticFaceDetection;
 @end

@@ -77,6 +77,7 @@
 @property (nonatomic, strong) PTPPLiveStickerView *liveStickerView;
 @property (nonatomic, assign) NSInteger invalidDetectionTimeOut;
 @property (nonatomic, strong) NSString *selectedARSticker;
+
 @end
 
 static NSString *PTPPCameraSettingFlash = @"PTPPCameraSettingFlash";
@@ -139,7 +140,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
             }
         }else{
             //AR stickers on screen, go to preview video
-            PTPPLiveStickerPreviewViewController *liveStickerVC = [[PTPPLiveStickerPreviewViewController alloc] initWithBasePhoto:image mouthSticker:weakSelf.liveStickerView.mouthSticker eyeSticker:weakSelf.liveStickerView.eyeSticker bottomSticker:weakSelf.liveStickerView.bottomSticker];
+            PTPPLiveStickerPreviewViewController *liveStickerVC = [[PTPPLiveStickerPreviewViewController alloc] initWithBasePhoto:image mouthSticker:weakSelf.liveStickerView.mouthSticker eyeSticker:weakSelf.liveStickerView.eyeSticker bottomSticker:weakSelf.liveStickerView.bottomSticker faceAngle:weakSelf.liveStickerView.faceAngle];
             [liveStickerVC setCropOption:[[weakSelf.cameraSettings objectForKey:PTPPCameraSettingCrop] integerValue]];
             [weakSelf.navigationController pushViewController:liveStickerVC animated:YES];
         }
@@ -785,7 +786,6 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
                                                      orientation: landscapeImage.imageOrientation];
     }
     
-    
     self.liveStickerView.hidden = NO;
     if (featuresArray.count == 0) {
         if (self.invalidDetectionTimeOut >= 15) {
@@ -802,6 +802,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     [UIView animateWithDuration:0.3 animations:^{
         self.liveStickerView.alpha = 1.0;
     } completion:^(BOOL finished) {}];
+    
     [self.liveStickerView updateLiveStickerFrameWithFaceFeatures:featuresArray forVideoBox:clap withPreviewBox:previewBox];
 }
 

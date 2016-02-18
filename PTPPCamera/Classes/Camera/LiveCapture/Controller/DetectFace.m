@@ -277,6 +277,7 @@
         CGRect previewBox = [DetectFace videoPreviewBoxForGravity:gravity frameSize:parentFrameSize apertureSize:clap.size];
         if([self.delegate respondsToSelector:@selector(detectedFaceController:features:forVideoBox:withPreviewBox:processedImage:)])
             [self.delegate detectedFaceController:self features:features forVideoBox:clap withPreviewBox:previewBox processedImage:newPtImage];
+       // NSLog(@"VideoBox:%@ PreviewBox:%@",NSStringFromCGRect(clap),NSStringFromCGRect(previewBox));
     });
 }
 

@@ -37,31 +37,33 @@
     return self;
 }
 
+-(void)fixRotationForStaticFaceDetection{
+    //self.foregroundView.transform = CGAffineTransformMakeRotation((1/180.0*M_PI));
+}
+
+//加载动态贴纸Animation基本配置
 -(void)setAttributeWithMouthAnimation:(PTPPStickerAnimation *)mouthAnimation eyeAnimation:(PTPPStickerAnimation *)eyeAnimation bottomAnimation:(PTPPStickerAnimation *)bottomAnimation{
     self.mouthAnimation = mouthAnimation;
     self.eyeAnimation = eyeAnimation;
     self.bottomAnimation = bottomAnimation;
 }
 
+//实时计算动态贴纸的坐标，大小和倾斜角度
 -(void)updateLiveStickerFrameWithFaceFeatures:(NSArray *)featuresArray forVideoBox:(CGRect)clap withPreviewBox:(CGRect)previewBox{
     for (CIFaceFeature *ff in featuresArray) {
-        
         CGRect faceRect = [ff bounds];
-        
         faceRect = [DetectFace convertFrame:faceRect previewBox:previewBox forVideoBox:clap isMirrored:YES];
         CGFloat faceWidth = faceRect.size.width;
         float newFaceWidth = [self.faceWidthFilter noiseFilterWithData:faceWidth];
         faceWidth = newFaceWidth;
-        
-        
         float newCenterX;
         float newCenterY;
-        
-
         self.hidden = NO;
+        
+        //确认左眼位置
         if(ff.hasLeftEyePosition)
         {
-            CGRect leftEyeFrame = CGRectMake(ff.leftEyePosition.x-faceWidth*0.15,  ff.leftEyePosition.y-faceWidth*0.15, faceWidth*0.3, faceWidth*0.3);
+            CGRect leftEyeFrame = CGRectMake(ff.leftEyePosition.y-faceWidth*0.15,  ff.leftEyePosition.x-faceWidth*0.15, faceWidth*0.3, faceWidth*0.3);
             self.leftEye.frame = [DetectFace convertFrame:leftEyeFrame previewBox:previewBox forVideoBox:clap isMirrored:YES];
             [self.leftEye setBackgroundColor:[[UIColor blueColor] colorWithAlphaComponent:0.3]];
             self.leftEye.layer.cornerRadius = faceWidth*0.15;
@@ -69,9 +71,10 @@
             newCenterY = [self.leftEyeFilterY noiseFilterWithData:self.leftEye.centerY];
             self.leftEye.center = CGPointMake(newCenterX, newCenterY);
         }
+        //确认右眼位置
         if(ff.hasRightEyePosition)
         {
-            CGRect rightEyeFrame = CGRectMake(ff.rightEyePosition.x-faceWidth*0.15, ff.rightEyePosition.y-faceWidth*0.15, faceWidth*0.3, faceWidth*0.3);
+            CGRect rightEyeFrame = CGRectMake(ff.rightEyePosition.y-faceWidth*0.15, ff.rightEyePosition.x-faceWidth*0.15, faceWidth*0.3, faceWidth*0.3);
             self.rightEye.frame = [DetectFace convertFrame:rightEyeFrame previewBox:previewBox forVideoBox:clap isMirrored:YES];
             [self.rightEye setBackgroundColor:[[UIColor blueColor] colorWithAlphaComponent:0.3]];
             self.rightEye.layer.cornerRadius = faceWidth*0.15;
@@ -80,6 +83,7 @@
             self.rightEye.center = CGPointMake(newCenterX, newCenterY);
         }
         
+        //计算双眼的中心点，加载动画
         if (ff.hasLeftEyePosition && ff.hasRightEyePosition && self.eyeAnimation) {
             self.eyeSticker.hidden = NO;
             CGFloat stickerWidth = self.eyeAnimation.width;
@@ -89,27 +93,21 @@
             CGFloat frameDuration = self.eyeAnimation.duration;
             CGFloat actualDistance = [self getDistanceFromPointA:self.leftEye.center pointB:self.rightEye.center]*kStickerScale;
             CGFloat ratio = actualDistance/stickerDistance;
-            //NSLog(@"ear ratio:%f scale:%f",ratio,[UIScreen mainScreen].scale);
-
             if (self.eyeSticker.animationImages.count == 0) {
                 self.eyeSticker.animationImages = self.eyeAnimation.imageList;
                 self.eyeSticker.animationDuration = frameDuration*self.eyeAnimation.imageList.count;
                 [self.eyeSticker startAnimating];
             }
-            
-            
             CGPoint eyeStickerCenter = CGPointMake((self.rightEye.centerX+self.leftEye.centerX)/2, (self.rightEye.centerY+self.leftEye.centerY)/2-(stickerCenter.y-stickerHeight/2)/kStickerScale);
-            
             [UIView animateWithDuration:0.1 animations:^{
                 self.eyeSticker.frame = CGRectMake(eyeStickerCenter.x-stickerWidth/2*ratio/2, eyeStickerCenter.y-stickerHeight/2*ratio/2, stickerWidth/2*ratio, stickerHeight/2*ratio);
-                // self.eyesSticker.center = eyeStickerCenter;
             }];
         }else{
             
             self.eyeSticker.hidden = YES;
         }
         
-        
+        //嘴巴动画
         if (ff.hasMouthPosition && self.mouthAnimation) {
             self.mouthSticker.hidden = NO;
             CGFloat stickerWidth = self.mouthAnimation.width;
@@ -118,7 +116,6 @@
             CGPoint stickerCenter = CGPointMake(self.mouthAnimation.centerX, self.mouthAnimation.centerY);
             CGFloat frameDuration = self.mouthAnimation.duration;
             CGFloat actualDistance = [self getDistanceFromPointA:self.leftEye.center pointB:self.rightEye.center]*kStickerScale;
-            
             CGFloat ratio = actualDistance/stickerDistance;
             CGRect mouthFrame = CGRectMake(ff.mouthPosition.x-stickerWidth*ratio/2, ff.mouthPosition.y-stickerHeight*ratio/2, stickerWidth*ratio, stickerHeight*ratio);
             if (self.mouthSticker.animationImages.count == 0) {
@@ -126,36 +123,29 @@
                 self.mouthSticker.animationDuration = frameDuration*self.mouthAnimation.imageList.count;
                 [self.mouthSticker startAnimating];
             }
-            
             self.mouthSticker.frame = [DetectFace convertFrame:mouthFrame previewBox:previewBox forVideoBox:clap isMirrored:YES];
             newCenterX = [self.mouthFilterX noiseFilterWithData:self.mouthSticker.centerX];
             newCenterY = [self.mouthFilterY noiseFilterWithData:self.mouthSticker.centerY];
-            
             self.mouthSticker.center = CGPointMake(newCenterX, newCenterY-(stickerCenter.y-stickerHeight/2)/kStickerScale);
-            
         }else{
-            
             self.mouthSticker.hidden = YES;
         }
         
+        //底部动画
         if (self.mouthAnimation || self.eyeAnimation) {
             if (self.bottomSticker.animationImages.count == 0) {
                 self.bottomSticker.animationImages = self.bottomAnimation.imageList;
                 self.bottomSticker.animationDuration = self.bottomAnimation.duration*self.bottomAnimation.imageList.count;
                 [self.bottomSticker startAnimating];
             }
-            
-           
         }
         
-        CGFloat tiltDegrees = [self pointPairToBearingDegrees:self.leftEye.center secondPoint:self.rightEye.center];
-        // NSLog(@"Tilt :%f",tiltDegrees);
+        //倾斜角度
+        self.faceAngle = [self pointPairToBearingDegrees:self.leftEye.center secondPoint:self.rightEye.center];
         [UIView animateWithDuration:0.3 animations:^{
-            self.foregroundView.transform = CGAffineTransformMakeRotation((tiltDegrees/180.0*M_PI));
+            self.foregroundView.transform = CGAffineTransformMakeRotation((self.faceAngle/180.0*M_PI));
         }];
-        
     }
-
 }
 
 - (CGFloat) pointPairToBearingDegrees:(CGPoint)startingPoint secondPoint:(CGPoint) endingPoint

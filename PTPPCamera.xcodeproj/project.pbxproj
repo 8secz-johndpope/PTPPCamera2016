@@ -1509,6 +1509,7 @@
 		C647C8FF1C71CF2B00E596EA /* placeholder.md in Sources */ = {isa = PBXBuildFile; fileRef = C647C8FE1C71CF2B00E596EA /* placeholder.md */; };
 		C647C9021C71CF3400E596EA /* AssetHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C647C9011C71CF3400E596EA /* AssetHelper.m */; };
 		C6669B0B1C75A508009291C4 /* PTPPLiveStickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = C6669B0A1C75A508009291C4 /* PTPPLiveStickerView.m */; };
+		C6CE891F1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6CE891E1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -3439,6 +3440,8 @@
 		C647C9011C71CF3400E596EA /* AssetHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AssetHelper.m; sourceTree = "<group>"; };
 		C6669B091C75A508009291C4 /* PTPPLiveStickerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPLiveStickerView.h; sourceTree = "<group>"; };
 		C6669B0A1C75A508009291C4 /* PTPPLiveStickerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPLiveStickerView.m; sourceTree = "<group>"; };
+		C6CE891D1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPLiveStickerEditViewController.h; sourceTree = "<group>"; };
+		C6CE891E1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPLiveStickerEditViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -3530,6 +3533,8 @@
 			children = (
 				C6433C1A1C72BFC900AF82AD /* PTPPStaticImageEditViewController.h */,
 				C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */,
+				C6CE891D1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.h */,
+				C6CE891E1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.m */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -7473,6 +7478,7 @@
 				C647BFA81C71BBBB00E596EA /* GPUImageHoughTransformLineDetector.m in Sources */,
 				C6669B0B1C75A508009291C4 /* PTPPLiveStickerView.m in Sources */,
 				C647BCD71C718C4B00E596EA /* placeholder.md in Sources */,
+				C6CE891F1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.m in Sources */,
 				C647BFB91C71BBBB00E596EA /* GPUImageLuminanceRangeFilter.m in Sources */,
 				C647BC081C7181BE00E596EA /* SOBaseView.m in Sources */,
 				C647BD071C718C4B00E596EA /* PTLoadingView.m in Sources */,

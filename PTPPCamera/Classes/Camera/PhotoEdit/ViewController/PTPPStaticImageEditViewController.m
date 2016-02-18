@@ -7,6 +7,7 @@
 //
 
 #import "PTPPStaticImageEditViewController.h"
+#import "PTPPLiveStickerEditViewController.h"
 #import "PTPPStaticImageEditToolBar.h"
 #import "PTPPCameraFilterScrollView.h"
 #import "PTFilterManager.h"
@@ -388,7 +389,8 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 }
 
 -(void)toggleARStickerMenu{
-    
+    PTPPLiveStickerEditViewController *liveStickerEditVC = [[PTPPLiveStickerEditViewController alloc] initWithBasePhoto:self.basePhotoView.image];
+    [self.navigationController pushViewController:liveStickerEditVC animated:YES];
 }
 
 -(void)toggleCropMenu{

@@ -32,7 +32,7 @@
 @implementation PTPPLiveStickerPreviewViewController
 
 #pragma mark - Life Cycles
--(instancetype)initWithBasePhoto:(UIImage *)image mouthSticker:(UIImageView *)mouthSticker eyeSticker:(UIImageView *)eyeSticker bottomSticker:(UIImageView *)bottomSticker{
+-(instancetype)initWithBasePhoto:(UIImage *)image mouthSticker:(UIImageView *)mouthSticker eyeSticker:(UIImageView *)eyeSticker bottomSticker:(UIImageView *)bottomSticker faceAngle:(CGFloat)faceAngle{
     self = [super init];
     if (self) {
         self.basePhoto = image;
@@ -42,6 +42,8 @@
         self.mouthSticker.frame = mouthSticker.frame;
         self.eyeSticker.frame = eyeSticker.frame;
         self.bottomSticker.frame = bottomSticker.frame;
+        self.eyeSticker.transform = CGAffineTransformMakeRotation((faceAngle/180.0*M_PI));
+        self.mouthSticker.transform = CGAffineTransformMakeRotation((faceAngle/180.0*M_PI));
         self.mouthSticker.animationDuration = mouthSticker.animationDuration;
         self.eyeSticker.animationDuration = eyeSticker.animationDuration;
         self.bottomSticker.animationDuration = bottomSticker.animationDuration;
