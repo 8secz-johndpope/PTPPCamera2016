@@ -31,8 +31,10 @@
 @property (nonatomic, strong) PTPPCameraFilterScrollView *rotateSrollView;
 @property (nonatomic, assign) NSInteger activeFilterID;
 @property (nonatomic, strong) PECropView *cropView;
+@property (nonatomic, assign) BOOL isRotating;
 @end
 
+static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 @implementation PTPPStaticImageEditViewController
 
 #pragma mark - Life Cycles
@@ -184,6 +186,138 @@
         [self.rotateSet addObject:dic];
     }
 }
+
+-(void)animateRotateImage:(UIImage *)image byDegrees:(CGFloat)degrees{
+    self.isRotating = YES;
+    UIImageView *animateImageView = [[UIImageView alloc] initWithImage:self.basePhotoView.image];
+    animateImageView.contentMode = UIViewContentModeScaleAspectFit;
+    animateImageView.frame = self.basePhotoView.bounds;
+    [self.basePhotoView addSubview:animateImageView];
+    self.basePhotoView.image = nil;
+    self.basePhoto = [self image:self.basePhoto rotatedByDegrees:degrees];
+    [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
+          initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseIn  animations:^(){
+              
+              animateImageView.transform = CGAffineTransformMakeRotation(DegreesToRadians(degrees));
+              animateImageView.frame = self.basePhotoView.bounds;
+          } completion:^(BOOL finished) {
+              [animateImageView removeFromSuperview];
+              self.basePhotoView.image = self.basePhoto;
+              self.isRotating = NO;
+          }];
+
+}
+
+-(void)animateFlipImage:(UIImage *)image direction:(NSInteger)direction{
+    self.isRotating = YES;
+    UIImageView *animateImageView = [[UIImageView alloc] initWithImage:self.basePhotoView.image];
+    animateImageView.contentMode = UIViewContentModeScaleAspectFit;
+    animateImageView.frame = self.basePhotoView.bounds;
+    [self.basePhotoView addSubview:animateImageView];
+    self.basePhotoView.image = nil;
+    self.basePhoto = [self image:image flip:direction];
+    CATransform3D t;
+    if (direction == 0) {
+        t = CATransform3DMakeRotation(M_PI, 0.0, 1.0, 0.0);
+    }else{
+        t = CATransform3DMakeRotation(M_PI, 1.0, 0.0, 0.0);
+    }
+    t.m34 = 1.0/-500;
+    [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
+          initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        animateImageView.layer.transform = t;
+                    }
+                    completion:^(BOOL finish){
+                        [animateImageView removeFromSuperview];
+                        self.basePhotoView.image = self.basePhoto;
+                        self.isRotating = NO;
+                    }];
+}
+
+- (UIImage *)image:(UIImage *)image rotatedByDegrees:(CGFloat)degrees
+{
+    // calculate the size of the rotated view's containing box for our drawing space
+    UIView *rotatedViewBox = [[UIView alloc] initWithFrame:CGRectMake(0,0,image.size.width, image.size.height)];
+    CGAffineTransform t = CGAffineTransformMakeRotation(DegreesToRadians(degrees));
+    rotatedViewBox.transform = t;
+    CGSize rotatedSize = rotatedViewBox.frame.size;
+//    CGFloat ratio = rotatedSize.height/rotatedSize.width;
+//    NSInteger factorOf16 = rotatedSize.width/16;
+//    NSInteger newWidth = factorOf16*16;
+//    NSInteger newHeight = newWidth*ratio;
+//    rotatedSize = CGSizeMake(newWidth, newHeight);
+    // Create the bitmap context
+    UIGraphicsBeginImageContext(rotatedSize);
+    CGContextRef bitmap = UIGraphicsGetCurrentContext();
+    
+    // Move the origin to the middle of the image so we will rotate and scale around the center.
+    CGContextTranslateCTM(bitmap, rotatedSize.width/2, rotatedSize.height/2);
+    
+    //   // Rotate the image context
+    CGContextRotateCTM(bitmap, DegreesToRadians(degrees));
+    
+    // Now, draw the rotated/scaled image into the context
+    CGContextScaleCTM(bitmap, 1.0, -1.0);
+    CGContextDrawImage(bitmap, CGRectMake(-image.size.width / 2, -image.size.height / 2, image.size.width, image.size.height), [image CGImage]);
+    
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+    
+}
+
+-(UIImage *)image:(UIImage *)image flip:(NSInteger)flipDirection{
+    
+    CGImageRef inImage = image.CGImage;
+    CGContextRef ctx = CGBitmapContextCreate(NULL,
+                                             CGImageGetWidth(inImage),
+                                             CGImageGetHeight(inImage),
+                                             CGImageGetBitsPerComponent(inImage),
+                                             CGImageGetBytesPerRow(inImage),
+                                             CGImageGetColorSpace(inImage),
+                                             CGImageGetBitmapInfo(inImage)
+                                             );
+    CGRect cropRect = CGRectMake(0, 0, image.size.width, image.size.height);
+    CGImageRef TheOtherHalf = CGImageCreateWithImageInRect(image.CGImage, cropRect);
+    CGContextDrawImage(ctx, CGRectMake(0, 0, CGImageGetWidth(inImage), CGImageGetHeight(inImage)), inImage);
+    
+    if (flipDirection == 0) {
+        CGAffineTransform transform = CGAffineTransformMakeTranslation(image.size.width, 0.0);
+        transform = CGAffineTransformScale(transform, -1.0, 1.0);
+        CGContextConcatCTM(ctx, transform);
+    }else{
+        CGAffineTransform transform = CGAffineTransformMakeTranslation(0.0, image.size.height);
+        transform = CGAffineTransformScale(transform, 1.0, -1.0);
+        CGContextConcatCTM(ctx, transform);
+    }
+    
+    
+    CGContextDrawImage(ctx, cropRect, TheOtherHalf);
+    
+    CGImageRef imageRef = CGBitmapContextCreateImage(ctx);
+    CGContextRelease(ctx);
+    UIImage *finalImage = [UIImage imageWithCGImage:imageRef];
+    CGImageRelease(imageRef);
+    
+    return finalImage;
+}
+
+-(void)displayToolBar:(BOOL)state basePhotoViewHeight:(CGFloat)height{
+    if (state) {
+        //Edit mode OFF
+        self.toolBar.frame = CGRectMake(0, Screenheight-self.toolBar.height, self.toolBar.width, self.toolBar.height);
+        self.topBar.frame = CGRectMake(self.topBar.left, 0, self.topBar.width, self.topBar.height);
+        self.basePhotoView.frame = CGRectMake(0, 0, Screenwidth, Screenheight);
+        self.cropView.frame = self.basePhotoView.frame;
+    }else{
+        //Edit mode ON
+        self.toolBar.frame = CGRectMake(0, Screenheight, self.toolBar.width, self.toolBar.height);
+        self.topBar.frame = CGRectMake(self.topBar.left, -HEIGHT_NAV, self.topBar.width, self.topBar.height);
+        self.basePhotoView.frame = CGRectMake(20, 37, Screenwidth-40, Screenheight-height-37*2);
+        self.cropView.frame = CGRectMake(0, 0, Screenwidth, Screenheight-height);
+    }
+}
+
 
 #pragma mark - Touch Events
 -(void)handleSingleTap{
@@ -345,17 +479,26 @@
     [self.rotateSrollView setAttributeWithFilterSet:self.rotateSet gridSpace:Screenwidth/4 immediateEffectApplied:YES];
     self.rotateSrollView.filterSelected = ^(NSInteger filterID, BOOL animated){
         //rotate or flip
+        if (weakSelf.isRotating) {
+            return;
+        }
         switch (filterID) {
             case 0:
-                weakSelf.basePhoto = [weakSelf image:weakSelf.basePhoto rotatedByDegrees:-90];
+                [weakSelf animateRotateImage:weakSelf.basePhoto byDegrees:-90];
                 break;
             case 1:
-                weakSelf.basePhoto = [weakSelf image:weakSelf.basePhoto rotatedByDegrees:90];
+                [weakSelf animateRotateImage:weakSelf.basePhoto byDegrees:90];
+                break;
+            case 2:
+                [weakSelf animateFlipImage:weakSelf.basePhoto direction:0];
+                break;
+            case 3:
+                [weakSelf animateFlipImage:weakSelf.basePhoto direction:1];
                 break;
             default:
                 break;
         }
-        weakSelf.basePhotoView.image = weakSelf.basePhoto;
+        
     };
     self.rotateSrollView.finishBlock = ^(BOOL saveChange){
 
@@ -383,50 +526,6 @@
     }];
 }
 
-static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
-- (UIImage *)image:(UIImage *)image rotatedByDegrees:(CGFloat)degrees
-{
-    // calculate the size of the rotated view's containing box for our drawing space
-    UIView *rotatedViewBox = [[UIView alloc] initWithFrame:CGRectMake(0,0,image.size.width, image.size.height)];
-    CGAffineTransform t = CGAffineTransformMakeRotation(DegreesToRadians(degrees));
-    rotatedViewBox.transform = t;
-    CGSize rotatedSize = rotatedViewBox.frame.size;
-    
-    // Create the bitmap context
-    UIGraphicsBeginImageContext(rotatedSize);
-    CGContextRef bitmap = UIGraphicsGetCurrentContext();
-    
-    // Move the origin to the middle of the image so we will rotate and scale around the center.
-    CGContextTranslateCTM(bitmap, rotatedSize.width/2, rotatedSize.height/2);
-    
-    //   // Rotate the image context
-    CGContextRotateCTM(bitmap, DegreesToRadians(degrees));
-    
-    // Now, draw the rotated/scaled image into the context
-    CGContextScaleCTM(bitmap, 1.0, -1.0);
-    CGContextDrawImage(bitmap, CGRectMake(-image.size.width / 2, -image.size.height / 2, image.size.width, image.size.height), [image CGImage]);
-    
-    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return newImage;
-    
-}
-
--(void)displayToolBar:(BOOL)state basePhotoViewHeight:(CGFloat)height{
-    if (state) {
-        //Edit mode OFF
-        self.toolBar.frame = CGRectMake(0, Screenheight-self.toolBar.height, self.toolBar.width, self.toolBar.height);
-        self.topBar.frame = CGRectMake(self.topBar.left, 0, self.topBar.width, self.topBar.height);
-        self.basePhotoView.frame = CGRectMake(0, 0, Screenwidth, Screenheight);
-        self.cropView.frame = self.basePhotoView.frame;
-    }else{
-        //Edit mode ON
-        self.toolBar.frame = CGRectMake(0, Screenheight, self.toolBar.width, self.toolBar.height);
-        self.topBar.frame = CGRectMake(self.topBar.left, -HEIGHT_NAV, self.topBar.width, self.topBar.height);
-        self.basePhotoView.frame = CGRectMake(20, 37, Screenwidth-40, Screenheight-height-37*2);
-        self.cropView.frame = CGRectMake(0, 0, Screenwidth, Screenheight-height);
-    }
-}
 
 #pragma mark - PTPPStaticImageEditToolBarDelegate
 -(void)toolBar:(PTPPStaticImageEditToolBar *)toolBar didSelectItemAtIndex:(NSInteger)index{
