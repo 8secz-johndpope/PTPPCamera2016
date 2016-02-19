@@ -18,6 +18,8 @@
 #define HEIGHT_NAV          44
 #define HEIGHT_BAR          49
 
+#define kFrameCount 37
+
 //葡萄相机主题色
 #define THEME_COLOR                     [UIColor colorWithHexString:@"ff5a5d"]
 //输入框分隔线颜色

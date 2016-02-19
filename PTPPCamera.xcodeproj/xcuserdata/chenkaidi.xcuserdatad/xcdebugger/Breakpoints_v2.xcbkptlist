@@ -9,13 +9,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "PTPPCamera/Classes/Camera/LiveCapture/View/PTPPLiveStickerView.m"
-            timestampString = "477484702.562495"
+            filePath = "PTPPCamera/Classes/Camera/LiveCapture/Model/PTImageSequenceToVideoConverter.m"
+            timestampString = "477557670.592109"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "128"
-            endingLineNumber = "128"
-            landmarkName = "-updateLiveStickerFrameWithFaceFeatures:forVideoBox:withPreviewBox:"
+            startingLineNumber = "105"
+            endingLineNumber = "105"
+            landmarkName = "-exportVideoWithImageSequence:exportSize:fps:totalFrame:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

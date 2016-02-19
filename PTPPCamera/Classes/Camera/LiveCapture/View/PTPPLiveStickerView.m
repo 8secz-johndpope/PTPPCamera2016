@@ -63,7 +63,7 @@
         //确认左眼位置
         if(ff.hasLeftEyePosition)
         {
-            CGRect leftEyeFrame = CGRectMake(ff.leftEyePosition.y-faceWidth*0.15,  ff.leftEyePosition.x-faceWidth*0.15, faceWidth*0.3, faceWidth*0.3);
+            CGRect leftEyeFrame = CGRectMake(ff.leftEyePosition.x-faceWidth*0.15,  ff.leftEyePosition.y-faceWidth*0.15, faceWidth*0.3, faceWidth*0.3);
             self.leftEye.frame = [DetectFace convertFrame:leftEyeFrame previewBox:previewBox forVideoBox:clap isMirrored:YES];
             [self.leftEye setBackgroundColor:[[UIColor blueColor] colorWithAlphaComponent:0.3]];
             self.leftEye.layer.cornerRadius = faceWidth*0.15;
@@ -74,7 +74,7 @@
         //确认右眼位置
         if(ff.hasRightEyePosition)
         {
-            CGRect rightEyeFrame = CGRectMake(ff.rightEyePosition.y-faceWidth*0.15, ff.rightEyePosition.x-faceWidth*0.15, faceWidth*0.3, faceWidth*0.3);
+            CGRect rightEyeFrame = CGRectMake(ff.rightEyePosition.x-faceWidth*0.15, ff.rightEyePosition.y-faceWidth*0.15, faceWidth*0.3, faceWidth*0.3);
             self.rightEye.frame = [DetectFace convertFrame:rightEyeFrame previewBox:previewBox forVideoBox:clap isMirrored:YES];
             [self.rightEye setBackgroundColor:[[UIColor blueColor] colorWithAlphaComponent:0.3]];
             self.rightEye.layer.cornerRadius = faceWidth*0.15;

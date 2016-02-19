@@ -6,8 +6,8 @@
 //  Copyright © 2016 Putao. All rights reserved.
 //
 
-#import "SOBaseViewController.h"
+#import "PTPPLiveStickerPreviewViewController.h"
 
-@interface PTPPLiveStickerEditViewController : SOBaseViewController
+@interface PTPPLiveStickerEditViewController : PTPPLiveStickerPreviewViewController
 -(instancetype)initWithBasePhoto:(UIImage *)basePhoto;
 @end

@@ -7,6 +7,7 @@
 //
 
 #import "PTImageSequenceToVideoConverter.h"
+#import "PTPPLiveStickerEditViewController.h"
 #import <Foundation/Foundation.h>
 #import <CoreMedia/CoreMedia.h>
 #import <CoreVideo/CoreVideo.h>
@@ -24,7 +25,9 @@
     // asVideoToPath:(NSString *)videoOutputPath
     // withFrameSize:(CGSize)imageSize
     // framesPerSecond:(NSUInteger)fps {
-    
+    if ([baseVC isKindOfClass:[PTPPLiveStickerEditViewController class]]) {
+        baseVC = (PTPPLiveStickerEditViewController *)baseVC;
+    }
     CGFloat ratio = exportSize.height/exportSize.width;
     NSInteger factorOf16 = exportSize.width/16;
     NSInteger newWidth = factorOf16*16;

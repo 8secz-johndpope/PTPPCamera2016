@@ -14,7 +14,7 @@
 #import "SVProgressHUD.h"
 #import "NSObject+Swizzle.h"
 
-#define kFrameCount 37
+
 @interface PTPPLiveStickerPreviewViewController ()
 @property (nonatomic, strong) NSMutableArray *mergedDownAnimationFrames;
 @property (nonatomic, strong) PTImageSequenceToVideoConverter *converter;
