@@ -7,12 +7,10 @@
 //
 
 #import "DownloadManager.h"
-#import "NSObject+Swizzle.h"
 #import "PTPPLiveStickerScrollView.h"
 #import "PTLiveStickerPickerCell.h"
-#import "PTMacro.h"
-#import "SOKit.h"
-#import "ZipArchive.h"
+#import "PTPPLocalFileManager.h"
+
 #define kCollectionViewEdgePadding 0
 #define kCellSpacing 0
 
@@ -71,31 +69,6 @@ static NSString *PTLiveStickerPickerCellID = @"PTLiveStickerPickerCellID";
     }
 }
 
--(void)unzipAllFiles{
-
-    NSFileManager *fileManager= [NSFileManager defaultManager];
-    NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
-    NSString *downloadFolder = [documentsPath stringByAppendingPathComponent:@"ARStickers"];
-    NSArray* dirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:downloadFolder
-                                                                        error:NULL];
-
-    [dirs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        NSString *filename = (NSString *)obj;
-        NSString *extension = [[filename pathExtension] lowercaseString];
-        if ([extension isEqualToString:@"zip"]) {
-            ZipArchive *zipArchive = [[ZipArchive alloc] init];
-            [zipArchive UnzipOpenFile:[downloadFolder stringByAppendingPathComponent:filename]];
-            BOOL unZipSuccess = [zipArchive UnzipFileTo:downloadFolder overWrite:YES];
-            [zipArchive UnzipCloseFile];
-            if (unZipSuccess) {
-                NSLog(@"File %@ unzip successful",filename);
-            }else{
-                 NSLog(@"File %@ unzip failed",filename);
-            }
-            [fileManager removeItemAtPath:[downloadFolder stringByAppendingPathComponent:filename] error:NULL];
-        }
-    }];
-}
 
 #pragma mark - Touch Events
 -(void)dismissMe{
@@ -116,7 +89,7 @@ static NSString *PTLiveStickerPickerCellID = @"PTLiveStickerPickerCellID";
 -(void)didFinishLoadingAllForManager:(DownloadManager *)downloadManager{
    
     NSLog(@"Download All Finish");
-    [self unzipAllFiles];
+    [PTPPLocalFileManager unzipAllFilesForARStickers];
 }
 
 - (void)downloadManager:(DownloadManager *)downloadManager downloadDidFail:(Download *)download;

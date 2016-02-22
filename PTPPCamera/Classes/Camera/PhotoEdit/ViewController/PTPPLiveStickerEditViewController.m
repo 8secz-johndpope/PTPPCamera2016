@@ -281,44 +281,6 @@
 
 - (void) getEyesImageView:(PTPPStickerAnimation *) model position:(CGPoint) position eyesScale:(float) scale eyesAngle:(float) angle
 {
-    
-//    UIImageView * _animationImageView = self.eyeSticker;
-//    
-//    // 计算放大后的图片显示位置和大小
-//    int sx = (position.x - 2 * model.centerX) + model.centerX;
-//    int sy = (position.y - 2 * model.centerY) + model.centerY;
-//    int rectW = model.width ;
-//    int rectH = model.height ;
-//    
-//    CGRect rect = CGRectMake(sx, sy, rectW, rectH);
-//    _animationImageView.frame = rect;
-//    // model里面的中心点到图像中心的距离
-//    int gap = calDistance(model.centerX, model.centerY, model.width/2, model.height/2);
-//    // 设置layer的位置
-//    _animationImageView.layer.position = CGPointMake(position.x+scale*gap*cos(3.14/2-angle), position.y-scale*gap*sin(3.14/2-angle));
-//    // 旋转
-//    _animationImageView.transform = CGAffineTransformMakeRotation(angle);
-//    
-//    // 显示动画边框
-//    // [_animationImageView.layer setBorderColor: [[UIColor purpleColor] CGColor]];
-//    // [_animationImageView.layer setBorderWidth: 1.0];
-//    
-//    // 全部加载图片当心内存溢出
-//    NSMutableArray * imageArr = [[NSMutableArray alloc] init];
-//    for(int i = 0; i<[model.imageList count]; i++){
-//        UIImage * image = [model.imageList objectAtIndex:i];
-//        [imageArr addObject:image];
-//    }
-//    _animationImageView.animationImages = imageArr;
-//    
-//    //Set the duration of the entire animation
-//    _animationImageView.animationDuration = model.duration*imageArr.count;
-//    
-//    //Set the repeat count. If you don't set that value, by default will be a loop (infinite)
-//    // _animationImageView.animationRepeatCount = 1;
-//    
-//    //Start the animationrepeatcount
-//    [_animationImageView startAnimating];
     self.eyeSticker.hidden = NO;
     CGFloat stickerWidth = self.eyeAnimation.width;
     CGFloat stickerHeight = self.eyeAnimation.height;
@@ -333,58 +295,17 @@
         [self.eyeSticker startAnimating];
     }
     CGPoint eyeStickerCenter = CGPointMake((self.rightEye.centerX+self.leftEye.centerX)/2, (self.rightEye.centerY+self.leftEye.centerY)/2-(stickerCenter.y-stickerHeight/2)/2);
-   
     self.eyeSticker.frame = CGRectMake(eyeStickerCenter.x-stickerWidth/2*ratio/2, eyeStickerCenter.y-stickerHeight/2*ratio/2, stickerWidth/2*ratio, stickerHeight/2*ratio);
-
     self.eyeSticker.transform = CGAffineTransformMakeRotation(angle);
     
 }
 
 - (void) getMouthImageView:(PTPPStickerAnimation *) model position:(CGPoint) position mouthScale:(float) scale mouthAngle:(float) angle
 {
-    
-//    UIImageView * _animationImageView = self.mouthSticker;
-//    
-//    int sx = scale * (position.x - 2 * model.centerX) + model.centerX;
-//    int sy = scale * (position.y - 2 * model.centerY) + model.centerY;
-//    int rectW = model.width * scale;
-//    int rectH = model.height * scale;
-//    
-//    // CGRect rect = CGRectMake(position.x - model.centerX, position.y - model.centerY, model.width, model.height);
-//    CGRect rect = CGRectMake(sx, sy, rectW, rectH);
-//    
-//    _animationImageView.frame = rect;
-//    
-//    // model里面的中心点到图像中心的距离
-//    int gap = calDistance(model.centerX, model.centerY, model.width/2, model.height/2);
-//    // 设置layer的位置
-//    _animationImageView.layer.position = CGPointMake(position.x+scale*gap*cos(3.14/2-angle), position.y-scale*gap*sin(3.14/2-angle));
-//    _animationImageView.transform = CGAffineTransformMakeRotation(angle);
-//    
-//    // 显示动画边框
-//    // [_animationImageView.layer setBorderColor: [[UIColor purpleColor] CGColor]];
-//    // [_animationImageView.layer setBorderWidth: 1.0];
-//    
-//    NSMutableArray * imageArr = [[NSMutableArray alloc] init];
-//    for(int i = 0; i<[model.imageList count]; i++){
-//        UIImage * image = [model.imageList objectAtIndex:i];
-//        [imageArr addObject:image];
-//    }
-//    _animationImageView.animationImages = imageArr;
-//    
-//    // Set the duration of the entire animation
-//    _animationImageView.animationDuration = model.duration*imageArr.count;
-//    
-//    // Set the repeat count. If you don't set that value, by default will be a loop (infinite)
-//    // _animationImageView.animationRepeatCount = 1;
-//    
-//    
-//    // Start the animationrepeatcount
-//    [_animationImageView startAnimating];
     self.mouthSticker.hidden = NO;
     CGFloat stickerWidth = self.mouthAnimation.width;
     CGFloat stickerHeight = self.mouthAnimation.height;
-    CGFloat stickerDistance = self.mouthAnimation.distance;
+    //CGFloat stickerDistance = self.mouthAnimation.distance;
     CGPoint stickerCenter = CGPointMake(self.mouthAnimation.centerX, self.mouthAnimation.centerY);
     CGFloat frameDuration = self.mouthAnimation.duration;
     CGFloat actualDistance = [self getDistanceFromPointA:self.leftEye.center pointB:self.rightEye.center]*2;

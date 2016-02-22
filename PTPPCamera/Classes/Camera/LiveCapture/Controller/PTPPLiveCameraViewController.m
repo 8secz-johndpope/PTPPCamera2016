@@ -25,10 +25,8 @@
 #import "NoiseFilter.h"
 #import "PTPPStickerXMLParser.h"
 #import "PTPPStickerAnimation.h"
-#import "NSObject+Swizzle.h"
-#import "SVProgressHUD.h"
-#import "SOKit.h"
-
+#import "PTPPLocalFileManager.h"
+#import "PTFilterManager.h"
 #define kFilterScrollHeight 130
 #define kFilterDataLength 10
 #define kStickerScale 2
@@ -68,7 +66,7 @@
 @property (nonatomic, strong) UIView *cropMaskBottom;
 @property (nonatomic, strong) PTPPCameraFilterScrollView *filterScrollView;
 @property (nonatomic, strong) PTPPLiveStickerScrollView *liveStickerScrollView;
-@property (nonatomic, strong) NSArray *filterSet;
+@property (nonatomic, strong) NSMutableArray *filterSet;
 @property (nonatomic, strong) NSMutableDictionary *cameraSettings;
 
 @property (nonatomic, strong) PTPPLiveCameraTipsView *tipsView;
@@ -128,8 +126,11 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
                                                scale: 1.0
                                          orientation: UIImageOrientationUpMirrored];
         }
-        
+        if (!weakSelf.filterView.hidden){
+            image = weakSelf.filterView.image;
+        }
         if (weakSelf.liveStickerView.alpha == 0 || (weakSelf.liveStickerView.eyeSticker.isHidden && weakSelf.liveStickerView.mouthSticker.isHidden)) {
+          
             CGFloat widthRatio = image.size.width/(Screenwidth*[UIScreen mainScreen].scale);
             CGFloat heightRatio = image.size.height/(Screenheight*[UIScreen mainScreen].scale);
             //No AR stickers on screen, go to static photo edit process.
@@ -140,6 +141,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
             }
         }else{
             //AR stickers on screen, go to preview video
+         
             PTPPLiveStickerPreviewViewController *liveStickerVC = [[PTPPLiveStickerPreviewViewController alloc] initWithBasePhoto:image mouthSticker:weakSelf.liveStickerView.mouthSticker eyeSticker:weakSelf.liveStickerView.eyeSticker bottomSticker:weakSelf.liveStickerView.bottomSticker faceAngle:weakSelf.liveStickerView.faceAngle];
             [liveStickerVC setCropOption:[[weakSelf.cameraSettings objectForKey:PTPPCameraSettingCrop] integerValue]];
             [weakSelf.navigationController pushViewController:liveStickerVC animated:YES];
@@ -147,6 +149,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
         
     };
     [self.detectFaceController startDetection];
+    [self preRenderFilterPreview];
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -168,7 +171,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     //    [self.detectFaceController stopDetection];
     //    self.detectFaceController = nil;
     [self.detectFaceController stopRunning];
-    self.filterView.hidden = YES;
+    //self.filterView.hidden = YES;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -389,11 +392,12 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 
 -(void)toggleFilterOption{
     __weak typeof(self) weakSelf = self;
-    [self.filterScrollView setAttributeWithFilterSet:self.filterSet gridSpace:70 immediateEffectApplied:NO];
+    self.filterScrollView.activeFilterID = self.detectFaceController.activeFilterID;
     self.filterScrollView.previousActiveFilterID = self.detectFaceController.activeFilterID;
+    [self.filterScrollView setAttributeWithFilterSet:self.filterSet gridSpace:70 immediateEffectApplied:NO];
     self.filterScrollView.filterSelected = ^(NSInteger filterID, BOOL animated){
  
-        
+        weakSelf.detectFaceController.activeFilterID = filterID;
         if (filterID != 0) {
             weakSelf.filterView.hidden = NO;
         }else{
@@ -469,24 +473,73 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 }
 
 #pragma mark Private methods
+
+-(void)preRenderFilterPreview{
+    UIImage *inputImage = [UIImage imageNamed:@"FM_cover_photo.jpg"];
+    CGSize newSize = CGSizeMake(inputImage.size.width/10, inputImage.size.height/10);
+    UIGraphicsBeginImageContext(newSize);
+    [inputImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    inputImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    for (NSInteger i=0; i<10; i++) {
+        NSDictionary *dic = [self getFilterResultFromInputImage:inputImage filterIndex:i];
+        [self.filterSet addObject:dic];
+    }
+}
+
+-(NSDictionary *)getFilterResultFromInputImage:(UIImage *)inputImage filterIndex:(NSInteger)index{
+    NSDictionary *dic = nil;
+    switch (index) {
+        case 0:
+            dic = [[NSDictionary alloc] initWithObjectsAndKeys:inputImage,PTFILTERIMAGE,@"原始",PTFILTERNAME, nil];
+            break;
+        case 1:
+            dic = [PTFilterManager PTFilter:inputImage BLCXwithInfo:0.1];
+            break;
+        case 2:
+            dic = [PTFilterManager PTFilter:inputImage SXGNwithInfo:2.0];
+            break;
+        case 3:
+            dic = [PTFilterManager PTFilter:inputImage JSLSwithInfo:1.2 saturation:0.6 temperature:4500.0];
+            break;
+        case 4:
+            dic = [PTFilterManager PTFilter:inputImage SLDCwithInfo:1.2];
+            break;
+        case 5:
+            dic = [PTFilterManager PTFilter:inputImage ZJLNwithInfo:1.2];
+            break;
+        case 6:
+            dic = [PTFilterManager PTFilterWithMSHK:inputImage];
+            break;
+        case 7:
+            dic = [PTFilterManager PTFilterWithBLWX:inputImage];
+            break;
+        case 8:
+            dic = [PTFilterManager PTFilter:inputImage WNRYwithInfo:1.2];
+            break;
+        case 9:
+            dic = [PTFilterManager PTFilter:inputImage YMYGwithInfo:1.2 temperature:7200.0];
+            break;
+        default:
+            break;
+    }
+    return dic;
+}
+
+
 //Read Sticker files from local directory
 -(BOOL)loadLiveStickerWithFileName:(NSString *)fileName{
-    NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
-    NSString *xmlFilePath = nil;
     NSString *downloadFolder = nil;
+    NSString *xmlFilePath = nil;
     if (fileName) {
-        downloadFolder = [documentsPath stringByAppendingPathComponent:[NSString stringWithFormat:@"ARStickers/%@",fileName]];
+        downloadFolder = [PTPPLocalFileManager getFolderPathForARStickerName:fileName];
         if (!downloadFolder){
             NSLog(@"Sticker not existed");
             return NO;
         }
-        NSArray* dirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:downloadFolder
-                                                                            error:NULL];
-        [dirs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            NSString *filename = (NSString *)obj;
-            NSString *extension = [[filename pathExtension] lowercaseString];
-            NSLog(@"%@.%@",fileName,extension);
-        }];
+        //Print list of file in the directory
+        [PTPPLocalFileManager printListOfFilesAtDirectory:downloadFolder];
+        
 #warning xml filename will be changed in the future!!!
         xmlFilePath = [NSString stringWithFormat:@"%@/sample.xml",downloadFolder];
         
@@ -497,7 +550,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     
     NSDictionary *resultDict = [PTPPStickerXMLParser dictionaryFromXMLFilePath:xmlFilePath];
     if (!resultDict) {
-        NSLog(@"Sticker not existed");
+        NSLog(@"Sticker XML not existed");
         return NO;
     }
     [self createStickerAnimationFromDictionarySettings:resultDict downloadFolder:downloadFolder];
@@ -891,22 +944,9 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     return _cameraSettings;
 }
 
--(NSArray *)filterSet{
+-(NSMutableArray *)filterSet{
     if (!_filterSet) {
-        _filterSet = @[
-                       @"Original",
-                       @"CILinearToSRGBToneCurve",
-                       @"CIPhotoEffectChrome",
-                       @"CIPhotoEffectFade",
-                       @"CIPhotoEffectInstant",
-                       @"CIPhotoEffectMono",
-                       @"CIPhotoEffectNoir",
-                       @"CIPhotoEffectProcess",
-                       @"CIPhotoEffectTonal",
-                       @"CIPhotoEffectTransfer",
-                       @"CISRGBToneCurveToLinear",
-                       @"CIVignetteEffect",
-                       ];
+        _filterSet = [[NSMutableArray alloc] init];
     }
     return _filterSet;
 }
@@ -1055,7 +1095,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 
 -(UIButton *)liveStickerButton{
     if (!_liveStickerButton) {
-        _liveStickerButton = [[UIButton alloc] initWithFrame:CGRectMake(Screenwidth/5*3, (kBottomControlHeight-Screenwidth/5)/2, Screenwidth/5, Screenwidth/5)];
+        _liveStickerButton = [[UIButton alloc] initWithFrame:CGRectMake(Screenwidth/5*1, (kBottomControlHeight-Screenwidth/5)/2, Screenwidth/5, Screenwidth/5)];
         [_liveStickerButton setImage:[UIImage imageNamed:@"icon_capture_20_15"] forState:UIControlStateNormal];
         [_liveStickerButton addTarget:self action:@selector(toggleLiveStickerOption) forControlEvents:UIControlEventTouchUpInside];
     }
@@ -1074,7 +1114,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 
 -(UIButton *)filterButton{
     if (!_filterButton) {
-        _filterButton = [[UIButton alloc] initWithFrame:CGRectMake(Screenwidth/5*1, (kBottomControlHeight-Screenwidth/5)/2, Screenwidth/5, Screenwidth/5)];
+        _filterButton = [[UIButton alloc] initWithFrame:CGRectMake(Screenwidth/5*3, (kBottomControlHeight-Screenwidth/5)/2, Screenwidth/5, Screenwidth/5)];
         [_filterButton setImage:[UIImage imageNamed:@"icon_capture_20_16"] forState:UIControlStateNormal];
         [_filterButton addTarget:self action:@selector(toggleFilterOption) forControlEvents:UIControlEventTouchUpInside];
     }

@@ -7,7 +7,7 @@
 #import "DetectFace.h"
 #import <CoreImage/CoreImage.h>
 #import <ImageIO/ImageIO.h>
-
+#import "PTFilterManager.h"
 #pragma mark-
 
 @interface DetectFace () <AVCaptureVideoDataOutputSampleBufferDelegate>
@@ -240,13 +240,7 @@
     // called asynchronously as the capture output is capturing sample buffers, this method asks the face detector
     // to detect features
     
-    NSString *titleFilter = self.filters[0];
-    if (self.activeFilterID<self.filters.count) {
-        titleFilter = [self.filters objectAtIndex:self.activeFilterID];
-    }
- 
-    self.filter = [CIFilter filterWithName:titleFilter keysAndValues:kCIInputImageKey,outputImage, nil];
-    outputImage = self.filter.outputImage;
+   
     
     
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
@@ -268,6 +262,9 @@
     outputImage = [outputImage imageByApplyingTransform:t];
     CGImageRef cgImage = [self.context createCGImage:outputImage fromRect:outputImage.extent];
     UIImage *newPtImage = [UIImage imageWithCGImage:cgImage];
+    NSDictionary *filterResult = [self getFilterResultFromInputImage:newPtImage filterIndex:self.activeFilterID];
+    UIImage *resultImage = [filterResult safeObjectForKey:PTFILTERIMAGE];
+    
     __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         weakSelf.previewLayer.contents = (__bridge id)(cgImage);
@@ -276,10 +273,50 @@
         NSString *gravity = [self.previewLayer videoGravity];
         CGRect previewBox = [DetectFace videoPreviewBoxForGravity:gravity frameSize:parentFrameSize apertureSize:clap.size];
         if([self.delegate respondsToSelector:@selector(detectedFaceController:features:forVideoBox:withPreviewBox:processedImage:)])
-            [self.delegate detectedFaceController:self features:features forVideoBox:clap withPreviewBox:previewBox processedImage:newPtImage];
+            [self.delegate detectedFaceController:self features:features forVideoBox:clap withPreviewBox:previewBox processedImage:resultImage];
        // NSLog(@"VideoBox:%@ PreviewBox:%@",NSStringFromCGRect(clap),NSStringFromCGRect(previewBox));
     });
 }
+
+-(NSDictionary *)getFilterResultFromInputImage:(UIImage *)inputImage filterIndex:(NSInteger)index{
+    NSDictionary *dic = nil;
+    switch (index) {
+        case 0:
+            dic = [[NSDictionary alloc] initWithObjectsAndKeys:inputImage,PTFILTERIMAGE,@"原始",PTFILTERNAME, nil];
+            break;
+        case 1:
+            dic = [PTFilterManager PTFilter:inputImage BLCXwithInfo:0.1];
+            break;
+        case 2:
+            dic = [PTFilterManager PTFilter:inputImage SXGNwithInfo:2.0];
+            break;
+        case 3:
+            dic = [PTFilterManager PTFilter:inputImage JSLSwithInfo:1.2 saturation:0.6 temperature:4500.0];
+            break;
+        case 4:
+            dic = [PTFilterManager PTFilter:inputImage SLDCwithInfo:1.2];
+            break;
+        case 5:
+            dic = [PTFilterManager PTFilter:inputImage ZJLNwithInfo:1.2];
+            break;
+        case 6:
+            dic = [PTFilterManager PTFilterWithMSHK:inputImage];
+            break;
+        case 7:
+            dic = [PTFilterManager PTFilterWithBLWX:inputImage];
+            break;
+        case 8:
+            dic = [PTFilterManager PTFilter:inputImage WNRYwithInfo:1.2];
+            break;
+        case 9:
+            dic = [PTFilterManager PTFilter:inputImage YMYGwithInfo:1.2 temperature:7200.0];
+            break;
+        default:
+            break;
+    }
+    return dic;
+}
+
 
 - (void)startDetection
 {
