@@ -13,10 +13,9 @@
 
 //Retreive local cache folder path given a particular sticker file name
 +(NSString *)getFolderPathForARStickerName:(NSString *)ARStickerName{
-    NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
     NSString *downloadFolder = nil;
     if (ARStickerName.length>0) {
-        downloadFolder = [documentsPath stringByAppendingPathComponent:[NSString stringWithFormat:@"ARStickers/%@",ARStickerName]];
+        downloadFolder = [[self getFolderPathForARStickers] stringByAppendingPathComponent:[NSString stringWithFormat:@"/%@",ARStickerName]];
         if (!downloadFolder){
             NSLog(@"Sticker not existed");
         }
@@ -26,8 +25,7 @@
 
 +(void)unzipAllFilesForARStickers{
     NSFileManager *fileManager= [NSFileManager defaultManager];
-    NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
-    NSString *downloadFolder = [documentsPath stringByAppendingPathComponent:@"ARStickers"];
+    NSString *downloadFolder = [self getFolderPathForARStickers];
     NSArray* dirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:downloadFolder
                                                                         error:NULL];
     
@@ -48,6 +46,12 @@
         }
     }];
 
+}
+
++(NSString *)getFolderPathForARStickers{
+    NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
+    NSString *downloadFolder = [documentsPath stringByAppendingPathComponent:@"ARStickers"];
+    return downloadFolder;
 }
 
 //Print list of files with given path

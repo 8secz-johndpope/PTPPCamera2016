@@ -8,7 +8,7 @@
 #import "SOKit.h"
 #import "PTPPNewHomeViewController.h"
 #import "PTPPLiveCameraViewController.h"
-
+#import "PTPPMaterialShopViewController.h"
 #import "PTAvatarView.h"
 #import "PTMacro.h"
 #import "PTPPHomeDashboardView.h"
@@ -153,7 +153,8 @@
 }
 
 - (void)toMaterialCenter{
-
+    PTPPMaterialShopViewController *materialShopVC = [[PTPPMaterialShopViewController alloc] init];
+    [self.navigationController pushViewController:materialShopVC animated:YES];
 }
 
 -(void)toFeedBack{

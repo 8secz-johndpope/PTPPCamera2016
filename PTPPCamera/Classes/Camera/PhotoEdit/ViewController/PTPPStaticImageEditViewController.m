@@ -506,7 +506,9 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
         
     };
     self.rotateSrollView.finishBlock = ^(BOOL saveChange){
-        
+        if (weakSelf.isRotating) {
+            return ;
+        }
         NSDictionary *filterResult = [weakSelf getFilterResultFromInputImage:weakSelf.basePhoto filterIndex:weakSelf.activeFilterID];
         UIImage *resultImage = [filterResult safeObjectForKey:PTFILTERIMAGE];
         weakSelf.basePhotoView.image = resultImage;

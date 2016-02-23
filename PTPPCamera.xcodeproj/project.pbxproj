@@ -1509,6 +1509,16 @@
 		C647C8FF1C71CF2B00E596EA /* placeholder.md in Sources */ = {isa = PBXBuildFile; fileRef = C647C8FE1C71CF2B00E596EA /* placeholder.md */; };
 		C647C9021C71CF3400E596EA /* AssetHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C647C9011C71CF3400E596EA /* AssetHelper.m */; };
 		C6669B0B1C75A508009291C4 /* PTPPLiveStickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = C6669B0A1C75A508009291C4 /* PTPPLiveStickerView.m */; };
+		C6681E471C7BF398009BC942 /* PTPPMaterialManagementViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E461C7BF398009BC942 /* PTPPMaterialManagementViewController.m */; };
+		C6681E4C1C7BF39D009BC942 /* PTPPMaterialShopViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E491C7BF39D009BC942 /* PTPPMaterialShopViewController.m */; };
+		C6681E4D1C7BF39D009BC942 /* PTPPMaterialStickerDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E4B1C7BF39D009BC942 /* PTPPMaterialStickerDetailViewController.m */; };
+		C6681E501C7BF46A009BC942 /* PTPPMaterialManagementBottomView.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E4F1C7BF46A009BC942 /* PTPPMaterialManagementBottomView.m */; };
+		C6681E5D1C7BF470009BC942 /* PTPPMaterialShopARStickerItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E521C7BF470009BC942 /* PTPPMaterialShopARStickerItemCell.m */; };
+		C6681E5E1C7BF470009BC942 /* PTPPMaterialShopItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E541C7BF470009BC942 /* PTPPMaterialShopItemCell.m */; };
+		C6681E5F1C7BF470009BC942 /* PTPPMaterialShopJigsawItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E561C7BF470009BC942 /* PTPPMaterialShopJigsawItemCell.m */; };
+		C6681E601C7BF470009BC942 /* PTPPMaterialShopStickerItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E581C7BF470009BC942 /* PTPPMaterialShopStickerItemCell.m */; };
+		C6681E611C7BF470009BC942 /* PTPPMaterialStickerDetailCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E5A1C7BF470009BC942 /* PTPPMaterialStickerDetailCell.m */; };
+		C6681E621C7BF470009BC942 /* PTPPMaterialStickerDetailHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E5C1C7BF470009BC942 /* PTPPMaterialStickerDetailHeaderView.m */; };
 		C691C9491C7AA2DB004C5F53 /* PTPPLocalFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C691C9481C7AA2DB004C5F53 /* PTPPLocalFileManager.m */; };
 		C6CE891F1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6CE891E1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.m */; };
 /* End PBXBuildFile section */
@@ -3441,6 +3451,26 @@
 		C647C9011C71CF3400E596EA /* AssetHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AssetHelper.m; sourceTree = "<group>"; };
 		C6669B091C75A508009291C4 /* PTPPLiveStickerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPLiveStickerView.h; sourceTree = "<group>"; };
 		C6669B0A1C75A508009291C4 /* PTPPLiveStickerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPLiveStickerView.m; sourceTree = "<group>"; };
+		C6681E451C7BF398009BC942 /* PTPPMaterialManagementViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialManagementViewController.h; sourceTree = "<group>"; };
+		C6681E461C7BF398009BC942 /* PTPPMaterialManagementViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialManagementViewController.m; sourceTree = "<group>"; };
+		C6681E481C7BF39D009BC942 /* PTPPMaterialShopViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialShopViewController.h; sourceTree = "<group>"; };
+		C6681E491C7BF39D009BC942 /* PTPPMaterialShopViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopViewController.m; sourceTree = "<group>"; };
+		C6681E4A1C7BF39D009BC942 /* PTPPMaterialStickerDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialStickerDetailViewController.h; sourceTree = "<group>"; };
+		C6681E4B1C7BF39D009BC942 /* PTPPMaterialStickerDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialStickerDetailViewController.m; sourceTree = "<group>"; };
+		C6681E4E1C7BF46A009BC942 /* PTPPMaterialManagementBottomView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialManagementBottomView.h; sourceTree = "<group>"; };
+		C6681E4F1C7BF46A009BC942 /* PTPPMaterialManagementBottomView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialManagementBottomView.m; sourceTree = "<group>"; };
+		C6681E511C7BF470009BC942 /* PTPPMaterialShopARStickerItemCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialShopARStickerItemCell.h; sourceTree = "<group>"; };
+		C6681E521C7BF470009BC942 /* PTPPMaterialShopARStickerItemCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopARStickerItemCell.m; sourceTree = "<group>"; };
+		C6681E531C7BF470009BC942 /* PTPPMaterialShopItemCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialShopItemCell.h; sourceTree = "<group>"; };
+		C6681E541C7BF470009BC942 /* PTPPMaterialShopItemCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopItemCell.m; sourceTree = "<group>"; };
+		C6681E551C7BF470009BC942 /* PTPPMaterialShopJigsawItemCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialShopJigsawItemCell.h; sourceTree = "<group>"; };
+		C6681E561C7BF470009BC942 /* PTPPMaterialShopJigsawItemCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopJigsawItemCell.m; sourceTree = "<group>"; };
+		C6681E571C7BF470009BC942 /* PTPPMaterialShopStickerItemCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialShopStickerItemCell.h; sourceTree = "<group>"; };
+		C6681E581C7BF470009BC942 /* PTPPMaterialShopStickerItemCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopStickerItemCell.m; sourceTree = "<group>"; };
+		C6681E591C7BF470009BC942 /* PTPPMaterialStickerDetailCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialStickerDetailCell.h; sourceTree = "<group>"; };
+		C6681E5A1C7BF470009BC942 /* PTPPMaterialStickerDetailCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialStickerDetailCell.m; sourceTree = "<group>"; };
+		C6681E5B1C7BF470009BC942 /* PTPPMaterialStickerDetailHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialStickerDetailHeaderView.h; sourceTree = "<group>"; };
+		C6681E5C1C7BF470009BC942 /* PTPPMaterialStickerDetailHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialStickerDetailHeaderView.m; sourceTree = "<group>"; };
 		C691C9471C7AA2DB004C5F53 /* PTPPLocalFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPLocalFileManager.h; sourceTree = "<group>"; };
 		C691C9481C7AA2DB004C5F53 /* PTPPLocalFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPLocalFileManager.m; sourceTree = "<group>"; };
 		C6CE891D1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPLiveStickerEditViewController.h; sourceTree = "<group>"; };
@@ -3588,6 +3618,7 @@
 		C647BAAA1C71802B00E596EA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				C6681E3C1C7BF273009BC942 /* Materials */,
 				C647C8DD1C71C9AC00E596EA /* Home */,
 				C647C8831C71C40200E596EA /* Camera */,
 				C647BD1F1C718D2000E596EA /* User */,
@@ -6321,6 +6352,97 @@
 			path = Util;
 			sourceTree = "<group>";
 		};
+		C6681E3C1C7BF273009BC942 /* Materials */ = {
+			isa = PBXGroup;
+			children = (
+				C6681E3D1C7BF273009BC942 /* Management */,
+				C6681E411C7BF273009BC942 /* Shop */,
+			);
+			path = Materials;
+			sourceTree = "<group>";
+		};
+		C6681E3D1C7BF273009BC942 /* Management */ = {
+			isa = PBXGroup;
+			children = (
+				C6681E3E1C7BF273009BC942 /* Model */,
+				C6681E3F1C7BF273009BC942 /* View */,
+				C6681E401C7BF273009BC942 /* ViewController */,
+			);
+			path = Management;
+			sourceTree = "<group>";
+		};
+		C6681E3E1C7BF273009BC942 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		C6681E3F1C7BF273009BC942 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				C6681E4E1C7BF46A009BC942 /* PTPPMaterialManagementBottomView.h */,
+				C6681E4F1C7BF46A009BC942 /* PTPPMaterialManagementBottomView.m */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		C6681E401C7BF273009BC942 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				C6681E451C7BF398009BC942 /* PTPPMaterialManagementViewController.h */,
+				C6681E461C7BF398009BC942 /* PTPPMaterialManagementViewController.m */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		C6681E411C7BF273009BC942 /* Shop */ = {
+			isa = PBXGroup;
+			children = (
+				C6681E421C7BF273009BC942 /* Model */,
+				C6681E431C7BF273009BC942 /* View */,
+				C6681E441C7BF273009BC942 /* ViewController */,
+			);
+			path = Shop;
+			sourceTree = "<group>";
+		};
+		C6681E421C7BF273009BC942 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		C6681E431C7BF273009BC942 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				C6681E531C7BF470009BC942 /* PTPPMaterialShopItemCell.h */,
+				C6681E541C7BF470009BC942 /* PTPPMaterialShopItemCell.m */,
+				C6681E511C7BF470009BC942 /* PTPPMaterialShopARStickerItemCell.h */,
+				C6681E521C7BF470009BC942 /* PTPPMaterialShopARStickerItemCell.m */,
+				C6681E551C7BF470009BC942 /* PTPPMaterialShopJigsawItemCell.h */,
+				C6681E561C7BF470009BC942 /* PTPPMaterialShopJigsawItemCell.m */,
+				C6681E571C7BF470009BC942 /* PTPPMaterialShopStickerItemCell.h */,
+				C6681E581C7BF470009BC942 /* PTPPMaterialShopStickerItemCell.m */,
+				C6681E591C7BF470009BC942 /* PTPPMaterialStickerDetailCell.h */,
+				C6681E5A1C7BF470009BC942 /* PTPPMaterialStickerDetailCell.m */,
+				C6681E5B1C7BF470009BC942 /* PTPPMaterialStickerDetailHeaderView.h */,
+				C6681E5C1C7BF470009BC942 /* PTPPMaterialStickerDetailHeaderView.m */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		C6681E441C7BF273009BC942 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				C6681E481C7BF39D009BC942 /* PTPPMaterialShopViewController.h */,
+				C6681E491C7BF39D009BC942 /* PTPPMaterialShopViewController.m */,
+				C6681E4A1C7BF39D009BC942 /* PTPPMaterialStickerDetailViewController.h */,
+				C6681E4B1C7BF39D009BC942 /* PTPPMaterialStickerDetailViewController.m */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -7515,6 +7637,7 @@
 				C647BDAB1C718E5100E596EA /* ELCAssetTablePicker.m in Sources */,
 				C647BFC41C71BBBB00E596EA /* GPUImageMovie.m in Sources */,
 				C647BBEF1C7181BE00E596EA /* UIImage+SOImage.m in Sources */,
+				C6681E5F1C7BF470009BC942 /* PTPPMaterialShopJigsawItemCell.m in Sources */,
 				C647BF6C1C71BBBB00E596EA /* GPUImageBilateralFilter.m in Sources */,
 				C647BBD01C7181BE00E596EA /* UIAlertView+AFNetworking.m in Sources */,
 				C647BBF61C7181BE00E596EA /* UIViewController+SOViewController.m in Sources */,
@@ -7535,6 +7658,7 @@
 				C647BF761C71BBBB00E596EA /* GPUImageColorBlendFilter.m in Sources */,
 				C647BC1E1C7181BE00E596EA /* SRSlimeView.m in Sources */,
 				C647BDAC1C718E5100E596EA /* ELCConsole.m in Sources */,
+				C6681E4D1C7BF39D009BC942 /* PTPPMaterialStickerDetailViewController.m in Sources */,
 				C647BBF41C7181BE00E596EA /* UIView+CustomBadge.m in Sources */,
 				C647BFBF1C71BBBB00E596EA /* GPUImageMissEtikateFilter.m in Sources */,
 				C647BFB21C71BBBB00E596EA /* GPUImageLevelsFilter.m in Sources */,
@@ -7575,6 +7699,7 @@
 				C647BDDB1C718E5100E596EA /* ZipArchive.mm in Sources */,
 				C647BC1F1C7181BE00E596EA /* SORefreshTableView.m in Sources */,
 				C647C8B81C71C40200E596EA /* PTPPAnimationModel.m in Sources */,
+				C6681E471C7BF398009BC942 /* PTPPMaterialManagementViewController.m in Sources */,
 				C647BBEC1C7181BE00E596EA /* NSString+SOAdditions.m in Sources */,
 				C647BF7D1C71BBBB00E596EA /* GPUImageColorPackingFilter.m in Sources */,
 				C647BFDB1C71BBBB00E596EA /* GPUImageRawDataInput.m in Sources */,
@@ -7587,12 +7712,14 @@
 				C647BD1E1C718C4B00E596EA /* PTMacro.m in Sources */,
 				C647BC161C7181BE00E596EA /* SOPopupButtonItem.m in Sources */,
 				C647BFC01C71BBBB00E596EA /* GPUImageMonochromeFilter.m in Sources */,
+				C6681E621C7BF470009BC942 /* PTPPMaterialStickerDetailHeaderView.m in Sources */,
 				C647BFC81C71BBBB00E596EA /* GPUImageNobleCornerDetectionFilter.m in Sources */,
 				C647BBEE1C7181BE00E596EA /* UIColor+SOColor.m in Sources */,
 				C647BBE61C7181BE00E596EA /* NSData+Additions.m in Sources */,
 				C647BFA11C71BBBB00E596EA /* GPUImageHazeFilter.m in Sources */,
 				C647C0091C71BBBB00E596EA /* GPUImageVignetteFilter.m in Sources */,
 				C647BBED1C7181BE00E596EA /* UIButton+SOButton.m in Sources */,
+				C6681E4C1C7BF39D009BC942 /* PTPPMaterialShopViewController.m in Sources */,
 				C647C8B51C71C40200E596EA /* PTPPLiveVideoShareViewController.m in Sources */,
 				C647C8C01C71C40200E596EA /* PTPPCameraFilterScrollView.m in Sources */,
 				C647BC241C7181BE00E596EA /* SOSegmentControlItem.m in Sources */,
@@ -7605,6 +7732,7 @@
 				C647BC0D1C7181BE00E596EA /* SODropBox.m in Sources */,
 				C647BF9C1C71BBBB00E596EA /* GPUImageGlassSphereFilter.m in Sources */,
 				C647BFF21C71BBBB00E596EA /* GPUImageStillCamera.m in Sources */,
+				C6681E5E1C7BF470009BC942 /* PTPPMaterialShopItemCell.m in Sources */,
 				C647BDA81C718E5100E596EA /* ELCAlbumPickerController.m in Sources */,
 				C647BBCD1C7181BE00E596EA /* AFURLSessionManager.m in Sources */,
 				C647BFF31C71BBBB00E596EA /* GPUImageStretchDistortionFilter.m in Sources */,
@@ -7647,6 +7775,7 @@
 				C647BBDF1C7181BE00E596EA /* UIImage+GIF.m in Sources */,
 				C647BCE21C718C4B00E596EA /* NSObject+Swizzle.m in Sources */,
 				C647C8D11C71C8EA00E596EA /* Download.m in Sources */,
+				C6681E501C7BF46A009BC942 /* PTPPMaterialManagementBottomView.m in Sources */,
 				C647BF8A1C71BBBB00E596EA /* GPUImageDissolveBlendFilter.m in Sources */,
 				C647BFA41C71BBBB00E596EA /* GPUImageHighPassFilter.m in Sources */,
 				C647BFFC1C71BBBB00E596EA /* GPUImageTiltShiftFilter.m in Sources */,
@@ -7654,9 +7783,11 @@
 				C647BFD11C71BBBB00E596EA /* GPUImagePicture+TextureSubimage.m in Sources */,
 				C647BF921C71BBBB00E596EA /* GPUImageFilter.m in Sources */,
 				C647C8C41C71C40200E596EA /* PTRecommendAppBottomView.m in Sources */,
+				C6681E601C7BF470009BC942 /* PTPPMaterialShopStickerItemCell.m in Sources */,
 				C647BFBA1C71BBBB00E596EA /* GPUImageLuminanceThresholdFilter.m in Sources */,
 				C647BDC71C718E5100E596EA /* UIView+MJExtension.m in Sources */,
 				C647BBD61C7181BE00E596EA /* NSData+ImageContentType.m in Sources */,
+				C6681E5D1C7BF470009BC942 /* PTPPMaterialShopARStickerItemCell.m in Sources */,
 				C647BC031C7181BE00E596EA /* SOBaseCollectionView.m in Sources */,
 				C647BBFF1C7181BE00E596EA /* SOHTTPRequestModel.m in Sources */,
 				C647BFD61C71BBBB00E596EA /* GPUImagePoissonBlendFilter.m in Sources */,
@@ -7828,6 +7959,7 @@
 				C647BF9F1C71BBBB00E596EA /* GPUImageHardLightBlendFilter.m in Sources */,
 				C647BD081C718C4B00E596EA /* PTLoadingViewCell.m in Sources */,
 				C647BF7E1C71BBBB00E596EA /* GPUImageColourFASTFeatureDetector.m in Sources */,
+				C6681E611C7BF470009BC942 /* PTPPMaterialStickerDetailCell.m in Sources */,
 				C647BF661C71BBBB00E596EA /* GPUImageAdaptiveThresholdFilter.m in Sources */,
 				C647BA951C717C4700E596EA /* main.m in Sources */,
 				C647BC001C7181BE00E596EA /* AFHTTPRequestOperation+SOHTTPRequestOperation.m in Sources */,
@@ -7979,7 +8111,7 @@
 				);
 				GCC_PREFIX_HEADER = PTPPCamera/PrefixHeader.pch;
 				INFOPLIST_FILE = PTPPCamera/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -8007,7 +8139,7 @@
 				);
 				GCC_PREFIX_HEADER = PTPPCamera/PrefixHeader.pch;
 				INFOPLIST_FILE = PTPPCamera/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
