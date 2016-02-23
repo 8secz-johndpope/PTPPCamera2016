@@ -10,8 +10,10 @@
 #import "PTPPLiveStickerEditViewController.h"
 #import "PTPPStaticImageEditToolBar.h"
 #import "PTPPCameraFilterScrollView.h"
+#import "PTPPStaticStickersScrollView.h"
 #import "PTFilterManager.h"
 #import "PECropView.h"
+#import "PTPPLocalFileManager.h"
 
 #define kFilterScrollHeight 150
 #define kCropScrollHeight 120
@@ -27,6 +29,7 @@
 @property (nonatomic, strong) NSMutableArray *filterSet;
 @property (nonatomic, strong) NSMutableArray *cropSet;
 @property (nonatomic, strong) NSMutableArray *rotateSet;
+@property (nonatomic, strong) PTPPStaticStickersScrollView *stickerScrollView;
 @property (nonatomic, strong) PTPPCameraFilterScrollView *filterScrollView;
 @property (nonatomic, strong) PTPPCameraFilterScrollView *cropScrollView;
 @property (nonatomic, strong) PTPPCameraFilterScrollView *rotateSrollView;
@@ -66,6 +69,16 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     [self preloadCropSizeSet];
     [self preloadRotateSet];
     [self updateFrame];
+    
+    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"fqj" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao2" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao3" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao4" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao5" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+    
+    [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -338,8 +351,32 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 }
 
 -(void)toggleStaticStickerMenu{
+     __weak typeof(self) weakSelf = self;
+    [self.stickerScrollView setAttributeWithFilePathSet:[PTPPLocalFileManager getListOfFilePathAtDirectory:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]]];
+    self.stickerScrollView.stickerSelected = ^(NSString *filePath, BOOL isFromBundle){
+        NSLog(@"filePath selected:%@",filePath);
+    };
+    self.stickerScrollView.finishBlock = ^(){
+        weakSelf.activeFilterID = weakSelf.filterScrollView.previousActiveFilterID;
+        [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
+              initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseOut  animations:^(){
+                  weakSelf.stickerScrollView.center = CGPointMake(weakSelf.stickerScrollView.centerX, Screenheight+weakSelf.stickerScrollView.height/2);
+                 
+              } completion:^(BOOL finished) {
+                  [weakSelf.stickerScrollView removeFromSuperview];
+                  weakSelf.stickerScrollView = nil;
+              }];
+    };
     
+    [self.view addSubview:self.stickerScrollView];
+    self.stickerScrollView.frame = CGRectMake(0, Screenheight, self.stickerScrollView.width, self.stickerScrollView.height);
+    [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
+          initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseOut  animations:^(){
+              weakSelf.stickerScrollView.frame = CGRectMake(0, Screenheight-weakSelf.stickerScrollView.height, weakSelf.stickerScrollView.width, weakSelf.stickerScrollView.height);
+
+          } completion:^(BOOL finished) {}];
 }
+
 -(void)toggleFilterMenu{
     __weak typeof(self) weakSelf = self;
     self.filterScrollView.activeFilterID = self.activeFilterID;
@@ -638,6 +675,14 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
         [_saveButton addTarget:self action:@selector(saveAndExport) forControlEvents:UIControlEventTouchUpInside];
     }
     return _saveButton;
+}
+
+-(PTPPStaticStickersScrollView *)stickerScrollView{
+    if (!_stickerScrollView) {
+        _stickerScrollView = [[PTPPStaticStickersScrollView alloc] initWithFrame:CGRectMake(0, 0, Screenwidth, kPrimaryCollectionViewHeight+kSecondaryCollectionViewHeight)];
+        _stickerScrollView.activeID = 0;
+    }
+    return _stickerScrollView;
 }
 
 -(PTPPCameraFilterScrollView *)filterScrollView{

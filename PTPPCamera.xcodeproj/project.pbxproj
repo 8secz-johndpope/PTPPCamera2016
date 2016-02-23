@@ -910,7 +910,6 @@
 		C647C64A1C71C2C200E596EA /* nz0035@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C647C2171C71C2C200E596EA /* nz0035@2x.png */; };
 		C647C64B1C71C2C200E596EA /* nz0036@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C647C2181C71C2C200E596EA /* nz0036@2x.png */; };
 		C647C64C1C71C2C200E596EA /* nz0037@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C647C2191C71C2C200E596EA /* nz0037@2x.png */; };
-		C647C64D1C71C2C200E596EA /* fd.zip in Resources */ = {isa = PBXBuildFile; fileRef = C647C21A1C71C2C200E596EA /* fd.zip */; };
 		C647C64E1C71C2C200E596EA /* hy.xml in Resources */ = {isa = PBXBuildFile; fileRef = C647C21C1C71C2C200E596EA /* hy.xml */; };
 		C647C64F1C71C2C200E596EA /* hy0001.png in Resources */ = {isa = PBXBuildFile; fileRef = C647C21D1C71C2C200E596EA /* hy0001.png */; };
 		C647C6501C71C2C200E596EA /* hy0002.png in Resources */ = {isa = PBXBuildFile; fileRef = C647C21E1C71C2C200E596EA /* hy0002.png */; };
@@ -1519,6 +1518,14 @@
 		C6681E601C7BF470009BC942 /* PTPPMaterialShopStickerItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E581C7BF470009BC942 /* PTPPMaterialShopStickerItemCell.m */; };
 		C6681E611C7BF470009BC942 /* PTPPMaterialStickerDetailCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E5A1C7BF470009BC942 /* PTPPMaterialStickerDetailCell.m */; };
 		C6681E621C7BF470009BC942 /* PTPPMaterialStickerDetailHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E5C1C7BF470009BC942 /* PTPPMaterialStickerDetailHeaderView.m */; };
+		C6681E641C7C2A86009BC942 /* qipao.zip in Resources */ = {isa = PBXBuildFile; fileRef = C6681E631C7C2A86009BC942 /* qipao.zip */; };
+		C6681E671C7C32D4009BC942 /* PTPPStaticStickersScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E661C7C32D4009BC942 /* PTPPStaticStickersScrollView.m */; };
+		C6681E6F1C7C3529009BC942 /* qipao2.zip in Resources */ = {isa = PBXBuildFile; fileRef = C6681E6B1C7C3529009BC942 /* qipao2.zip */; };
+		C6681E701C7C3529009BC942 /* qipao3.zip in Resources */ = {isa = PBXBuildFile; fileRef = C6681E6C1C7C3529009BC942 /* qipao3.zip */; };
+		C6681E711C7C3529009BC942 /* qipao4.zip in Resources */ = {isa = PBXBuildFile; fileRef = C6681E6D1C7C3529009BC942 /* qipao4.zip */; };
+		C6681E721C7C3529009BC942 /* qipao5.zip in Resources */ = {isa = PBXBuildFile; fileRef = C6681E6E1C7C3529009BC942 /* qipao5.zip */; };
+		C6681E751C7C382F009BC942 /* PTStaticStickerPickerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E741C7C382F009BC942 /* PTStaticStickerPickerCell.m */; };
+		C6681E791C7C5953009BC942 /* fqj.zip in Resources */ = {isa = PBXBuildFile; fileRef = C6681E781C7C5953009BC942 /* fqj.zip */; };
 		C691C9491C7AA2DB004C5F53 /* PTPPLocalFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C691C9481C7AA2DB004C5F53 /* PTPPLocalFileManager.m */; };
 		C6CE891F1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6CE891E1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.m */; };
 /* End PBXBuildFile section */
@@ -2820,7 +2827,6 @@
 		C647C2171C71C2C200E596EA /* nz0035@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "nz0035@2x.png"; sourceTree = "<group>"; };
 		C647C2181C71C2C200E596EA /* nz0036@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "nz0036@2x.png"; sourceTree = "<group>"; };
 		C647C2191C71C2C200E596EA /* nz0037@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "nz0037@2x.png"; sourceTree = "<group>"; };
-		C647C21A1C71C2C200E596EA /* fd.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = fd.zip; sourceTree = "<group>"; };
 		C647C21C1C71C2C200E596EA /* hy.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = hy.xml; sourceTree = "<group>"; };
 		C647C21D1C71C2C200E596EA /* hy0001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hy0001.png; sourceTree = "<group>"; };
 		C647C21E1C71C2C200E596EA /* hy0002.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hy0002.png; sourceTree = "<group>"; };
@@ -3471,6 +3477,16 @@
 		C6681E5A1C7BF470009BC942 /* PTPPMaterialStickerDetailCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialStickerDetailCell.m; sourceTree = "<group>"; };
 		C6681E5B1C7BF470009BC942 /* PTPPMaterialStickerDetailHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialStickerDetailHeaderView.h; sourceTree = "<group>"; };
 		C6681E5C1C7BF470009BC942 /* PTPPMaterialStickerDetailHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialStickerDetailHeaderView.m; sourceTree = "<group>"; };
+		C6681E631C7C2A86009BC942 /* qipao.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = qipao.zip; sourceTree = "<group>"; };
+		C6681E651C7C32D4009BC942 /* PTPPStaticStickersScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPStaticStickersScrollView.h; sourceTree = "<group>"; };
+		C6681E661C7C32D4009BC942 /* PTPPStaticStickersScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPStaticStickersScrollView.m; sourceTree = "<group>"; };
+		C6681E6B1C7C3529009BC942 /* qipao2.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = qipao2.zip; sourceTree = "<group>"; };
+		C6681E6C1C7C3529009BC942 /* qipao3.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = qipao3.zip; sourceTree = "<group>"; };
+		C6681E6D1C7C3529009BC942 /* qipao4.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = qipao4.zip; sourceTree = "<group>"; };
+		C6681E6E1C7C3529009BC942 /* qipao5.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = qipao5.zip; sourceTree = "<group>"; };
+		C6681E731C7C382F009BC942 /* PTStaticStickerPickerCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTStaticStickerPickerCell.h; sourceTree = "<group>"; };
+		C6681E741C7C382F009BC942 /* PTStaticStickerPickerCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTStaticStickerPickerCell.m; sourceTree = "<group>"; };
+		C6681E781C7C5953009BC942 /* fqj.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = fqj.zip; sourceTree = "<group>"; };
 		C691C9471C7AA2DB004C5F53 /* PTPPLocalFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPLocalFileManager.h; sourceTree = "<group>"; };
 		C691C9481C7AA2DB004C5F53 /* PTPPLocalFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPLocalFileManager.m; sourceTree = "<group>"; };
 		C6CE891D1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPLiveStickerEditViewController.h; sourceTree = "<group>"; };
@@ -3557,6 +3573,10 @@
 			children = (
 				C6433C1D1C72C66D00AF82AD /* PTPPStaticImageEditToolBar.h */,
 				C6433C1E1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m */,
+				C6681E651C7C32D4009BC942 /* PTPPStaticStickersScrollView.h */,
+				C6681E661C7C32D4009BC942 /* PTPPStaticStickersScrollView.m */,
+				C6681E731C7C382F009BC942 /* PTStaticStickerPickerCell.h */,
+				C6681E741C7C382F009BC942 /* PTStaticStickerPickerCell.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -5196,10 +5216,15 @@
 		C647C10F1C71C2C100E596EA /* stickers */ = {
 			isa = PBXGroup;
 			children = (
+				C6681E781C7C5953009BC942 /* fqj.zip */,
+				C6681E631C7C2A86009BC942 /* qipao.zip */,
+				C6681E6B1C7C3529009BC942 /* qipao2.zip */,
+				C6681E6C1C7C3529009BC942 /* qipao3.zip */,
+				C6681E6D1C7C3529009BC942 /* qipao4.zip */,
+				C6681E6E1C7C3529009BC942 /* qipao5.zip */,
 				C647C1101C71C2C100E596EA /* axfl */,
 				C647C15D1C71C2C100E596EA /* cn */,
 				C647C1CE1C71C2C100E596EA /* fd */,
-				C647C21A1C71C2C200E596EA /* fd.zip */,
 				C647C21B1C71C2C200E596EA /* hy */,
 				C647C2421C71C2C200E596EA /* hz */,
 				C647C28E1C71C2C200E596EA /* kq */,
@@ -6610,6 +6635,7 @@
 				C647C4D01C71C2C200E596EA /* icon_40_06@2x.png in Resources */,
 				C647C8671C71C2C200E596EA /* icon_share_small_watermark.png in Resources */,
 				C647C82A1C71C2C200E596EA /* film_icon_translation.png in Resources */,
+				C6681E721C7C3529009BC942 /* qipao5.zip in Resources */,
 				C647C6E61C71C2C200E596EA /* kqbj0002@2x.png in Resources */,
 				C647C53A1C71C2C200E596EA /* img_index_05@2x.png in Resources */,
 				C647C8801C71C2C200E596EA /* tt_spBg_iOS_04.jpg in Resources */,
@@ -6979,6 +7005,7 @@
 				C647C6DE1C71C2C200E596EA /* kq0031@2x.png in Resources */,
 				C647C62D1C71C2C200E596EA /* nz0006@2x.png in Resources */,
 				C647C87F1C71C2C200E596EA /* tt_spBg_iOS_03.jpg in Resources */,
+				C6681E6F1C7C3529009BC942 /* qipao2.zip in Resources */,
 				C647C5DC1C71C2C200E596EA /* cns0037@2x.png in Resources */,
 				C647C4EE1C71C2C200E596EA /* icon_capture_20_10@2x.png in Resources */,
 				C647C47E1C71C2C200E596EA /* btn_20_back_w_dis@2x.png in Resources */,
@@ -7023,6 +7050,7 @@
 				C647C5C61C71C2C200E596EA /* cns0015@2x.png in Resources */,
 				C647C6D71C71C2C200E596EA /* kq0024@2x.png in Resources */,
 				C647C74D1C71C2C200E596EA /* xhx0020.png in Resources */,
+				C6681E791C7C5953009BC942 /* fqj.zip in Resources */,
 				C647C8721C71C2C200E596EA /* template_jigsaw_pressed.png in Resources */,
 				C647C8441C71C2C200E596EA /* icon_share_navbarbutton_save.png in Resources */,
 				C647C7691C71C2C200E596EA /* xm0010@2x.png in Resources */,
@@ -7067,6 +7095,7 @@
 				C647C6461C71C2C200E596EA /* nz0031@2x.png in Resources */,
 				C647C4CF1C71C2C200E596EA /* icon_40_05@3x.png in Resources */,
 				C647C5481C71C2C200E596EA /* axfl0002.png in Resources */,
+				C6681E641C7C2A86009BC942 /* qipao.zip in Resources */,
 				C647C6CE1C71C2C200E596EA /* kq0015@2x.png in Resources */,
 				C647C5361C71C2C200E596EA /* img_index_03@2x.png in Resources */,
 				C647C70A1C71C2C200E596EA /* mhl.xml in Resources */,
@@ -7211,7 +7240,6 @@
 				C647C4BA1C71C2C200E596EA /* icon_20_10@2x.png in Resources */,
 				C647C8421C71C2C200E596EA /* icon_share_navbarbutton_commit.png in Resources */,
 				C647C5681C71C2C200E596EA /* axfl0034.png in Resources */,
-				C647C64D1C71C2C200E596EA /* fd.zip in Resources */,
 				C647C7481C71C2C200E596EA /* xhx0015.png in Resources */,
 				C647C8211C71C2C200E596EA /* mark_button_tensile.png in Resources */,
 				C647C51F1C71C2C200E596EA /* icon_capture_20_34@3x.png in Resources */,
@@ -7479,6 +7507,8 @@
 				C647C68B1C71C2C200E596EA /* hz0023@2x.png in Resources */,
 				C647C8541C71C2C200E596EA /* s3_bg.png in Resources */,
 				C647C7821C71C2C200E596EA /* xm0035@2x.png in Resources */,
+				C6681E701C7C3529009BC942 /* qipao3.zip in Resources */,
+				C6681E711C7C3529009BC942 /* qipao4.zip in Resources */,
 				C647C4AF1C71C2C200E596EA /* btn_to_capture_nor@3x.png in Resources */,
 				C647C6571C71C2C200E596EA /* hy0009.png in Resources */,
 				C647C63D1C71C2C200E596EA /* nz0022@2x.png in Resources */,
@@ -7720,6 +7750,7 @@
 				C647C0091C71BBBB00E596EA /* GPUImageVignetteFilter.m in Sources */,
 				C647BBED1C7181BE00E596EA /* UIButton+SOButton.m in Sources */,
 				C6681E4C1C7BF39D009BC942 /* PTPPMaterialShopViewController.m in Sources */,
+				C6681E671C7C32D4009BC942 /* PTPPStaticStickersScrollView.m in Sources */,
 				C647C8B51C71C40200E596EA /* PTPPLiveVideoShareViewController.m in Sources */,
 				C647C8C01C71C40200E596EA /* PTPPCameraFilterScrollView.m in Sources */,
 				C647BC241C7181BE00E596EA /* SOSegmentControlItem.m in Sources */,
@@ -7925,6 +7956,7 @@
 				C647BBF71C7181BE00E596EA /* UIWebView+Memory.m in Sources */,
 				C647BC231C7181BE00E596EA /* SOSegmentControl.m in Sources */,
 				C647C0031C71BBBB00E596EA /* GPUImageTwoPassTextureSamplingFilter.m in Sources */,
+				C6681E751C7C382F009BC942 /* PTStaticStickerPickerCell.m in Sources */,
 				C647BCEC1C718C4B00E596EA /* UIScrollView+BlurCover.m in Sources */,
 				C647BC0F1C7181BE00E596EA /* SOIndexView.m in Sources */,
 				C647BF931C71BBBB00E596EA /* GPUImageFilterGroup.m in Sources */,

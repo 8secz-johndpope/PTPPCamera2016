@@ -10,6 +10,13 @@
 
 @interface PTPPLocalFileManager : NSObject
 +(NSString *)getFolderPathForARStickerName:(NSString *)ARStickerName;
-+(void)printListOfFilesAtDirectory:(NSString *)directory;
+
 +(void)unzipAllFilesForARStickers;
++(BOOL)unzipFileFromPath:(NSString *)filePath desPath:(NSString *)despath;
+
++(NSString *)getRootFolderPathForARStickers;
++(NSString *)getRootFolderPathForStaitcStickers;
++(NSString *)getNSBundlePathForFileName:(NSString *)fileName ofType:(NSString *)fileType;
++(NSArray *)getListOfFilePathAtDirectory :(NSString *)directory;
++(void)printListOfFilesAtDirectory:(NSString *)directory;
 @end
