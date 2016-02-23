@@ -14,6 +14,7 @@
 #import "PTFilterManager.h"
 #import "PECropView.h"
 #import "PTPPLocalFileManager.h"
+#import "WaterMarkView.h"
 
 #define kFilterScrollHeight 150
 #define kCropScrollHeight 120
@@ -24,6 +25,7 @@
 @property (nonatomic, strong) UIButton *backButton;
 @property (nonatomic, strong) UIButton *saveButton;
 @property (nonatomic, strong) UIView *canvasView;
+@property (nonatomic, strong) UIView *staticStickerView;
 @property (nonatomic, strong) UIImageView *basePhotoView;
 @property (nonatomic, strong) UIImage *basePhoto;
 @property (nonatomic, strong) NSMutableArray *filterSet;
@@ -55,7 +57,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     self.view.backgroundColor = [UIColor colorWithRed:0.15 green:0.15 blue:0.15 alpha:1.0];
     [self.view addSubview:self.canvasView];
     [self.canvasView addSubview:self.basePhotoView];
-    
+    [self.canvasView addSubview:self.staticStickerView];
     [self.view addSubview:self.topBar];
     [self.view addSubview:self.toolBar];
     [self.topBar addSubview:self.backButton];
@@ -325,12 +327,14 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
         self.toolBar.frame = CGRectMake(0, Screenheight-self.toolBar.height, self.toolBar.width, self.toolBar.height);
         self.topBar.frame = CGRectMake(self.topBar.left, 0, self.topBar.width, self.topBar.height);
         self.basePhotoView.frame = CGRectMake(0, 0, Screenwidth, Screenheight);
+        self.staticStickerView.frame = CGRectMake(0, 0, self.staticStickerView.width, self.staticStickerView.height);
         self.cropView.frame = self.basePhotoView.frame;
     }else{
         //Edit mode ON
         self.toolBar.frame = CGRectMake(0, Screenheight, self.toolBar.width, self.toolBar.height);
         self.topBar.frame = CGRectMake(self.topBar.left, -HEIGHT_NAV, self.topBar.width, self.topBar.height);
         self.basePhotoView.frame = CGRectMake(20, 37, Screenwidth-40, Screenheight-height-37*2);
+        self.staticStickerView.frame = CGRectMake(0, -height/2, self.staticStickerView.width, self.staticStickerView.height);
         self.cropView.frame = CGRectMake(0, 0, Screenwidth, Screenheight-height);
     }
 }
@@ -338,8 +342,14 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 
 #pragma mark - Touch Events
 -(void)handleSingleTap{
-    //    [self.filterScrollView confirm];
-    //    [self.cropScrollView confirm];
+    if (self.stickerScrollView.finishBlock) {
+        self.stickerScrollView.finishBlock();
+    }
+    for(WaterMarkView *wmView in self.staticStickerView.subviews){
+        if ([wmView isKindOfClass:[WaterMarkView class]]) {
+            [wmView hideTrivials];
+        }
+    }
 }
 
 -(void)goBack{
@@ -355,9 +365,29 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     [self.stickerScrollView setAttributeWithFilePathSet:[PTPPLocalFileManager getListOfFilePathAtDirectory:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]]];
     self.stickerScrollView.stickerSelected = ^(NSString *filePath, BOOL isFromBundle){
         NSLog(@"filePath selected:%@",filePath);
+        WaterMarkView *wmView = [[WaterMarkView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+        wmView.center = weakSelf.view.center;
+        UIImage *stickerImage = [[UIImage alloc] initWithContentsOfFile:filePath];
+  
+        UIImageView *stickerView = [[UIImageView alloc] initWithFrame:wmView.bounds];
+        stickerView.image = stickerImage;
+        [wmView setWMContentView:stickerView];
+        [weakSelf.staticStickerView addSubview:wmView];
+        wmView.alpha = 0.0;
+        wmView.transform = CGAffineTransformMakeScale(2.0, 2.0);
+        [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
+              initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseOut  animations:^(){
+                  wmView.alpha = 1.0;
+                  wmView.transform = CGAffineTransformMakeScale(1.0, 1.0);
+              } completion:^(BOOL finished) {}];
+
     };
     self.stickerScrollView.finishBlock = ^(){
-        weakSelf.activeFilterID = weakSelf.filterScrollView.previousActiveFilterID;
+        for(WaterMarkView *wmView in weakSelf.staticStickerView.subviews){
+            if ([wmView isKindOfClass:[WaterMarkView class]]) {
+                [wmView hideTrivials];
+            }
+        }
         [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
               initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseOut  animations:^(){
                   weakSelf.stickerScrollView.center = CGPointMake(weakSelf.stickerScrollView.centerX, Screenheight+weakSelf.stickerScrollView.height/2);
@@ -369,6 +399,11 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     };
     
     [self.view addSubview:self.stickerScrollView];
+    for(WaterMarkView *wmView in weakSelf.staticStickerView.subviews){
+        if ([wmView isKindOfClass:[WaterMarkView class]]) {
+            [wmView showTrivials];
+        }
+    }
     self.stickerScrollView.frame = CGRectMake(0, Screenheight, self.stickerScrollView.width, self.stickerScrollView.height);
     [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
           initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseOut  animations:^(){
@@ -409,6 +444,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
               initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseOut  animations:^(){
                   weakSelf.filterScrollView.center = CGPointMake(weakSelf.filterScrollView.centerX, Screenheight+weakSelf.filterScrollView.height/2);
                   [weakSelf displayToolBar:YES basePhotoViewHeight:weakSelf.filterScrollView.height];
+                  weakSelf.staticStickerView.alpha = 1.0;
               } completion:^(BOOL finished) {
                   [weakSelf.filterScrollView removeFromSuperview];
                   weakSelf.filterScrollView = nil;
@@ -420,6 +456,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
           initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseOut  animations:^(){
               weakSelf.filterScrollView.frame = CGRectMake(0, Screenheight-weakSelf.filterScrollView.height, weakSelf.filterScrollView.width, weakSelf.filterScrollView.height);
+              weakSelf.staticStickerView.alpha = 0.0;
               [weakSelf displayToolBar:NO basePhotoViewHeight:self.filterScrollView.height];
           } completion:^(BOOL finished) {}];
     
@@ -493,6 +530,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
               initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseOut  animations:^(){
                   weakSelf.cropScrollView.center = CGPointMake(weakSelf.filterScrollView.centerX, Screenheight+weakSelf.cropScrollView.height/2);
                   [weakSelf displayToolBar:YES basePhotoViewHeight:weakSelf.cropScrollView.height];
+                  weakSelf.staticStickerView.alpha = 1.0;
               } completion:^(BOOL finished) {
                   [weakSelf.cropScrollView removeFromSuperview];
                   weakSelf.cropScrollView = nil;
@@ -509,6 +547,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
           initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseOut  animations:^(){
               weakSelf.cropScrollView.frame = CGRectMake(0, Screenheight-weakSelf.cropScrollView.height, weakSelf.cropScrollView.width, weakSelf.cropScrollView.height);
               [weakSelf displayToolBar:NO basePhotoViewHeight:self.cropScrollView.height];
+              weakSelf.staticStickerView.alpha = 0.0;
           } completion:^(BOOL finished) {
               [UIView animateWithDuration:0.35 animations:^{
                   self.cropView.alpha = 1.0;
@@ -554,6 +593,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
               initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseOut  animations:^(){
                   weakSelf.rotateSrollView.center = CGPointMake(weakSelf.rotateSrollView.centerX, Screenheight+weakSelf.cropScrollView.height/2);
                   [weakSelf displayToolBar:YES basePhotoViewHeight:weakSelf.rotateSrollView.height];
+                  weakSelf.staticStickerView.alpha = 1.0;
               } completion:^(BOOL finished) {
                   [weakSelf.rotateSrollView removeFromSuperview];
                   weakSelf.rotateSrollView = nil;
@@ -566,6 +606,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
           initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseOut  animations:^(){
               weakSelf.rotateSrollView.frame = CGRectMake(0, Screenheight-weakSelf.rotateSrollView.height, weakSelf.rotateSrollView.width, weakSelf.rotateSrollView.height);
               [weakSelf displayToolBar:NO basePhotoViewHeight:self.rotateSrollView.height];
+              weakSelf.staticStickerView.alpha = 0.0;
           } completion:^(BOOL finished) {
           }];
 }
@@ -601,6 +642,13 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
         _canvasView = [[UIView alloc] initWithFrame:self.view.frame];
     }
     return _canvasView;
+}
+
+-(UIView *)staticStickerView{
+    if (!_staticStickerView) {
+        _staticStickerView = [[UIView alloc] initWithFrame:self.canvasView.bounds];
+    }
+    return _staticStickerView;
 }
 
 -(UIImageView *)basePhotoView{

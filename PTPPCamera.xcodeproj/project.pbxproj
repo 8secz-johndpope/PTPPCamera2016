@@ -1526,6 +1526,9 @@
 		C6681E721C7C3529009BC942 /* qipao5.zip in Resources */ = {isa = PBXBuildFile; fileRef = C6681E6E1C7C3529009BC942 /* qipao5.zip */; };
 		C6681E751C7C382F009BC942 /* PTStaticStickerPickerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E741C7C382F009BC942 /* PTStaticStickerPickerCell.m */; };
 		C6681E791C7C5953009BC942 /* fqj.zip in Resources */ = {isa = PBXBuildFile; fileRef = C6681E781C7C5953009BC942 /* fqj.zip */; };
+		C6681E7C1C7C5EA4009BC942 /* WaterMarkView.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E7B1C7C5EA4009BC942 /* WaterMarkView.m */; };
+		C6681E7F1C7C5F21009BC942 /* WaterMarkBorderView.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E7E1C7C5F21009BC942 /* WaterMarkBorderView.m */; };
+		C6681E821C7C5F54009BC942 /* UIImage+Rotation.m in Sources */ = {isa = PBXBuildFile; fileRef = C6681E811C7C5F54009BC942 /* UIImage+Rotation.m */; };
 		C691C9491C7AA2DB004C5F53 /* PTPPLocalFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C691C9481C7AA2DB004C5F53 /* PTPPLocalFileManager.m */; };
 		C6CE891F1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6CE891E1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.m */; };
 /* End PBXBuildFile section */
@@ -3487,6 +3490,12 @@
 		C6681E731C7C382F009BC942 /* PTStaticStickerPickerCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTStaticStickerPickerCell.h; sourceTree = "<group>"; };
 		C6681E741C7C382F009BC942 /* PTStaticStickerPickerCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTStaticStickerPickerCell.m; sourceTree = "<group>"; };
 		C6681E781C7C5953009BC942 /* fqj.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = fqj.zip; sourceTree = "<group>"; };
+		C6681E7A1C7C5EA4009BC942 /* WaterMarkView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WaterMarkView.h; sourceTree = "<group>"; };
+		C6681E7B1C7C5EA4009BC942 /* WaterMarkView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WaterMarkView.m; sourceTree = "<group>"; };
+		C6681E7D1C7C5F21009BC942 /* WaterMarkBorderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WaterMarkBorderView.h; sourceTree = "<group>"; };
+		C6681E7E1C7C5F21009BC942 /* WaterMarkBorderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WaterMarkBorderView.m; sourceTree = "<group>"; };
+		C6681E801C7C5F54009BC942 /* UIImage+Rotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Rotation.h"; sourceTree = "<group>"; };
+		C6681E811C7C5F54009BC942 /* UIImage+Rotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Rotation.m"; sourceTree = "<group>"; };
 		C691C9471C7AA2DB004C5F53 /* PTPPLocalFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPLocalFileManager.h; sourceTree = "<group>"; };
 		C691C9481C7AA2DB004C5F53 /* PTPPLocalFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPLocalFileManager.m; sourceTree = "<group>"; };
 		C6CE891D1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPLiveStickerEditViewController.h; sourceTree = "<group>"; };
@@ -3571,6 +3580,10 @@
 		C6433C181C72BF6100AF82AD /* View */ = {
 			isa = PBXGroup;
 			children = (
+				C6681E7D1C7C5F21009BC942 /* WaterMarkBorderView.h */,
+				C6681E7E1C7C5F21009BC942 /* WaterMarkBorderView.m */,
+				C6681E7A1C7C5EA4009BC942 /* WaterMarkView.h */,
+				C6681E7B1C7C5EA4009BC942 /* WaterMarkView.m */,
 				C6433C1D1C72C66D00AF82AD /* PTPPStaticImageEditToolBar.h */,
 				C6433C1E1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m */,
 				C6681E651C7C32D4009BC942 /* PTPPStaticStickersScrollView.h */,
@@ -4174,6 +4187,8 @@
 				C647BC591C718C4B00E596EA /* UIImage+Help.m */,
 				C647BC5A1C718C4B00E596EA /* UIImageView+PTCopy.h */,
 				C647BC5B1C718C4B00E596EA /* UIImageView+PTCopy.m */,
+				C6681E801C7C5F54009BC942 /* UIImage+Rotation.h */,
+				C6681E811C7C5F54009BC942 /* UIImage+Rotation.m */,
 				C647BC5C1C718C4B00E596EA /* UIScrollView+BlurCover.h */,
 				C647BC5D1C718C4B00E596EA /* UIScrollView+BlurCover.m */,
 				C647BC5E1C718C4B00E596EA /* UITabBar+badge.h */,
@@ -7620,6 +7635,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C647BFDD1C71BBBB00E596EA /* GPUImageRGBClosingFilter.m in Sources */,
+				C6681E821C7C5F54009BC942 /* UIImage+Rotation.m in Sources */,
 				C647BDB51C718E5100E596EA /* MJRefreshAutoFooter.m in Sources */,
 				C6433C1C1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m in Sources */,
 				C647BC151C7181BE00E596EA /* SOPopupButtonGroupView.m in Sources */,
@@ -7986,6 +8002,7 @@
 				C647C8DA1C71C93C00E596EA /* MLTransitionAnimation.m in Sources */,
 				C647BC221C7181BE00E596EA /* SOSegmentButton.m in Sources */,
 				C647BBE11C7181BE00E596EA /* UIImageView+HighlightedWebCache.m in Sources */,
+				C6681E7F1C7C5F21009BC942 /* WaterMarkBorderView.m in Sources */,
 				C647BFD91C71BBBB00E596EA /* GPUImagePosterizeFilter.m in Sources */,
 				C647BF8E1C71BBBB00E596EA /* GPUImageExclusionBlendFilter.m in Sources */,
 				C647BF9F1C71BBBB00E596EA /* GPUImageHardLightBlendFilter.m in Sources */,
@@ -8022,6 +8039,7 @@
 				C647BFFE1C71BBBB00E596EA /* GPUImageToonFilter.m in Sources */,
 				C647BF791C71BBBB00E596EA /* GPUImageColorDodgeBlendFilter.m in Sources */,
 				C647BFB31C71BBBB00E596EA /* GPUImageLightenBlendFilter.m in Sources */,
+				C6681E7C1C7C5EA4009BC942 /* WaterMarkView.m in Sources */,
 				C647BC0A1C7181BE00E596EA /* SOAutoHideMessageView.m in Sources */,
 				C647BCFB1C718C4B00E596EA /* PTUtilTool.m in Sources */,
 				C647BFEA1C71BBBB00E596EA /* GPUImageSkinToneFilter.m in Sources */,
