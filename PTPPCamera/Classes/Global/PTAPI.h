@@ -33,3 +33,4 @@
 
 //素材中心
 #define API_MATERIAL_LIST               @"/material/list"
+#define API_MATERIAL_DETAILS            @"/material/details"

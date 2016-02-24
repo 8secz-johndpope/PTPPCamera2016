@@ -25,6 +25,7 @@
     item.icon = [dict safeStringForKey:kIcon];
     item.coverPic = [dict safeStringForKey:kCoverPic];
     item.releaseTime = [dict safeStringForKey:kReleaseTime];
+    item.isNew = [[dict safeStringForKey:kIsNew] boolValue];
     return (item);
 }
 
@@ -57,6 +58,7 @@
     item.icon = self.icon;
     item.coverPic = self.coverPic;
     item.releaseTime = self.releaseTime;
+    item.isNew = self.isNew;
     return (item);
 }
 

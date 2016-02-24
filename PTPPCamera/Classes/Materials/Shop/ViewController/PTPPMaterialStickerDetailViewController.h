@@ -9,5 +9,6 @@
 #import "SOBaseViewController.h"
 
 @interface PTPPMaterialStickerDetailViewController : SOBaseViewController
-
+@property (nonatomic, strong) NSString *materialType;
+@property (nonatomic, strong) NSString *packageID;
 @end

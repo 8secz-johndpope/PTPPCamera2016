@@ -169,20 +169,20 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
         case 0:{
             cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShopStickerItemCellID forIndexPath:indexPath];
             PTPPMaterialShopStickerItem *staticStickerItem = [self.staticStickerArray safeObjectAtIndex:indexPath.row];
-            [((PTPPMaterialShopStickerItemCell *)cell) setAttributeWithImageURL:staticStickerItem.coverPic stickerName:staticStickerItem.packageName stickerCount:staticStickerItem.totalNum binarySize:staticStickerItem.packageSize downloadStatus:PTPPMaterialDownloadStatusReady isNew:YES];
+            [((PTPPMaterialShopStickerItemCell *)cell) setAttributeWithImageURL:staticStickerItem.coverPic stickerName:staticStickerItem.packageName stickerCount:staticStickerItem.totalNum binarySize:staticStickerItem.packageSize downloadStatus:PTPPMaterialDownloadStatusReady isNew:staticStickerItem.isNew];
 
             break;
         }
         case 1:{
             cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShoptARStickerItemCellID forIndexPath:indexPath];
             PTPPMaterialShopStickerItem *ARStickerItem = [self.ARStickerArray safeObjectAtIndex:indexPath.row];
-            [((PTPPMaterialShopARStickerItemCell *)cell) setAttributeWithImageURL:ARStickerItem.coverPic downloadStatus:PTPPMaterialDownloadStatusReady isNew:YES];
+            [((PTPPMaterialShopARStickerItemCell *)cell) setAttributeWithImageURL:ARStickerItem.coverPic downloadStatus:PTPPMaterialDownloadStatusReady isNew:ARStickerItem.isNew];
             break;
         }
         case 2:{
             cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShopJigsawItemCellID forIndexPath:indexPath];
             PTPPMaterialShopStickerItem *jigsawTemplateItem = [self.jigsawTemplateArray safeObjectAtIndex:indexPath.row];
-            [((PTPPMaterialShopJigsawItemCell *)cell) setAttributeWithImageURL:jigsawTemplateItem.coverPic downloadStatus:PTPPMaterialDownloadStatusReady isNew:YES];
+            [((PTPPMaterialShopJigsawItemCell *)cell) setAttributeWithImageURL:jigsawTemplateItem.coverPic downloadStatus:PTPPMaterialDownloadStatusReady isNew:jigsawTemplateItem.isNew];
             break;
         }
         default:
@@ -194,7 +194,10 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
 
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     if (self.activeSection == 0) {
+        PTPPMaterialShopStickerItem *stickerItem = [self.staticStickerArray safeObjectAtIndex:indexPath.row];
         PTPPMaterialStickerDetailViewController *stickerDetailVC = [[PTPPMaterialStickerDetailViewController alloc] init];
+        stickerDetailVC.materialType = @"sticker_pic";
+        stickerDetailVC.packageID = stickerItem.packageID;
         [self.navigationController pushViewController:stickerDetailVC animated:YES];
     }
 }

@@ -1534,6 +1534,8 @@
 		C6D62CDE1C7D525A00B69F57 /* PTPPMaterialManagementEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6D62CDD1C7D525A00B69F57 /* PTPPMaterialManagementEditViewController.m */; };
 		C6D62CE11C7D565F00B69F57 /* PTPPMaterialShopStickerItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C6D62CE01C7D565F00B69F57 /* PTPPMaterialShopStickerItem.m */; };
 		C6D62CE41C7D567C00B69F57 /* PTPPMaterialShopStickerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C6D62CE31C7D567C00B69F57 /* PTPPMaterialShopStickerModel.m */; };
+		C6D62CE71C7D98C700B69F57 /* PTPPMaterialShopStickerDetailModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C6D62CE61C7D98C700B69F57 /* PTPPMaterialShopStickerDetailModel.m */; };
+		C6D62CEA1C7D98F600B69F57 /* PTPPMaterialShopStickerDetailItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C6D62CE91C7D98F600B69F57 /* PTPPMaterialShopStickerDetailItem.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -3509,6 +3511,10 @@
 		C6D62CE01C7D565F00B69F57 /* PTPPMaterialShopStickerItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopStickerItem.m; sourceTree = "<group>"; };
 		C6D62CE21C7D567C00B69F57 /* PTPPMaterialShopStickerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialShopStickerModel.h; sourceTree = "<group>"; };
 		C6D62CE31C7D567C00B69F57 /* PTPPMaterialShopStickerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopStickerModel.m; sourceTree = "<group>"; };
+		C6D62CE51C7D98C700B69F57 /* PTPPMaterialShopStickerDetailModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialShopStickerDetailModel.h; sourceTree = "<group>"; };
+		C6D62CE61C7D98C700B69F57 /* PTPPMaterialShopStickerDetailModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopStickerDetailModel.m; sourceTree = "<group>"; };
+		C6D62CE81C7D98F600B69F57 /* PTPPMaterialShopStickerDetailItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialShopStickerDetailItem.h; sourceTree = "<group>"; };
+		C6D62CE91C7D98F600B69F57 /* PTPPMaterialShopStickerDetailItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopStickerDetailItem.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -6464,6 +6470,10 @@
 				C6D62CE01C7D565F00B69F57 /* PTPPMaterialShopStickerItem.m */,
 				C6D62CE21C7D567C00B69F57 /* PTPPMaterialShopStickerModel.h */,
 				C6D62CE31C7D567C00B69F57 /* PTPPMaterialShopStickerModel.m */,
+				C6D62CE81C7D98F600B69F57 /* PTPPMaterialShopStickerDetailItem.h */,
+				C6D62CE91C7D98F600B69F57 /* PTPPMaterialShopStickerDetailItem.m */,
+				C6D62CE51C7D98C700B69F57 /* PTPPMaterialShopStickerDetailModel.h */,
+				C6D62CE61C7D98C700B69F57 /* PTPPMaterialShopStickerDetailModel.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -7892,6 +7902,7 @@
 				C647BF6D1C71BBBB00E596EA /* GPUImageBoxBlurFilter.m in Sources */,
 				C647BDD91C718E5100E596EA /* unzip.m in Sources */,
 				C647BBD71C7181BE00E596EA /* SDImageCache.m in Sources */,
+				C6D62CE71C7D98C700B69F57 /* PTPPMaterialShopStickerDetailModel.m in Sources */,
 				C647BBDA1C7181BE00E596EA /* SDWebImageDownloader.m in Sources */,
 				C647BBFB1C7181BE00E596EA /* SOLocalAuthManager.m in Sources */,
 				C647BF671C71BBBB00E596EA /* GPUImageAddBlendFilter.m in Sources */,
@@ -8026,6 +8037,7 @@
 				C647BD081C718C4B00E596EA /* PTLoadingViewCell.m in Sources */,
 				C647BF7E1C71BBBB00E596EA /* GPUImageColourFASTFeatureDetector.m in Sources */,
 				C6681E611C7BF470009BC942 /* PTPPMaterialStickerDetailCell.m in Sources */,
+				C6D62CEA1C7D98F600B69F57 /* PTPPMaterialShopStickerDetailItem.m in Sources */,
 				C647BF661C71BBBB00E596EA /* GPUImageAdaptiveThresholdFilter.m in Sources */,
 				C647BA951C717C4700E596EA /* main.m in Sources */,
 				C647BC001C7181BE00E596EA /* AFHTTPRequestOperation+SOHTTPRequestOperation.m in Sources */,

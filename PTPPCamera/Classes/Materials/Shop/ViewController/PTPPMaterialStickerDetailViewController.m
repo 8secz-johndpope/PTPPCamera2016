@@ -9,14 +9,18 @@
 #import "PTPPMaterialStickerDetailViewController.h"
 #import "PTPPMaterialStickerDetailCell.h"
 #import "PTPPMaterialStickerDetailHeaderView.h"
-#import "SOKit.h"
-#import "PTMacro.h"
+#import "PTPPMaterialShopStickerDetailItem.h"
+#import "PTPPMaterialShopStickerDetailModel.h"
+
 #define kCollectionViewEdgePadding 10
 #define kCellSpacing 5
 
-@interface PTPPMaterialStickerDetailViewController ()<UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
+@interface PTPPMaterialStickerDetailViewController ()<UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, SOModelDelegate>
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UICollectionViewFlowLayout *layout;
+
+@property (nonatomic, strong) PTPPMaterialShopStickerDetailItem *stickerDetailItem;
+@property (nonatomic, strong) PTPPMaterialShopStickerDetailModel *stickerDetailModel;
 @end
 
 static NSString *PTPPMaterialStickerDetailCellID = @"PTPPMaterialStickerDetailCellID";
@@ -24,6 +28,15 @@ static NSString *PTPPMaterialStickerDetailHeaderViewID = @"PTPPMaterialStickerDe
 @implementation PTPPMaterialStickerDetailViewController
 
 #pragma mark - Life Cycles
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if(self) {
+        _stickerDetailModel = [PTPPMaterialShopStickerDetailModel shareModel];
+        [_stickerDetailModel setDelegate:self];
+    }
+    return (self);
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self disableAdjustsScrollView];
@@ -34,12 +47,21 @@ static NSString *PTPPMaterialStickerDetailHeaderViewID = @"PTPPMaterialStickerDe
     [self setTitle:@"贴纸详情" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:18] selector:nil];
     [self showLeftItemWithImage:[UIImage imageNamed:@"back_white"] selector:@selector(goBack) animation:YES];
     [self.view addSubview:self.collectionView];
-
+    [self loadStickerDetailData];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+
+#pragma mark - Private Methods
+-(void)loadStickerDetailData{
+    [self.stickerDetailModel cancelAllRequest];
+    self.stickerDetailModel.materialType = self.materialType;
+    self.stickerDetailModel.packageID = self.packageID;
+    [self.stickerDetailModel startLoad];
 }
 
 #pragma mark - Touch Events
@@ -53,7 +75,7 @@ static NSString *PTPPMaterialStickerDetailHeaderViewID = @"PTPPMaterialStickerDe
 }
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
-    return 15;
+    return self.stickerDetailItem.thunbmailList.count;
 }
 
 -(UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section{
@@ -76,16 +98,15 @@ static NSString *PTPPMaterialStickerDetailHeaderViewID = @"PTPPMaterialStickerDe
 
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     UICollectionViewCell *cell;
-    NSString *imageURL = @"http://pic25.nipic.com/20121128/2457331_222533059344_2.jpg";
     cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialStickerDetailCellID forIndexPath:indexPath];
-    [((PTPPMaterialStickerDetailCell *)cell) setAttributeWithImageURL:imageURL];
+    [((PTPPMaterialStickerDetailCell *)cell) setAttributeWithImageURL:[self.stickerDetailItem.thunbmailList safeObjectAtIndex:indexPath.row]];
     return cell;
 }
 
 -(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
     if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
         PTPPMaterialStickerDetailHeaderView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:PTPPMaterialStickerDetailHeaderViewID forIndexPath:indexPath];
-        [headerView setAttributeWithBannerImgURL:@"http://pic25.nipic.com/20121128/2457331_222533059344_2.jpg" stickerName:@"这里显示贴纸包的名称" stickerDetail:@"这里显示的是这个贴纸包的简介最多不会超过两行，这里显示的是这个贴纸包的简介最多不会超过两行。" isDownloaded:NO];
+        [headerView setAttributeWithBannerImgURL:self.stickerDetailItem.bannerPic stickerName:self.stickerDetailItem.packageName stickerDetail:self.stickerDetailItem.storeDescription isDownloaded:NO];
         return headerView;
     }
     return nil;
@@ -94,6 +115,21 @@ static NSString *PTPPMaterialStickerDetailHeaderViewID = @"PTPPMaterialStickerDe
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section {
     return CGSizeMake(collectionView.width, [PTPPMaterialStickerDetailHeaderView getHeightWithStickerDetailText:@"这里显示的是这个贴纸包的简介最多不会超过两行，这里显示的是这个贴纸包的简介最多不会超过两行。" constraintWidth:collectionView.width-20]);
 }
+
+#pragma mark - <SOModelDelegate>
+
+-(void)model:(SOBaseModel *)model didReceivedData:(id)data userInfo:(id)info{
+    [SVProgressHUD dismiss];
+    if (model == self.stickerDetailModel) {
+        self.stickerDetailItem = data;
+        [self.collectionView reloadData];
+    }
+}
+
+-(void)model:(SOBaseModel *)model didFailedInfo:(id)info error:(id)error{
+    [SVProgressHUD dismiss];
+}
+
 
 -(UICollectionViewFlowLayout *)layout{
     if (!_layout) {
