@@ -8,110 +8,28 @@
 
 #import <Foundation/Foundation.h>
 
-#ifndef PT_API
-#define PT_API
+#define PTPPAppID                       @"1200"
+#define SECRETKEY                       @"c8789e2f57f541489a2d253c7f212b28"
+#define DEBUG_APP                       1       // 0-外网 1-内网
 
-#define PT_HTTP_SUCCESS_CODE    200
+//新地址 －－ 内网
+#if DEBUG_APP
 
+#define PTPP_BASE_URL                   @"http://api-paipai.start.wang"
+#define PTPP_CLOUD_URL                  @"http://upload.dev.putaocloud.com"
 
-/**
- *  @brief  打包类型, 0:内网测试  1.外网测试  2.发布AppStore
- */
-#define PT_API_TYPE         (0)
-/**
- * @brief  打点和推送功能开关变量 0-内网 1-外网
- */
-#define DEBUG_APP           (0)
+#else
 
-
-/**
- *  @brief  应用ID
- */
-extern NSString * const _Nonnull PTLatitudeAppID;
-
-/**
- *  @brief  平台ID
- */
-extern NSString * const _Nonnull PTLatitudePlatformID;
-
-/**
- *  @brief  secret key
- */
-extern NSString * const _Nonnull PTLatitudeSecretKey;
-
-/**
- *  @brief  baidu map key
- */
-extern NSString * const _Nonnull PTLatitudeBaiduMapKey;
-
-/**
- *  @brief  wx key
- */
-extern NSString * const _Nonnull PTLatitudeWxKey;
-
-/**
- *  @brief  触发接口调试界面的时长
- */
-extern NSTimeInterval PTLatitudeDebugMenuTimeInt;
-
-
-/**
- *  @brief  资源更新secret key
- */
-extern NSString * const _Nonnull PTLatitudeDataSourceSecretKey;
-
-/**
- *  @brief  资源更新地址
- */
-extern NSString * const _Nonnull PTLatitudeDataSourceUpdateURL;
-
-
-
-/**
- *  @brief  通过基本路径和相对路径，获取绝对路径
- *
- *  @return 返回绝对路径
- */
-extern NSString * const _Nonnull PTAbsoluteURLString(NSString * _Nonnull baseURLString, NSString * _Nullable  relativeURLString);
-
-
-/***********************************************************************************/
-/****************************         BaseURL        *******************************/
-
-/**
- *  @brief  Passport 服务地址
- */
-extern NSString * const _Nonnull PTLatitudePassportServiceBaseURL;
-
-/**
- *  @brief  葡萄探索号地址
- */
-extern NSString * const _Nonnull PTLatitudeStoreServiceBaseURL;
-
-extern NSString * const _Nonnull PTLatitudeUserServiceBaseURL;
-
-/**
- *  @brief  H5地址
- */
-extern NSString * const _Nonnull PTLatitudeH5ServiceBaseURL;
-
-/***********************************************************************************/
-/***********************************************************************************/
-
-
-
-/**
- *  @brief  Passport AppID
- *          线上线下相同
- */
-extern NSString * const _Nonnull PTLatitudePassportAppID;
-/**
- *  @brief  Passport SecretKey
- */
-extern NSString * const _Nonnull PTLatitudePassportAppSecretKey;
-
-
-
+#define PTPP_BASE_URL                   @""
+#define PTPP_CLOUD_URL                  @"http://upload.putaocloud.com"
 
 #endif
 
+//分享视频
+#define API_GET_VIDEO_UPLOAD_TOKEN      @"/get/upload/token"
+#define VIDEO_UPLOAD_PATH               @"/videoupload"
+#define API_VIDEO_WEB_SHARE             @"/relation/media"
+#define API_VIDEO_H5                    @"/share/media?media_url="
+
+//素材中心
+#define API_MATERIAL_LIST               @"/material/list"

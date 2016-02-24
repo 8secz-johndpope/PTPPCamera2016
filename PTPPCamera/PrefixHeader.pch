@@ -19,4 +19,6 @@
 #import "UIImageView+WebCache.h"
 #import "AFNetworking.h"
 #import "KKNavigationController.h"
+#import "PTAPI.h"
+#import "PTUtilTool.h"
 #endif /* PrefixHeader_pch */

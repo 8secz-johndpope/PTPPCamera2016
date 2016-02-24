@@ -7,23 +7,34 @@
 //
 
 #import "PTPPMaterialShopViewController.h"
-#import "PTPPMaterialManagementViewController.h"
+#import "PTPPMaterialManagementListViewController.h"
 #import "PTPPMaterialStickerDetailViewController.h"
 #import "PTPPMaterialShopStickerItemCell.h"
 #import "PTPPMaterialShopARStickerItemCell.h"
 #import "PTPPMaterialShopJigsawItemCell.h"
 #import "PTCustomMenuSliderView.h"
 #import "PTPPMaterialManagementBottomView.h"
-#import "PTMacro.h"
+#import "PTPPMaterialShopStickerItem.h"
+#import "PTPPMaterialShopStickerModel.h"
 
 #define kCollectionViewEdgePadding 10
 #define kCellSpacing 5
 
-@interface PTPPMaterialShopViewController () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, PTCustomMenuSliderViewDelegate, PTPPMaterialManagementBottomViewDelegate>
+@interface PTPPMaterialShopViewController () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, PTCustomMenuSliderViewDelegate, PTPPMaterialManagementBottomViewDelegate, SOModelDelegate>
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UICollectionViewFlowLayout *layout;
 @property (nonatomic, strong) PTCustomMenuSliderView *sliderView;
 @property (nonatomic, strong) PTPPMaterialManagementBottomView *bottomView;
+
+@property (nonatomic, strong) PTPPMaterialShopStickerItem *staticStickerItem;
+@property (nonatomic, strong) PTPPMaterialShopStickerModel *staticStickerModel;
+@property (nonatomic, strong) NSMutableArray *staticStickerArray;
+@property (nonatomic, strong) PTPPMaterialShopStickerItem *ARStickerItem;
+@property (nonatomic, strong) PTPPMaterialShopStickerModel *ARStickerModel;
+@property (nonatomic, strong) NSMutableArray *ARStickerArray;
+@property (nonatomic, strong) PTPPMaterialShopStickerItem *jigsawTemplateItem;
+@property (nonatomic, strong) PTPPMaterialShopStickerModel *jigsawTemplateModel;
+@property (nonatomic, strong) NSMutableArray *jigsawTemplateArray;
 
 @property (nonatomic, assign) BOOL selectionMode;
 @end
@@ -34,6 +45,24 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
 @implementation PTPPMaterialShopViewController
 
 #pragma mark - Life Cycles
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if(self) {
+        _staticStickerModel = [PTPPMaterialShopStickerModel shareModel];
+        [_staticStickerModel setDelegate:self];
+        _staticStickerArray = [[NSMutableArray alloc] init];
+        
+        _ARStickerModel = [PTPPMaterialShopStickerModel shareModel];
+        [_ARStickerModel setDelegate:self];
+        _ARStickerArray = [[NSMutableArray alloc] init];
+        
+        _jigsawTemplateModel= [PTPPMaterialShopStickerModel shareModel];
+        [_jigsawTemplateModel setDelegate:self];
+        _jigsawTemplateArray = [[NSMutableArray alloc] init];
+    }
+    return (self);
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self disableAdjustsScrollView];
@@ -43,24 +72,14 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
     [self.navigationController setNavigationBarHidden:NO];
     [self.navigationController.navigationBar setBarTintColor:UIColorFromRGB(0xff5a5d)];
     [self setTitle:@"素材中心" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:18] selector:nil];
-    if (self.managementMode) {
-        [self showRightItemWithText:@"管理" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(toggleEditMode) animation:NO];
-    }else{
-        [self showRightItemWithText:@"素材管理" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(toggleMaterialManagement) animation:NO];
-    }
-    
+    [self showRightItemWithText:@"素材管理" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(toggleMaterialManagement) animation:NO];
     [self showLeftItemWithImage:[UIImage imageNamed:@"back_white"] selector:@selector(goBack) animation:YES];
     [self.sliderView setAttributeWithItems:@[@"贴纸",@"动态贴图",@"拼图模版"] buttonWidth:Screenwidth/3 themeColor:UIColorFromRGB(0xff5a5d) idleColor:[UIColor grayColor] trackerWidth:20];
-    if (!self.managementMode) {
-        [self.view addSubview:self.sliderView];
-        self.collectionView.frame = CGRectMake(0, self.sliderView.bottom, self.collectionView.width, self.collectionView.height);
-    }else{
-        self.collectionView.frame = CGRectMake(0, 0, Screenwidth, Screenheight-HEIGHT_NAV);
-    }
-    
+    [self.view addSubview:self.sliderView];
+    self.collectionView.frame = CGRectMake(0, self.sliderView.bottom, self.collectionView.width, self.collectionView.height);
     [self.view addSubview:self.collectionView];
+    [self sliderView:self.sliderView didSelecteAtIndex:self.activeSection];
     
-    // Do any additional setup after loading the view.
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -80,20 +99,45 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
 }
 
 -(void)toggleMaterialManagement{
-    PTPPMaterialManagementViewController *manageVC = [[PTPPMaterialManagementViewController alloc] init];
+    PTPPMaterialManagementListViewController *manageVC = [[PTPPMaterialManagementListViewController alloc] init];
     [self.navigationController pushViewController:manageVC animated:YES];
 }
 
--(void)toggleEditMode{
-    if (!self.selectionMode) {
-        [self showRightItemWithText:@"取消" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(toggleEditMode) animation:NO];
-        [self.view addSubview:self.bottomView];
-    }else{
-        [self showRightItemWithText:@"管理" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(toggleEditMode) animation:NO];
-        [self.bottomView removeFromSuperview];
-    }
-    self.selectionMode = !self.selectionMode;
-    [self.collectionView reloadData];
+#pragma mark - Private Methods
+-(void)loadNewStaticStickerData{
+    [self.staticStickerArray removeAllObjects];
+    [self.staticStickerModel cancelAllRequest];
+    self.staticStickerModel.materialType = @"sticker_pic";
+    [self.staticStickerModel reloadData];
+    [SVProgressHUD showWithStatus:@"加载中"];
+}
+
+-(void)loadMoreStaticStickerData{
+    [self.staticStickerModel loadDataAtPageIndex:self.staticStickerModel.pageIndex];
+}
+
+-(void)loadNewARStickerData{
+    [self.ARStickerArray removeAllObjects];
+    [self.ARStickerModel cancelAllRequest];
+    self.ARStickerModel.materialType = @"dynamic_pic";
+    [self.ARStickerModel reloadData];
+    [SVProgressHUD showWithStatus:@"加载中"];
+}
+
+-(void)loadMoreARStickerData{
+    [self.ARStickerModel loadDataAtPageIndex:self.ARStickerModel.pageIndex];
+}
+
+-(void)loadNewJigsawTemplateData{
+    [self.jigsawTemplateArray removeAllObjects];
+    [self.jigsawTemplateModel cancelAllRequest];
+    self.jigsawTemplateModel.materialType = @"template_pic";
+    [self.jigsawTemplateModel reloadData];
+    [SVProgressHUD showWithStatus:@"加载中"];
+}
+
+-(void)loadMoreJigsawTemplateData{
+    [self.jigsawTemplateModel loadDataAtPageIndex:self.jigsawTemplateModel.pageIndex];
 }
 
 #pragma mark - UICollectionViewDataSource / UICollectionViewDelegateFlowLayout
@@ -102,40 +146,45 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
 }
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
-    return 15;
+    switch (self.activeSection) {
+        case 0:
+            return self.staticStickerArray.count;
+            break;
+        case 1:
+            return self.ARStickerArray.count;
+            break;
+        case 2:
+            return self.jigsawTemplateArray.count;
+            break;
+        default:
+            break;
+    }
+    return 0;
 }
 
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     UICollectionViewCell *cell;
-    NSString *imageURL = @"http://pic25.nipic.com/20121128/2457331_222533059344_2.jpg";
+
     switch (self.activeSection) {
-        case 0:
+        case 0:{
             cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShopStickerItemCellID forIndexPath:indexPath];
-            if (self.managementMode) {
-                [((PTPPMaterialShopStickerItemCell *)cell)  setAttributeWithImageURL:imageURL stickerName:@"贴纸的名称" stickerCount:@"13" binarySize:@"1.2MB" editStatus:PTPPMaterialEditStatusItemDeselected isNew:NO];
-            }else{
-                [((PTPPMaterialShopStickerItemCell *)cell) setAttributeWithImageURL:imageURL stickerName:@"贴纸的名称" stickerCount:@"13" binarySize:@"1.2MB" downloadStatus:PTPPMaterialDownloadStatusReady isNew:YES];
-            }
-            ((PTPPMaterialShopStickerItemCell *)cell).selectionMode = self.selectionMode;
+            PTPPMaterialShopStickerItem *staticStickerItem = [self.staticStickerArray safeObjectAtIndex:indexPath.row];
+            [((PTPPMaterialShopStickerItemCell *)cell) setAttributeWithImageURL:staticStickerItem.coverPic stickerName:staticStickerItem.packageName stickerCount:staticStickerItem.totalNum binarySize:staticStickerItem.packageSize downloadStatus:PTPPMaterialDownloadStatusReady isNew:YES];
+
             break;
-        case 1:
+        }
+        case 1:{
             cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShoptARStickerItemCellID forIndexPath:indexPath];
-            if (self.managementMode) {
-                [((PTPPMaterialShopARStickerItemCell *)cell) setAttributeWithImageURL:imageURL editStatus:PTPPMaterialEditStatusItemDeselected isNew:NO];
-            }else{
-                [((PTPPMaterialShopARStickerItemCell *)cell) setAttributeWithImageURL:imageURL downloadStatus:PTPPMaterialDownloadStatusReady isNew:YES];
-            }
-            ((PTPPMaterialShopARStickerItemCell *)cell).selectionMode = self.selectionMode;
+            PTPPMaterialShopStickerItem *ARStickerItem = [self.ARStickerArray safeObjectAtIndex:indexPath.row];
+            [((PTPPMaterialShopARStickerItemCell *)cell) setAttributeWithImageURL:ARStickerItem.coverPic downloadStatus:PTPPMaterialDownloadStatusReady isNew:YES];
             break;
-        case 2:
+        }
+        case 2:{
             cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShopJigsawItemCellID forIndexPath:indexPath];
-            if (self.managementMode) {
-                [((PTPPMaterialShopJigsawItemCell *)cell) setAttributeWithImageURL:imageURL editStatus:PTPPMaterialEditStatusItemDeselected isNew:YES];
-            }else{
-                [((PTPPMaterialShopJigsawItemCell *)cell) setAttributeWithImageURL:imageURL downloadStatus:PTPPMaterialDownloadStatusReady isNew:YES];
-            }
-            ((PTPPMaterialShopJigsawItemCell *)cell).selectionMode = self.selectionMode;
+            PTPPMaterialShopStickerItem *jigsawTemplateItem = [self.jigsawTemplateArray safeObjectAtIndex:indexPath.row];
+            [((PTPPMaterialShopJigsawItemCell *)cell) setAttributeWithImageURL:jigsawTemplateItem.coverPic downloadStatus:PTPPMaterialDownloadStatusReady isNew:YES];
             break;
+        }
         default:
             break;
     }
@@ -144,7 +193,7 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
 }
 
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
-    if (self.activeSection == 1) {
+    if (self.activeSection == 0) {
         PTPPMaterialStickerDetailViewController *stickerDetailVC = [[PTPPMaterialStickerDetailViewController alloc] init];
         [self.navigationController pushViewController:stickerDetailVC animated:YES];
     }
@@ -172,6 +221,29 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
 #pragma mark - PTCustomMenuSliderViewDelegate
 -(void)sliderView:(PTCustomMenuSliderView *)sliderView didSelecteAtIndex:(NSInteger)index{
     self.activeSection = index;
+    
+    switch (index) {
+        case 0:
+            if (self.staticStickerArray.count == 0) {
+                [self loadNewStaticStickerData];
+            }
+            
+            break;
+        case 1:
+            if (self.ARStickerArray.count == 0) {
+                [self loadNewARStickerData];
+            }
+            
+            break;
+        case 2:
+            if (self.jigsawTemplateArray.count == 0) {
+                [self loadNewJigsawTemplateData];
+            }
+            
+            break;
+        default:
+            break;
+    }
     [self.collectionView reloadData];
 }
 
@@ -183,6 +255,47 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
 -(void)didToggleDelete:(PTPPMaterialManagementBottomView *)bottomView{
 
 }
+
+#pragma mark - <SOModelDelegate>
+
+-(void)model:(SOBaseModel *)model didReceivedData:(id)data userInfo:(id)info{
+    [SVProgressHUD dismiss];
+    if ([[(PTPPMaterialShopStickerModel *)model materialType] isEqualToString:@"sticker_pic"]) {
+        NSLog(@"Success");
+        if(!data || ![data isKindOfClass:[NSArray class]] || [data count] < self.staticStickerModel.pageOffset) {
+            
+        } else {
+
+        }
+        [self.staticStickerArray addObjectsFromArray:data];
+        [self.collectionView reloadData];
+    }
+    if ([[(PTPPMaterialShopStickerModel *)model materialType] isEqualToString:@"dynamic_pic"]) {
+        NSLog(@"Success");
+        if(!data || ![data isKindOfClass:[NSArray class]] || [data count] < self.ARStickerModel.pageOffset) {
+            
+        } else {
+            
+        }
+        [self.ARStickerArray addObjectsFromArray:data];
+        [self.collectionView reloadData];
+    }
+    if ([[(PTPPMaterialShopStickerModel *)model materialType] isEqualToString:@"template_pic"]) {
+        NSLog(@"Success");
+        if(!data || ![data isKindOfClass:[NSArray class]] || [data count] < self.jigsawTemplateModel.pageOffset) {
+            
+        } else {
+            
+        }
+        [self.jigsawTemplateArray addObjectsFromArray:data];
+        [self.collectionView reloadData];
+    }
+}
+
+-(void)model:(SOBaseModel *)model didFailedInfo:(id)info error:(id)error{
+    [SVProgressHUD dismiss];
+}
+
 
 #pragma mark - getters/setters
 -(PTCustomMenuSliderView *)sliderView{
@@ -219,13 +332,7 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
         _collectionView.delegate = self;
         _collectionView.dataSource = self;
         _collectionView.backgroundColor = [UIColor clearColor];
-        if (self.managementMode) {
-             _collectionView.contentInset = UIEdgeInsetsMake(10, 0, 10+HEIGHT_NAV, 0);
-        }else{
-             _collectionView.contentInset = UIEdgeInsetsMake(10, 0, 10, 0);
-        }
-       
-
+        _collectionView.contentInset = UIEdgeInsetsMake(10, 0, 10, 0);
     }
     return _collectionView;
 }

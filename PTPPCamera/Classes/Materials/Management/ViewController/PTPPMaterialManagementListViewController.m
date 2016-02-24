@@ -6,15 +6,15 @@
 //  Copyright © 2016 putao. All rights reserved.
 //
 
-#import "PTPPMaterialManagementViewController.h"
-#import "PTPPMaterialShopViewController.h"
+#import "PTPPMaterialManagementListViewController.h"
+#import "PTPPMaterialManagementEditViewController.h"
 #import "PTMacro.h"
 
-@interface PTPPMaterialManagementViewController () <UITableViewDelegate, UITableViewDataSource>
+@interface PTPPMaterialManagementListViewController () <UITableViewDelegate, UITableViewDataSource>
 @property (nonatomic, strong) UITableView *tableView;
 @end
 
-@implementation PTPPMaterialManagementViewController
+@implementation PTPPMaterialManagementListViewController
 
 #pragma mark - Life Cycles
 - (void)viewDidLoad {
@@ -80,8 +80,7 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    PTPPMaterialShopViewController *libraryManagementVC = [[PTPPMaterialShopViewController alloc] init];
-    libraryManagementVC.managementMode = YES;
+    PTPPMaterialManagementEditViewController *libraryManagementVC = [[PTPPMaterialManagementEditViewController alloc] init];
     libraryManagementVC.activeSection = indexPath.row;
     [self.navigationController pushViewController:libraryManagementVC animated:YES];
 }

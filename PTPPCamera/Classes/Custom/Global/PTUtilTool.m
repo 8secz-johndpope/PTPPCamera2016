@@ -280,4 +280,12 @@
     return flag;
 }
 
+#pragma mark - 时间戳转换
++(NSDate *)convertDateFromTimestamp:(NSNumber *)dateNumber{
+    NSTimeInterval time = dateNumber.longLongValue;
+    long long int date = (long long int)time;
+    NSDate *newDate = [NSDate dateWithTimeIntervalSince1970:date];
+    return newDate;
+}
+
 @end

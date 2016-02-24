@@ -109,6 +109,8 @@ NSString * const SOHTTPRequestMethodPOST        = @"POST";
     __SOWEAK typeof(self) weak_self = self;
     if(self.method && [self.method isEqualToString:SOHTTPRequestMethodGET]) {
         AFHTTPRequestOperation *operation = [self.requestOperationManager GET:self.baseURLString parameters:self.parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
+            NSError * error;
+            responseObject = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
             [weak_self request:operation didReceived:responseObject];
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
             [weak_self request:operation didFailed:error];

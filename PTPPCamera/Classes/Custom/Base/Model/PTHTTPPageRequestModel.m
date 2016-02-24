@@ -38,10 +38,9 @@
 
 - (void)appendOtherParameters {
     [super appendOtherParameters];
-    [self.parameters safeSetObject:@"" forKey:@"uid"];
-    [self.parameters safeSetObject:@"" forKey:@"token"];
-    [self.parameters safeSetObject:@"" forKey:@"deviceid"];
-    [self.parameters safeSetObject:PTLatitudeAppID forKey:@"appid"];
+    [self.parameters safeSetObject:[PTUtilTool getDeviceID] forKey:@"device_id"];
+    [self.parameters safeSetObject:[PTUtilTool getDeviceName] forKey:@"device_name"];
+    [self.parameters safeSetObject:PTPPAppID forKey:@"appid"];
 }
 
 #pragma mark - <SOHTTPPageModelProtocol>
@@ -74,6 +73,8 @@
 
 - (void)request:(AFHTTPRequestOperation *)request didReceived:(id)responseObject {
     self.pageIndex = ([request pageIndex] + 1);
+    NSError * error;
+    responseObject = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
     if(self.delegate && [self.delegate respondsToSelector:@selector(model:didReceivedData:userInfo:)]) {
         [self.delegate model:self didReceivedData:responseObject userInfo:nil];
     }

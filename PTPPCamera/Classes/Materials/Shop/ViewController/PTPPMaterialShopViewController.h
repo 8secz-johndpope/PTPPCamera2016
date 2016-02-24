@@ -9,6 +9,5 @@
 #import "SOBaseViewController.h"
 
 @interface PTPPMaterialShopViewController : SOBaseViewController
-@property (nonatomic, assign) BOOL managementMode;
 @property (nonatomic, assign) NSInteger activeSection;
 @end

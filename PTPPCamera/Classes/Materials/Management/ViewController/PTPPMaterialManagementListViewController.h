@@ -8,6 +8,6 @@
 
 #import "SOBaseViewController.h"
 
-@interface PTPPMaterialManagementViewController : SOBaseViewController
+@interface PTPPMaterialManagementListViewController : SOBaseViewController
 
 @end

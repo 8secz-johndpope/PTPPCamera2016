@@ -105,4 +105,6 @@
 + (BOOL)checkCameraCanUse;
 
 
++(NSDate *)convertDateFromTimestamp:(NSNumber *)dateNumber;
+
 @end

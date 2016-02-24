@@ -27,10 +27,9 @@
 
 - (void)appendOtherParameters {
     [super appendOtherParameters];
-    [self.parameters safeSetObject:@"" forKey:@"uid"];
-    [self.parameters safeSetObject:@"" forKey:@"token"];
-    [self.parameters safeSetObject:@"" forKey:@"deviceid"];
-    [self.parameters safeSetObject:PTLatitudeAppID forKey:@"appid"];
+    [self.parameters safeSetObject:[PTUtilTool getDeviceID] forKey:@"device_id"];
+    [self.parameters safeSetObject:[PTUtilTool getDeviceName] forKey:@"device_name"];
+    [self.parameters safeSetObject:PTPPAppID forKey:@"appid"];
 }
 
 #pragma mark - <SOBaseModelProtocol>
