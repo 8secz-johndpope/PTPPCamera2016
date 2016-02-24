@@ -5,7 +5,8 @@
 //  Created by CHEN KAIDI on 15/1/2016.
 //  Copyright © 2016 putao. All rights reserved.
 //
-
+#import "DownloadManager.h"
+#import "PTPPLocalFileManager.h"
 #import "PTPPMaterialStickerDetailViewController.h"
 #import "PTPPMaterialStickerDetailCell.h"
 #import "PTPPMaterialStickerDetailHeaderView.h"
@@ -15,12 +16,13 @@
 #define kCollectionViewEdgePadding 10
 #define kCellSpacing 5
 
-@interface PTPPMaterialStickerDetailViewController ()<UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, SOModelDelegate>
+@interface PTPPMaterialStickerDetailViewController ()<UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, SOModelDelegate, DownloadManagerDelegate>
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UICollectionViewFlowLayout *layout;
 
 @property (nonatomic, strong) PTPPMaterialShopStickerDetailItem *stickerDetailItem;
 @property (nonatomic, strong) PTPPMaterialShopStickerDetailModel *stickerDetailModel;
+
 @end
 
 static NSString *PTPPMaterialStickerDetailCellID = @"PTPPMaterialStickerDetailCellID";
@@ -50,6 +52,20 @@ static NSString *PTPPMaterialStickerDetailHeaderViewID = @"PTPPMaterialStickerDe
     [self loadStickerDetailData];
 }
 
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidFinishLoading:) name:kDownloadDidFinishLoading object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidReceiveData:) name:kDownloadDidReceiveData object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidFail:) name:kDownloadDidFail object:nil];
+}
+
+-(void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kDownloadDidFinishLoading object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kDownloadDidFail object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kDownloadDidReceiveData object:nil];
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -62,6 +78,39 @@ static NSString *PTPPMaterialStickerDetailHeaderViewID = @"PTPPMaterialStickerDe
     self.stickerDetailModel.materialType = self.materialType;
     self.stickerDetailModel.packageID = self.packageID;
     [self.stickerDetailModel startLoad];
+}
+
+-(void)initiateDownload{
+    
+    NSString *downloadFolder = [PTPPLocalFileManager getRootFolderPathForStaitcStickers];
+    NSString *urlString = self.stickerDetailItem.downloadURL;
+
+    NSString *downloadFilename = [downloadFolder stringByAppendingPathComponent:[urlString lastPathComponent]];
+    NSURL *url = [NSURL URLWithString:urlString];
+        
+    [[DownloadManager shareManager] addDownloadWithFilename:downloadFilename URL:url];
+    
+}
+
+#pragma mark - NSNotifications
+- (void)downloadDidFinishLoading:(NSNotification *)notification{
+    NSLog(@"download complete");
+    [SVProgressHUD dismissWithSuccess:@"下载完成" afterDelay:0.6];
+    Download *download = notification.object;
+    
+    [PTPPLocalFileManager unzipFileFromPath:download.filename desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+    [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+    [PTPPLocalFileManager updateDownloadedStaticStickerListWithPackageID:self.packageID fileName:[download.filename lastPathComponent]];
+    [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForCache]];
+    [self.collectionView reloadData];
+}
+
+- (void)downloadDidFail:(NSNotification *)notification{
+    NSLog(@"download failed");
+}
+
+- (void)downloadDidReceiveData:(NSNotification *)notification{
+    NSLog(@"download ongoing");
 }
 
 #pragma mark - Touch Events
@@ -106,14 +155,21 @@ static NSString *PTPPMaterialStickerDetailHeaderViewID = @"PTPPMaterialStickerDe
 -(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
     if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
         PTPPMaterialStickerDetailHeaderView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:PTPPMaterialStickerDetailHeaderViewID forIndexPath:indexPath];
-        [headerView setAttributeWithBannerImgURL:self.stickerDetailItem.bannerPic stickerName:self.stickerDetailItem.packageName stickerDetail:self.stickerDetailItem.storeDescription isDownloaded:NO];
+        NSString *fileName = [self.stickerDetailItem.downloadURL lastPathComponent];
+        BOOL downloaded = [PTPPLocalFileManager checkIfDownloadedList:[PTPPLocalFileManager getDownloadedStaticStickerList] containsFileName:fileName];
+        [headerView setAttributeWithBannerImgURL:self.stickerDetailItem.bannerPic stickerName:self.stickerDetailItem.packageName stickerDetail:self.stickerDetailItem.storeDescription isDownloaded:downloaded];
+        __weak typeof(self) weakSelf = self;
+        headerView.downloadAciton = ^{
+            [weakSelf initiateDownload];
+            [SVProgressHUD showWithStatus:@"下载中"];
+        };
         return headerView;
     }
     return nil;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section {
-    return CGSizeMake(collectionView.width, [PTPPMaterialStickerDetailHeaderView getHeightWithStickerDetailText:@"这里显示的是这个贴纸包的简介最多不会超过两行，这里显示的是这个贴纸包的简介最多不会超过两行。" constraintWidth:collectionView.width-20]);
+    return CGSizeMake(collectionView.width, [PTPPMaterialStickerDetailHeaderView getHeightWithStickerDetailText:self.stickerDetailItem.storeDescription constraintWidth:collectionView.width-20]);
 }
 
 #pragma mark - <SOModelDelegate>
@@ -129,7 +185,6 @@ static NSString *PTPPMaterialStickerDetailHeaderViewID = @"PTPPMaterialStickerDe
 -(void)model:(SOBaseModel *)model didFailedInfo:(id)info error:(id)error{
     [SVProgressHUD dismiss];
 }
-
 
 -(UICollectionViewFlowLayout *)layout{
     if (!_layout) {

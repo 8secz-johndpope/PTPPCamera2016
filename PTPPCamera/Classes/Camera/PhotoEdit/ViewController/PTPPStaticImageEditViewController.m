@@ -72,12 +72,12 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     [self preloadRotateSet];
     [self updateFrame];
     
-    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
-    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"fqj" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
-    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao2" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
-    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao3" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
-    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao4" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
-    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao5" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+//    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+//    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"fqj" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+//    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao2" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+//    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao3" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+//    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao4" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+//    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao5" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
     
     [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
     

@@ -47,8 +47,11 @@
     self.downloadStatus = downloaded;
     if (self.downloadStatus) {
         [self.downloadButton setTitle:@"已下载" forState:UIControlStateNormal];
+        self.downloadButton.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.7];
+        
     }else{
         [self.downloadButton setTitle:@"下载" forState:UIControlStateNormal];
+        self.downloadButton.backgroundColor = UIColorFromRGB(0xff5a5d);
     }
     [self setNeedsLayout];
 }
@@ -61,6 +64,14 @@
     self.downloadButton.center = CGPointMake(self.downloadButton.centerX, self.stickerNameLabel.centerY);
     self.stickerDetailLabel.frame = CGRectMake(10, self.stickerNameLabel.bottom+10, self.detailContainer.width-20, detailHeight);
     self.detailContainer.frame = CGRectMake(0, self.bannerImageView.bottom, self.detailContainer.width, self.stickerDetailLabel.bottom+10);
+}
+
+-(void)initiateDownload{
+    if (!self.downloadStatus) {
+        if (self.downloadAciton) {
+            self.downloadAciton();
+        }
+    }
 }
 
 -(UIImageView *)bannerImageView{
@@ -104,6 +115,7 @@
         _downloadButton.backgroundColor = UIColorFromRGB(0xff5a5d);
         _downloadButton.layer.cornerRadius = 2;
         _downloadButton.layer.masksToBounds = YES;
+        [_downloadButton addTarget:self action:@selector(initiateDownload) forControlEvents:UIControlEventTouchUpInside];
     }
     return _downloadButton;
 }

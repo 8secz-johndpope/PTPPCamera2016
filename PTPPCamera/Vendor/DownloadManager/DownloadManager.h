@@ -22,8 +22,14 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
+
 #import <Foundation/Foundation.h>
 #import "Download.h"
+
+#define kDownloadDidFinishLoading               @"kDownloadDidFinishLoading"
+#define kDownloadDidFail                        @"kDownloadDidFail"
+#define kDownloadDidReceiveData                 @"kDownloadDidReceiveData"
+#define kDownloadDidFinishLoadingAllForManager  @"kDownloadDidFinishLoadingAllForManager"
 
 @class DownloadManager;
 @class Download;
@@ -112,23 +118,8 @@
 
 @interface DownloadManager : NSObject
 
-/// @name Initialization
-
-/** Returns pointer to initialized `DownloadManager` object.
- *
- * @param delegate
- *
- * The delegate that conforms to `DownloadManagerDelegate` which will receive 
- * information regarding the progress of the downloads.
- *
- * @return
- *
- * Returns pointer to `DownloadManager` object. If error, this is `nil`.
- *
- * @see DownloadManagerDelegate
- */
-
-- (instancetype)initWithDelegate:(id<DownloadManagerDelegate>)delegate;
+//Singleton
++(instancetype)shareManager;
 
 /// @name Control Download Manager
 

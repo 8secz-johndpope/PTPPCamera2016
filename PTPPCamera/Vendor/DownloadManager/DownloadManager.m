@@ -35,6 +35,15 @@
 
 #pragma mark - DownloadManager public methods
 
++(instancetype)shareManager{
+    static DownloadManager *_manager = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _manager = [[DownloadManager alloc] init];
+    });
+    return _manager;
+}
+
 - (instancetype)init
 {
     self = [super init];
@@ -91,10 +100,10 @@
 {
     [self.downloads removeObject:download];
     
-    if ([self.delegate respondsToSelector:@selector(downloadManager:downloadDidFinishLoading:)]) {
-        [self.delegate downloadManager:self downloadDidFinishLoading:download];
-    }
-
+//    if ([self.delegate respondsToSelector:@selector(downloadManager:downloadDidFinishLoading:)]) {
+//        [self.delegate downloadManager:self downloadDidFinishLoading:download];
+//    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDownloadDidFinishLoading object:download];
     [self tryDownloading];
 }
 
@@ -102,9 +111,9 @@
 {
     [self.downloads removeObject:download];
 
-    if ([self.delegate respondsToSelector:@selector(downloadManager:downloadDidFail:)])
-        [self.delegate downloadManager:self downloadDidFail:download];
-
+//    if ([self.delegate respondsToSelector:@selector(downloadManager:downloadDidFail:)])
+//        [self.delegate downloadManager:self downloadDidFail:download];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDownloadDidFail object:download];
     if (!self.cancelAllInProgress) {
         [self tryDownloading];
     }
@@ -112,18 +121,20 @@
 
 - (void)downloadDidReceiveData:(Download *)download
 {
-    if ([self.delegate respondsToSelector:@selector(downloadManager:downloadDidReceiveData:)]) {
-        [self.delegate downloadManager:self downloadDidReceiveData:download];
-    }
+//    if ([self.delegate respondsToSelector:@selector(downloadManager:downloadDidReceiveData:)]) {
+//        [self.delegate downloadManager:self downloadDidReceiveData:download];
+//    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDownloadDidReceiveData object:download];
 }
 
 #pragma mark - Private methods
 
 - (void)informDelegateThatDownloadsAreDone
 {
-    if ([self.delegate respondsToSelector:@selector(didFinishLoadingAllForManager:)]) {
-        [self.delegate didFinishLoadingAllForManager:self];
-    }
+//    if ([self.delegate respondsToSelector:@selector(didFinishLoadingAllForManager:)]) {
+//        [self.delegate didFinishLoadingAllForManager:self];
+//    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDownloadDidFinishLoadingAllForManager object:nil];
 }
 
 - (void)tryDownloading

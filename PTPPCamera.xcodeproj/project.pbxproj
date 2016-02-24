@@ -3719,7 +3719,6 @@
 			isa = PBXGroup;
 			children = (
 				C60FD1641C732ABD00F5886B /* PEPhotoCropEditor */,
-				C647C8CC1C71C8EA00E596EA /* DownloadManager */,
 				C647C8C81C71C87D00E596EA /* SHA_1 */,
 				C647BDE91C71BBBA00E596EA /* GPUImage */,
 				C647BDE31C718FE700E596EA /* DZNEmptyDataSet */,
@@ -4219,6 +4218,7 @@
 		C647BC801C718C4B00E596EA /* Global */ = {
 			isa = PBXGroup;
 			children = (
+				C647C8CC1C71C8EA00E596EA /* DownloadManager */,
 				C6433C201C72F40300AF82AD /* PTFilterManager.h */,
 				C6433C211C72F40300AF82AD /* PTFilterManager.m */,
 				C647BC841C718C4B00E596EA /* PTUtilTool.h */,
@@ -6345,7 +6345,8 @@
 				C647C8CF1C71C8EA00E596EA /* DownloadManager.h */,
 				C647C8D01C71C8EA00E596EA /* DownloadManager.m */,
 			);
-			path = DownloadManager;
+			name = DownloadManager;
+			path = ../../../Vendor/DownloadManager;
 			sourceTree = "<group>";
 		};
 		C647C8D31C71C93C00E596EA /* MLTransition */ = {

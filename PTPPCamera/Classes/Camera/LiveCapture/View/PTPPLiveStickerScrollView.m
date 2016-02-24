@@ -155,12 +155,12 @@ static NSString *PTLiveStickerPickerCellID = @"PTLiveStickerPickerCellID";
 }
 
 #pragma mark - Getters/Setters
--(DownloadManager *)downloadManager{
-    if (!_downloadManager) {
-        _downloadManager = [[DownloadManager alloc] initWithDelegate:self];
-    }
-    return _downloadManager;
-}
+//-(DownloadManager *)downloadManager{
+//    if (!_downloadManager) {
+//        _downloadManager = [[DownloadManager alloc] initWithDelegate:self];
+//    }
+//    return _downloadManager;
+//}
 
 -(NSMutableArray *)filterControlSet{
     if (!_stickerControlSet) {
