@@ -56,18 +56,18 @@ static NSString *PTLiveStickerPickerCellID = @"PTLiveStickerPickerCellID";
 }
 
 #pragma mark - Private methods
--(void)initiateDownloadProcess{
-    NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
-    NSString *downloadFolder = [documentsPath stringByAppendingPathComponent:@"ARStickers"];
-    NSArray *urlStrings = @[@"http://123.56.159.214/downloads/demo2.zip"];
-    for (NSString *urlString in urlStrings)
-    {
-        NSString *downloadFilename = [downloadFolder stringByAppendingPathComponent:[urlString lastPathComponent]];
-        NSURL *url = [NSURL URLWithString:urlString];
-        
-        [self.downloadManager addDownloadWithFilename:downloadFilename URL:url];
-    }
-}
+//-(void)initiateDownloadProcess{
+//    NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
+//    NSString *downloadFolder = [documentsPath stringByAppendingPathComponent:@"ARStickers"];
+//    NSArray *urlStrings = @[@"http://123.56.159.214/downloads/demo2.zip"];
+//    for (NSString *urlString in urlStrings)
+//    {
+//        NSString *downloadFilename = [downloadFolder stringByAppendingPathComponent:[urlString lastPathComponent]];
+//        NSURL *url = [NSURL URLWithString:urlString];
+//        
+//        [self.downloadManager addDownloadWithFilename:downloadFilename URL:url];
+//    }
+//}
 
 
 #pragma mark - Touch Events

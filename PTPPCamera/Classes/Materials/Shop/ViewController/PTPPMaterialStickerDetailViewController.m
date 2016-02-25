@@ -88,7 +88,7 @@ static NSString *PTPPMaterialStickerDetailHeaderViewID = @"PTPPMaterialStickerDe
     NSString *downloadFilename = [downloadFolder stringByAppendingPathComponent:[urlString lastPathComponent]];
     NSURL *url = [NSURL URLWithString:urlString];
         
-    [[DownloadManager shareManager] addDownloadWithFilename:downloadFilename URL:url];
+    [[DownloadManager shareManager] addDownloadWithFilename:downloadFilename URL:url packageID:self.packageID];
     
 }
 
@@ -98,7 +98,7 @@ static NSString *PTPPMaterialStickerDetailHeaderViewID = @"PTPPMaterialStickerDe
     [SVProgressHUD dismissWithSuccess:@"下载完成" afterDelay:0.6];
     Download *download = notification.object;
     
-    [PTPPLocalFileManager unzipFileFromPath:download.filename desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+    [PTPPLocalFileManager unzipFileFromPath:download.filename desPath:[[PTPPLocalFileManager getRootFolderPathForStaitcStickers] stringByAppendingPathComponent:[[download.filename lastPathComponent] stringByDeletingPathExtension]]];
     [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
     [PTPPLocalFileManager updateDownloadedStaticStickerListWithPackageID:self.packageID fileName:[download.filename lastPathComponent]];
     [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForCache]];

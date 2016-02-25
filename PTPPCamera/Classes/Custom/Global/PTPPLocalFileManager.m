@@ -133,6 +133,12 @@ static NSString *JigsawTemplatePlistFile = @"JigsawTemplate.plist";
     return downloadFolder;
 }
 
++(NSString *)getRootFolderPathForJigsawTemplate{
+    NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
+    NSString *downloadFolder = [documentsPath stringByAppendingPathComponent:@"JigsawTemplate"];
+    return downloadFolder;
+}
+
 +(NSString *)getNSBundlePathForFileName:(NSString *)fileName ofType:(NSString *)fileType{
     return [[NSBundle mainBundle] pathForResource:fileName ofType:fileType];
 }
@@ -156,7 +162,7 @@ static NSString *JigsawTemplatePlistFile = @"JigsawTemplate.plist";
 //Print list of files with given path
 +(void)printListOfFilesAtDirectory:(NSString *)directory{
     NSArray* dirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:directory error:NULL];
-    NSLog(@"*************************************************************************");
+    NSLog(@"*********************************START***********************************");
     NSLog(@"%@",directory);
     NSLog(@"*************************************************************************");
     if (dirs.count == 0) {
@@ -172,7 +178,7 @@ static NSString *JigsawTemplatePlistFile = @"JigsawTemplate.plist";
         }
         
     }];
-     NSLog(@"*************************************************************************");
+     NSLog(@"********************************END**************************************");
 }
 
 @end

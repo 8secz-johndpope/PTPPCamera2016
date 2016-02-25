@@ -1533,9 +1533,12 @@
 		C6CE891F1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6CE891E1C75C2BD0089D4E0 /* PTPPLiveStickerEditViewController.m */; };
 		C6D62CDE1C7D525A00B69F57 /* PTPPMaterialManagementEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6D62CDD1C7D525A00B69F57 /* PTPPMaterialManagementEditViewController.m */; };
 		C6D62CE11C7D565F00B69F57 /* PTPPMaterialShopStickerItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C6D62CE01C7D565F00B69F57 /* PTPPMaterialShopStickerItem.m */; };
-		C6D62CE41C7D567C00B69F57 /* PTPPMaterialShopStickerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C6D62CE31C7D567C00B69F57 /* PTPPMaterialShopStickerModel.m */; };
+		C6D62CE41C7D567C00B69F57 /* PTPPMaterialShopStaticStickerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C6D62CE31C7D567C00B69F57 /* PTPPMaterialShopStaticStickerModel.m */; };
 		C6D62CE71C7D98C700B69F57 /* PTPPMaterialShopStickerDetailModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C6D62CE61C7D98C700B69F57 /* PTPPMaterialShopStickerDetailModel.m */; };
 		C6D62CEA1C7D98F600B69F57 /* PTPPMaterialShopStickerDetailItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C6D62CE91C7D98F600B69F57 /* PTPPMaterialShopStickerDetailItem.m */; };
+		C6EC120A1C7EA3A8002C93FD /* PTMaterialShopLoadingCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C6EC12091C7EA3A8002C93FD /* PTMaterialShopLoadingCell.m */; };
+		C6EC120F1C7EAED8002C93FD /* PTPPMaterialShopARStickerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C6EC120C1C7EAED8002C93FD /* PTPPMaterialShopARStickerModel.m */; };
+		C6EC12101C7EAED8002C93FD /* PTPPMaterialShopJigsawTemplateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C6EC120E1C7EAED8002C93FD /* PTPPMaterialShopJigsawTemplateModel.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -3509,12 +3512,18 @@
 		C6D62CDD1C7D525A00B69F57 /* PTPPMaterialManagementEditViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialManagementEditViewController.m; sourceTree = "<group>"; };
 		C6D62CDF1C7D565F00B69F57 /* PTPPMaterialShopStickerItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialShopStickerItem.h; sourceTree = "<group>"; };
 		C6D62CE01C7D565F00B69F57 /* PTPPMaterialShopStickerItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopStickerItem.m; sourceTree = "<group>"; };
-		C6D62CE21C7D567C00B69F57 /* PTPPMaterialShopStickerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialShopStickerModel.h; sourceTree = "<group>"; };
-		C6D62CE31C7D567C00B69F57 /* PTPPMaterialShopStickerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopStickerModel.m; sourceTree = "<group>"; };
+		C6D62CE21C7D567C00B69F57 /* PTPPMaterialShopStaticStickerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialShopStaticStickerModel.h; sourceTree = "<group>"; };
+		C6D62CE31C7D567C00B69F57 /* PTPPMaterialShopStaticStickerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopStaticStickerModel.m; sourceTree = "<group>"; };
 		C6D62CE51C7D98C700B69F57 /* PTPPMaterialShopStickerDetailModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialShopStickerDetailModel.h; sourceTree = "<group>"; };
 		C6D62CE61C7D98C700B69F57 /* PTPPMaterialShopStickerDetailModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopStickerDetailModel.m; sourceTree = "<group>"; };
 		C6D62CE81C7D98F600B69F57 /* PTPPMaterialShopStickerDetailItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialShopStickerDetailItem.h; sourceTree = "<group>"; };
 		C6D62CE91C7D98F600B69F57 /* PTPPMaterialShopStickerDetailItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopStickerDetailItem.m; sourceTree = "<group>"; };
+		C6EC12081C7EA3A8002C93FD /* PTMaterialShopLoadingCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTMaterialShopLoadingCell.h; sourceTree = "<group>"; };
+		C6EC12091C7EA3A8002C93FD /* PTMaterialShopLoadingCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTMaterialShopLoadingCell.m; sourceTree = "<group>"; };
+		C6EC120B1C7EAED8002C93FD /* PTPPMaterialShopARStickerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialShopARStickerModel.h; sourceTree = "<group>"; };
+		C6EC120C1C7EAED8002C93FD /* PTPPMaterialShopARStickerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopARStickerModel.m; sourceTree = "<group>"; };
+		C6EC120D1C7EAED8002C93FD /* PTPPMaterialShopJigsawTemplateModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPMaterialShopJigsawTemplateModel.h; sourceTree = "<group>"; };
+		C6EC120E1C7EAED8002C93FD /* PTPPMaterialShopJigsawTemplateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPMaterialShopJigsawTemplateModel.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -6469,8 +6478,12 @@
 			children = (
 				C6D62CDF1C7D565F00B69F57 /* PTPPMaterialShopStickerItem.h */,
 				C6D62CE01C7D565F00B69F57 /* PTPPMaterialShopStickerItem.m */,
-				C6D62CE21C7D567C00B69F57 /* PTPPMaterialShopStickerModel.h */,
-				C6D62CE31C7D567C00B69F57 /* PTPPMaterialShopStickerModel.m */,
+				C6D62CE21C7D567C00B69F57 /* PTPPMaterialShopStaticStickerModel.h */,
+				C6D62CE31C7D567C00B69F57 /* PTPPMaterialShopStaticStickerModel.m */,
+				C6EC120B1C7EAED8002C93FD /* PTPPMaterialShopARStickerModel.h */,
+				C6EC120C1C7EAED8002C93FD /* PTPPMaterialShopARStickerModel.m */,
+				C6EC120D1C7EAED8002C93FD /* PTPPMaterialShopJigsawTemplateModel.h */,
+				C6EC120E1C7EAED8002C93FD /* PTPPMaterialShopJigsawTemplateModel.m */,
 				C6D62CE81C7D98F600B69F57 /* PTPPMaterialShopStickerDetailItem.h */,
 				C6D62CE91C7D98F600B69F57 /* PTPPMaterialShopStickerDetailItem.m */,
 				C6D62CE51C7D98C700B69F57 /* PTPPMaterialShopStickerDetailModel.h */,
@@ -6494,6 +6507,8 @@
 				C6681E5A1C7BF470009BC942 /* PTPPMaterialStickerDetailCell.m */,
 				C6681E5B1C7BF470009BC942 /* PTPPMaterialStickerDetailHeaderView.h */,
 				C6681E5C1C7BF470009BC942 /* PTPPMaterialStickerDetailHeaderView.m */,
+				C6EC12081C7EA3A8002C93FD /* PTMaterialShopLoadingCell.h */,
+				C6EC12091C7EA3A8002C93FD /* PTMaterialShopLoadingCell.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -7737,6 +7752,7 @@
 				C647BFD81C71BBBB00E596EA /* GPUImagePolkaDotFilter.m in Sources */,
 				C647BBE31C7181BE00E596EA /* UIView+WebCacheOperation.m in Sources */,
 				C647BF7A1C71BBBB00E596EA /* GPUImageColorInvertFilter.m in Sources */,
+				C6EC12101C7EAED8002C93FD /* PTPPMaterialShopJigsawTemplateModel.m in Sources */,
 				C647BFF91C71BBBB00E596EA /* GPUImageThresholdEdgeDetectionFilter.m in Sources */,
 				C647C00D1C71BBBB00E596EA /* GPUImageXYDerivativeFilter.m in Sources */,
 				C647C8B41C71C40200E596EA /* PTPPLiveStickerPreviewViewController.m in Sources */,
@@ -7907,6 +7923,7 @@
 				C647BBDA1C7181BE00E596EA /* SDWebImageDownloader.m in Sources */,
 				C647BBFB1C7181BE00E596EA /* SOLocalAuthManager.m in Sources */,
 				C647BF671C71BBBB00E596EA /* GPUImageAddBlendFilter.m in Sources */,
+				C6EC120F1C7EAED8002C93FD /* PTPPMaterialShopARStickerModel.m in Sources */,
 				C647BF6F1C71BBBB00E596EA /* GPUImageBuffer.m in Sources */,
 				C647BDB81C718E5100E596EA /* MJRefreshFooter.m in Sources */,
 				C647BBD21C7181BE00E596EA /* UIImageView+AFNetworking.m in Sources */,
@@ -8013,6 +8030,7 @@
 				C647BFCA1C71BBBB00E596EA /* GPUImageNormalBlendFilter.m in Sources */,
 				C647C8EF1C71CA6200E596EA /* PTAvatarView.m in Sources */,
 				C647BBE71C7181BE00E596EA /* NSDate+SOAdditions.m in Sources */,
+				C6EC120A1C7EA3A8002C93FD /* PTMaterialShopLoadingCell.m in Sources */,
 				C647BBDB1C7181BE00E596EA /* SDWebImageDownloaderOperation.m in Sources */,
 				C647BFE31C71BBBB00E596EA /* GPUImageSaturationFilter.m in Sources */,
 				C647BFB51C71BBBB00E596EA /* GPUImageLineGenerator.m in Sources */,
@@ -8049,7 +8067,7 @@
 				C647BDC51C718E5100E596EA /* UIScrollView+MJExtension.m in Sources */,
 				C647BCE61C718C4B00E596EA /* NSString+PTJSON.m in Sources */,
 				C647BF871C71BBBB00E596EA /* GPUImageDilationFilter.m in Sources */,
-				C6D62CE41C7D567C00B69F57 /* PTPPMaterialShopStickerModel.m in Sources */,
+				C6D62CE41C7D567C00B69F57 /* PTPPMaterialShopStaticStickerModel.m in Sources */,
 				C647BFA31C71BBBB00E596EA /* GPUImageHighlightShadowTintFilter.m in Sources */,
 				C647BDBC1C718E5100E596EA /* MJRefreshAutoStateFooter.m in Sources */,
 				C647BBFA1C7181BE00E596EA /* SOLoadMoreItem.m in Sources */,

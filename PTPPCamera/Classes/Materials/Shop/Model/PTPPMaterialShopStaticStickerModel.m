@@ -6,16 +6,16 @@
 //  Copyright © 2016 Putao. All rights reserved.
 //
 
-#import "PTPPMaterialShopStickerModel.h"
+#import "PTPPMaterialShopStaticStickerModel.h"
 #import "PTPPMaterialShopStickerItem.h"
 
-@implementation PTPPMaterialShopStickerModel
+@implementation PTPPMaterialShopStaticStickerModel
 
 + (instancetype)shareModel {
-    static PTPPMaterialShopStickerModel *_model = nil;
+    static PTPPMaterialShopStaticStickerModel *_model = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _model = [[PTPPMaterialShopStickerModel alloc] init];
+        _model = [[PTPPMaterialShopStaticStickerModel alloc] init];
     });
     return (_model);
 }

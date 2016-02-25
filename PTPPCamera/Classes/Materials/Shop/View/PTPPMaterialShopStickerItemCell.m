@@ -63,6 +63,17 @@
     [self setNeedsLayout];
 }
 
+-(void)setLoadingView{
+    self.cellLoadingView.center = CGPointMake(self.width/2, self.height/2);
+    self.stickerPreview.hidden = YES;
+    self.downloadStatusView.hidden = YES;
+    self.editStatusView.hidden = YES;
+    self.latestArrivalTag.hidden = YES;
+    self.cellLoadingView.hidden = NO;
+    [self.cellLoadingView startAnimating];
+    [self setNeedsLayout];
+}
+
 -(void)layoutSubviews{
     [super layoutSubviews];
     self.stickerNameLabel.frame = CGRectMake(10, (self.height-self.stickerPreview.height)/2-self.stickerNameLabel.font.lineHeight+self.stickerPreview.bottom, self.width-20, self.stickerNameLabel.font.lineHeight);
@@ -73,6 +84,7 @@
 
 -(void)toggleDownloadButton{
     [super toggleDownloadButton];
+    
 }
 
 -(UILabel *)stickerNameLabel{

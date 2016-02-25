@@ -67,10 +67,10 @@
     return self;
 }
 
-- (void)addDownloadWithFilename:(NSString *)filename URL:(NSURL *)url
+- (void)addDownloadWithFilename:(NSString *)filename URL:(NSURL *)url packageID:(NSString *)packageID
 {
     Download *download = [[Download alloc] initWithFilename:filename URL:url delegate:self];
-    
+    download.packageID = packageID;
     [self.downloads addObject:download];
     
     [self start];

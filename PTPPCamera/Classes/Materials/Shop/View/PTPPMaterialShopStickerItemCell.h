@@ -8,8 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "PTPPMaterialShopItemCell.h"
-    
+
+
+
 @interface PTPPMaterialShopStickerItemCell :PTPPMaterialShopItemCell
+
+
 -(void)setAttributeWithImageURL:(NSString *)imageURL stickerName:(NSString *)stickerName stickerCount:(NSString *)stickerCount binarySize:(NSString *)binarySize downloadStatus:(PTPPMaterialDownloadStatus)downloadStatus isNew:(BOOL)isNew;
 -(void)setAttributeWithImageURL:(NSString *)imageURL stickerName:(NSString *)stickerName stickerCount:(NSString *)stickerCount binarySize:(NSString *)binarySize editStatus:(PTPPMaterialEditStatus)editStatus isNew:(BOOL)isNew;
+-(void)setLoadingView;
 @end

@@ -89,7 +89,7 @@
  *
  * @see initWithFilename:URL:delegate:
  */
-
+@property (nonatomic, copy) NSString *packageID;
 @property (nonatomic, copy) NSString *filename;
 
 /** The remote URL of the file being downloaded. Generally not set manually, but rather by call to `initWithFilename:URL:delegate:`.

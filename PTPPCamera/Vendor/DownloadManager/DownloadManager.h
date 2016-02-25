@@ -137,7 +137,7 @@
  * @see url
  */
 
-- (void)addDownloadWithFilename:(NSString *)filename URL:(NSURL *)url;
+- (void)addDownloadWithFilename:(NSString *)filename URL:(NSURL *)url packageID:(NSString *)packageID;
 
 /// Cancel all downloads in progress or pending.
 

@@ -6,57 +6,69 @@
 //  Copyright © 2016 putao. All rights reserved.
 //
 
+#import "PTPPLocalFileManager.h"
 #import "PTPPMaterialShopViewController.h"
 #import "PTPPMaterialManagementListViewController.h"
 #import "PTPPMaterialStickerDetailViewController.h"
+#import "PTMaterialShopLoadingCell.h"
 #import "PTPPMaterialShopStickerItemCell.h"
 #import "PTPPMaterialShopARStickerItemCell.h"
 #import "PTPPMaterialShopJigsawItemCell.h"
 #import "PTCustomMenuSliderView.h"
 #import "PTPPMaterialManagementBottomView.h"
 #import "PTPPMaterialShopStickerItem.h"
-#import "PTPPMaterialShopStickerModel.h"
+#import "PTPPMaterialShopStaticStickerModel.h"
+#import "PTPPMaterialShopARStickerModel.h"
+#import "PTPPMaterialShopJigsawTemplateModel.h"
+#import "DownloadManager.h"
 
 #define kCollectionViewEdgePadding 10
 #define kCellSpacing 5
 
-@interface PTPPMaterialShopViewController () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, PTCustomMenuSliderViewDelegate, PTPPMaterialManagementBottomViewDelegate, SOModelDelegate>
+@interface PTPPMaterialShopViewController () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, PTCustomMenuSliderViewDelegate, SOModelDelegate>
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UICollectionViewFlowLayout *layout;
 @property (nonatomic, strong) PTCustomMenuSliderView *sliderView;
 @property (nonatomic, strong) PTPPMaterialManagementBottomView *bottomView;
 
 @property (nonatomic, strong) PTPPMaterialShopStickerItem *staticStickerItem;
-@property (nonatomic, strong) PTPPMaterialShopStickerModel *staticStickerModel;
-@property (nonatomic, strong) NSMutableArray *staticStickerArray;
+@property (nonatomic, strong) PTPPMaterialShopStaticStickerModel *staticStickerModel;
+@property (nonatomic, strong) NSMutableArray <PTPPMaterialShopStickerItem*>*staticStickerArray;
 @property (nonatomic, strong) PTPPMaterialShopStickerItem *ARStickerItem;
-@property (nonatomic, strong) PTPPMaterialShopStickerModel *ARStickerModel;
-@property (nonatomic, strong) NSMutableArray *ARStickerArray;
+@property (nonatomic, strong) PTPPMaterialShopARStickerModel *ARStickerModel;
+@property (nonatomic, strong) NSMutableArray <PTPPMaterialShopStickerItem*>*ARStickerArray;
 @property (nonatomic, strong) PTPPMaterialShopStickerItem *jigsawTemplateItem;
-@property (nonatomic, strong) PTPPMaterialShopStickerModel *jigsawTemplateModel;
-@property (nonatomic, strong) NSMutableArray *jigsawTemplateArray;
+@property (nonatomic, strong) PTPPMaterialShopJigsawTemplateModel *jigsawTemplateModel;
+@property (nonatomic, strong) NSMutableArray <PTPPMaterialShopStickerItem*>*jigsawTemplateArray;
 
+@property (nonatomic, assign) BOOL loadingStaticSticker;
+@property (nonatomic, assign) BOOL loadingARSticker;
+@property (nonatomic, assign) BOOL loadingJigsawTemplate;
+@property (nonatomic, assign) BOOL staticStickerDataFinished;
+@property (nonatomic, assign) BOOL ARStickerDataFinished;
+@property (nonatomic, assign) BOOL jigsawTemplateDataFinished;
 @property (nonatomic, assign) BOOL selectionMode;
 @end
 
 static NSString *PTPPMaterialShopStickerItemCellID = @"PTPPMaterialShopStickerItemCellID";
 static NSString *PTPPMaterialShoptARStickerItemCellID = @"PTPPMaterialShoptARStickerItemCellID";
 static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItemCellID";
+static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID";
 @implementation PTPPMaterialShopViewController
 
 #pragma mark - Life Cycles
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if(self) {
-        _staticStickerModel = [PTPPMaterialShopStickerModel shareModel];
+        _staticStickerModel = [PTPPMaterialShopStaticStickerModel shareModel];
         [_staticStickerModel setDelegate:self];
         _staticStickerArray = [[NSMutableArray alloc] init];
         
-        _ARStickerModel = [PTPPMaterialShopStickerModel shareModel];
+        _ARStickerModel = [PTPPMaterialShopARStickerModel shareModel];
         [_ARStickerModel setDelegate:self];
         _ARStickerArray = [[NSMutableArray alloc] init];
         
-        _jigsawTemplateModel= [PTPPMaterialShopStickerModel shareModel];
+        _jigsawTemplateModel= [PTPPMaterialShopJigsawTemplateModel shareModel];
         [_jigsawTemplateModel setDelegate:self];
         _jigsawTemplateArray = [[NSMutableArray alloc] init];
     }
@@ -84,14 +96,63 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidFinishLoading:) name:kDownloadDidFinishLoading object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidReceiveData:) name:kDownloadDidReceiveData object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidFail:) name:kDownloadDidFail object:nil];
 }
 
+-(void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kDownloadDidFinishLoading object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kDownloadDidFail object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kDownloadDidReceiveData object:nil];
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - NSNotifications
+- (void)downloadDidFinishLoading:(NSNotification *)notification{
+    NSLog(@"download complete");
+    Download *download = notification.object;
+    NSString *desPath = nil;
+    switch (self.activeSection) {
+        case 0:
+            desPath = [PTPPLocalFileManager getRootFolderPathForStaitcStickers] ;
+            [PTPPLocalFileManager unzipFileFromPath:download.filename desPath:[desPath stringByAppendingPathComponent:[[download.filename lastPathComponent] stringByDeletingPathExtension]]];
+            [PTPPLocalFileManager updateDownloadedStaticStickerListWithPackageID:download.packageID fileName:[download.filename lastPathComponent]];
+            break;
+        case 1:
+            desPath = [PTPPLocalFileManager getRootFolderPathForARStickers] ;
+            [PTPPLocalFileManager unzipFileFromPath:download.filename desPath:[desPath stringByAppendingPathComponent:[[download.filename lastPathComponent] stringByDeletingPathExtension]]];
+            [PTPPLocalFileManager updateDownloadedARStickerListWithPackageID:download.packageID fileName:[download.filename lastPathComponent]];
+            break;
+        case 2:
+            desPath = [PTPPLocalFileManager getRootFolderPathForJigsawTemplate] ;
+            [PTPPLocalFileManager unzipFileFromPath:download.filename desPath:[desPath stringByAppendingPathComponent:[[download.filename lastPathComponent] stringByDeletingPathExtension]]];
+            [PTPPLocalFileManager updateDownloadedJigsawTemplateListWithPackageID:download.packageID fileName:[download.filename lastPathComponent]];
+            break;
+            
+        default:
+            break;
+    }
+   
+    [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+    [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForARStickers]];
+    [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForJigsawTemplate]];
+    
+    //[PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForCache]];
+    [self.collectionView reloadData];
+}
+
+- (void)downloadDidFail:(NSNotification *)notification{
+    NSLog(@"download failed");
+}
+
+- (void)downloadDidReceiveData:(NSNotification *)notification{
+    NSLog(@"download ongoing");
+}
 
 #pragma mark - Touch events
 -(void)goBack{
@@ -105,39 +166,71 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
 
 #pragma mark - Private Methods
 -(void)loadNewStaticStickerData{
+    if (self.loadingStaticSticker) {
+        return;
+    }
+    self.loadingStaticSticker = YES;
     [self.staticStickerArray removeAllObjects];
     [self.staticStickerModel cancelAllRequest];
+    self.staticStickerModel.pageOffset = 10;
     self.staticStickerModel.materialType = @"sticker_pic";
     [self.staticStickerModel reloadData];
     [SVProgressHUD showWithStatus:@"加载中"];
 }
 
 -(void)loadMoreStaticStickerData{
+    if (self.loadingStaticSticker || self.staticStickerArray.count == 0) {
+        return;
+    }
+    self.loadingStaticSticker = YES;
     [self.staticStickerModel loadDataAtPageIndex:self.staticStickerModel.pageIndex];
 }
 
 -(void)loadNewARStickerData{
+    if (self.loadingARSticker) {
+        return;
+    }
+    self.loadingARSticker = YES;
     [self.ARStickerArray removeAllObjects];
     [self.ARStickerModel cancelAllRequest];
+    self.ARStickerModel.pageOffset = 18;
     self.ARStickerModel.materialType = @"dynamic_pic";
     [self.ARStickerModel reloadData];
     [SVProgressHUD showWithStatus:@"加载中"];
 }
 
 -(void)loadMoreARStickerData{
+    if (self.loadingARSticker || self.ARStickerArray.count == 0) {
+        return;
+    }
+    self.loadingARSticker = YES;
     [self.ARStickerModel loadDataAtPageIndex:self.ARStickerModel.pageIndex];
 }
 
 -(void)loadNewJigsawTemplateData{
+    if (self.loadingJigsawTemplate) {
+        return;
+    }
+    self.loadingJigsawTemplate = YES;
     [self.jigsawTemplateArray removeAllObjects];
     [self.jigsawTemplateModel cancelAllRequest];
+    self.jigsawTemplateModel.pageOffset = 10;
     self.jigsawTemplateModel.materialType = @"template_pic";
     [self.jigsawTemplateModel reloadData];
     [SVProgressHUD showWithStatus:@"加载中"];
 }
 
 -(void)loadMoreJigsawTemplateData{
+    if (self.loadingJigsawTemplate || self.jigsawTemplateArray.count == 0) {
+        return;
+    }
+    self.loadingJigsawTemplate = YES;
     [self.jigsawTemplateModel loadDataAtPageIndex:self.jigsawTemplateModel.pageIndex];
+}
+
+-(void)downloadMaterialFromSourceURL:(NSString *)sourceURL saveAtDestPath:(NSString *)destPathURL packageID:(NSString *)packageID {
+    [[DownloadManager shareManager] addDownloadWithFilename:destPathURL URL:[NSURL URLWithString:sourceURL] packageID:packageID];
+    [self.collectionView reloadData];
 }
 
 #pragma mark - UICollectionViewDataSource / UICollectionViewDelegateFlowLayout
@@ -146,49 +239,143 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
 }
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
+    NSInteger dataCount = 0;
     switch (self.activeSection) {
         case 0:
-            return self.staticStickerArray.count;
+            dataCount = self.staticStickerArray.count;
+            if (!self.staticStickerDataFinished) {
+                dataCount += 1;
+            }
             break;
         case 1:
-            return self.ARStickerArray.count;
+            dataCount = self.ARStickerArray.count;
+            if (!self.ARStickerDataFinished) {
+                dataCount += 1;
+            }
             break;
         case 2:
-            return self.jigsawTemplateArray.count;
+            dataCount = self.jigsawTemplateArray.count;
+            if (!self.jigsawTemplateDataFinished) {
+                dataCount += 1;
+            }
             break;
         default:
             break;
     }
-    return 0;
+
+    return dataCount;
 }
 
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     UICollectionViewCell *cell;
-
+    
+    __weak typeof(self) weakSelf = self;
     switch (self.activeSection) {
         case 0:{
-            cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShopStickerItemCellID forIndexPath:indexPath];
+            //贴纸Cell
             PTPPMaterialShopStickerItem *staticStickerItem = [self.staticStickerArray safeObjectAtIndex:indexPath.row];
-            [((PTPPMaterialShopStickerItemCell *)cell) setAttributeWithImageURL:staticStickerItem.coverPic stickerName:staticStickerItem.packageName stickerCount:staticStickerItem.totalNum binarySize:staticStickerItem.packageSize downloadStatus:PTPPMaterialDownloadStatusReady isNew:staticStickerItem.isNew];
-
+            NSString *downloadFolder = [PTPPLocalFileManager getRootFolderPathForStaitcStickers];
+            NSString *urlString = staticStickerItem.downloadURL;
+            NSString *downloadFilename = [downloadFolder stringByAppendingPathComponent:[urlString lastPathComponent]];
+            NSString *fileName = [staticStickerItem.downloadURL lastPathComponent];
+            BOOL downloaded = [PTPPLocalFileManager checkIfDownloadedList:[PTPPLocalFileManager getDownloadedStaticStickerList] containsFileName:fileName];
+            PTPPMaterialDownloadStatus downloadStatus;
+            if (downloaded) {
+                downloadStatus = PTPPMaterialDownloadStatusFinished;
+            }else{
+                if (staticStickerItem.isDownloading) {
+                    downloadStatus = PTPPMaterialDownloadStatusInProgress;
+                }else{
+                    downloadStatus = PTPPMaterialDownloadStatusReady;
+                }
+            }
+            if (indexPath.row == self.staticStickerArray.count) {
+                NSLog(@"Triggering loading cell...");
+                cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShopLoadingCellID forIndexPath:indexPath];
+                [((PTMaterialShopLoadingCell *)cell) startAnimating];
+                [self loadMoreStaticStickerData];
+                
+            }else{
+                cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShopStickerItemCellID forIndexPath:indexPath];
+                [((PTPPMaterialShopStickerItemCell *)cell) setAttributeWithImageURL:staticStickerItem.coverPic stickerName:staticStickerItem.packageName stickerCount:staticStickerItem.totalNum binarySize:staticStickerItem.packageSize downloadStatus:downloadStatus isNew:staticStickerItem.isNew];
+                ((PTPPMaterialShopStickerItemCell *)cell).downloadAction = ^{
+                    staticStickerItem.isDownloading = YES;
+                    [weakSelf downloadMaterialFromSourceURL:urlString saveAtDestPath:downloadFilename packageID:staticStickerItem.packageID];
+                };
+            }
             break;
         }
         case 1:{
-            cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShoptARStickerItemCellID forIndexPath:indexPath];
+            //动态贴图Cell
             PTPPMaterialShopStickerItem *ARStickerItem = [self.ARStickerArray safeObjectAtIndex:indexPath.row];
-            [((PTPPMaterialShopARStickerItemCell *)cell) setAttributeWithImageURL:ARStickerItem.coverPic downloadStatus:PTPPMaterialDownloadStatusReady isNew:ARStickerItem.isNew];
+            NSString *downloadFolder = [PTPPLocalFileManager getRootFolderPathForARStickers];
+            NSString *urlString = ARStickerItem.downloadURL;
+            NSString *downloadFilename = [downloadFolder stringByAppendingPathComponent:[urlString lastPathComponent]];
+            NSString *fileName = [ARStickerItem.downloadURL lastPathComponent];
+            BOOL downloaded = [PTPPLocalFileManager checkIfDownloadedList:[PTPPLocalFileManager getDownloadedARStickerList] containsFileName:fileName];
+            PTPPMaterialDownloadStatus downloadStatus;
+            if (downloaded) {
+                downloadStatus = PTPPMaterialDownloadStatusFinished;
+            }else{
+                if (ARStickerItem.isDownloading) {
+                    downloadStatus = PTPPMaterialDownloadStatusInProgress;
+                }else{
+                    downloadStatus = PTPPMaterialDownloadStatusReady;
+                }
+            }
+            if (indexPath.row == self.ARStickerArray.count) {
+                NSLog(@"Triggering loading cell...");
+                cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShopLoadingCellID forIndexPath:indexPath];
+                [((PTMaterialShopLoadingCell *)cell) startAnimating];
+                [self loadMoreARStickerData];
+                
+            }else{
+                cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShoptARStickerItemCellID forIndexPath:indexPath];
+                [((PTPPMaterialShopARStickerItemCell *)cell) setAttributeWithImageURL:ARStickerItem.coverPic downloadStatus:downloadStatus isNew:ARStickerItem.isNew];
+                ((PTPPMaterialShopStickerItemCell *)cell).downloadAction = ^{
+                    ARStickerItem.isDownloading = YES;
+                    [weakSelf downloadMaterialFromSourceURL:urlString saveAtDestPath:downloadFilename packageID:ARStickerItem.packageID];
+                };
+            }
             break;
         }
         case 2:{
-            cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShopJigsawItemCellID forIndexPath:indexPath];
+            //拼图模版Cell
             PTPPMaterialShopStickerItem *jigsawTemplateItem = [self.jigsawTemplateArray safeObjectAtIndex:indexPath.row];
-            [((PTPPMaterialShopJigsawItemCell *)cell) setAttributeWithImageURL:jigsawTemplateItem.coverPic downloadStatus:PTPPMaterialDownloadStatusReady isNew:jigsawTemplateItem.isNew];
+            NSString *downloadFolder = [PTPPLocalFileManager getRootFolderPathForJigsawTemplate];
+            NSString *urlString = jigsawTemplateItem.downloadURL;
+            NSString *downloadFilename = [downloadFolder stringByAppendingPathComponent:[urlString lastPathComponent]];
+            NSString *fileName = [jigsawTemplateItem.downloadURL lastPathComponent];
+            BOOL downloaded = [PTPPLocalFileManager checkIfDownloadedList:[PTPPLocalFileManager getDownloadedJigsawTemplateList] containsFileName:fileName];
+            PTPPMaterialDownloadStatus downloadStatus;
+            if (downloaded) {
+                downloadStatus = PTPPMaterialDownloadStatusFinished;
+            }else{
+                if (jigsawTemplateItem.isDownloading) {
+                    downloadStatus = PTPPMaterialDownloadStatusInProgress;
+                }else{
+                    downloadStatus = PTPPMaterialDownloadStatusReady;
+                }
+            }
+            if (indexPath.row == self.jigsawTemplateArray.count) {
+                NSLog(@"Triggering loading cell...");
+                cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShopLoadingCellID forIndexPath:indexPath];
+                [((PTMaterialShopLoadingCell *)cell) startAnimating];
+                [self loadMoreJigsawTemplateData];
+                
+            }else{
+                cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShopJigsawItemCellID forIndexPath:indexPath];
+                [((PTPPMaterialShopJigsawItemCell *)cell) setAttributeWithImageURL:jigsawTemplateItem.coverPic downloadStatus:downloadStatus isNew:jigsawTemplateItem.isNew];
+                ((PTPPMaterialShopStickerItemCell *)cell).downloadAction = ^{
+                    jigsawTemplateItem.isDownloading = YES;
+                    [weakSelf downloadMaterialFromSourceURL:urlString saveAtDestPath:downloadFilename packageID:jigsawTemplateItem.packageID];
+                };
+            }
             break;
         }
         default:
             break;
     }
-    
     return cell;
 }
 
@@ -224,7 +411,6 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
 #pragma mark - PTCustomMenuSliderViewDelegate
 -(void)sliderView:(PTCustomMenuSliderView *)sliderView didSelecteAtIndex:(NSInteger)index{
     self.activeSection = index;
-    
     switch (index) {
         case 0:
             if (self.staticStickerArray.count == 0) {
@@ -247,46 +433,41 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
         default:
             break;
     }
+    [self.collectionView setContentOffset:CGPointZero];
     [self.collectionView reloadData];
-}
-
-#pragma mark - PTPPMaterialManagementBottomViewDelegate
--(void)didToggleSelectAll:(PTPPMaterialManagementBottomView *)bottomView{
-    
-}
-
--(void)didToggleDelete:(PTPPMaterialManagementBottomView *)bottomView{
-
 }
 
 #pragma mark - <SOModelDelegate>
 
 -(void)model:(SOBaseModel *)model didReceivedData:(id)data userInfo:(id)info{
     [SVProgressHUD dismiss];
-    if ([[(PTPPMaterialShopStickerModel *)model materialType] isEqualToString:@"sticker_pic"]) {
+    if (model == self.staticStickerModel) {
         NSLog(@"Success");
+        self.loadingStaticSticker = NO;
         if(!data || ![data isKindOfClass:[NSArray class]] || [data count] < self.staticStickerModel.pageOffset) {
-            
+            self.staticStickerDataFinished = YES;
         } else {
 
         }
         [self.staticStickerArray addObjectsFromArray:data];
         [self.collectionView reloadData];
     }
-    if ([[(PTPPMaterialShopStickerModel *)model materialType] isEqualToString:@"dynamic_pic"]) {
+    if (model == self.ARStickerModel) {
         NSLog(@"Success");
+        self.loadingARSticker = NO;
         if(!data || ![data isKindOfClass:[NSArray class]] || [data count] < self.ARStickerModel.pageOffset) {
-            
+            self.ARStickerDataFinished = YES;
         } else {
             
         }
         [self.ARStickerArray addObjectsFromArray:data];
         [self.collectionView reloadData];
     }
-    if ([[(PTPPMaterialShopStickerModel *)model materialType] isEqualToString:@"template_pic"]) {
+    if (model == self.jigsawTemplateModel) {
         NSLog(@"Success");
+        self.loadingJigsawTemplate = NO;
         if(!data || ![data isKindOfClass:[NSArray class]] || [data count] < self.jigsawTemplateModel.pageOffset) {
-            
+            self.jigsawTemplateDataFinished = YES;
         } else {
             
         }
@@ -297,6 +478,9 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
 
 -(void)model:(SOBaseModel *)model didFailedInfo:(id)info error:(id)error{
     [SVProgressHUD dismiss];
+    self.loadingStaticSticker = NO;
+    self.loadingARSticker = NO;
+    self.loadingJigsawTemplate = NO;
 }
 
 
@@ -332,6 +516,7 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
         [_collectionView registerClass:[PTPPMaterialShopStickerItemCell class] forCellWithReuseIdentifier:PTPPMaterialShopStickerItemCellID];
         [_collectionView registerClass:[PTPPMaterialShopARStickerItemCell class] forCellWithReuseIdentifier:PTPPMaterialShoptARStickerItemCellID];
         [_collectionView registerClass:[PTPPMaterialShopJigsawItemCell class] forCellWithReuseIdentifier:PTPPMaterialShopJigsawItemCellID];
+        [_collectionView registerClass:[PTMaterialShopLoadingCell class] forCellWithReuseIdentifier:PTPPMaterialShopLoadingCellID];
         _collectionView.delegate = self;
         _collectionView.dataSource = self;
         _collectionView.backgroundColor = [UIColor clearColor];

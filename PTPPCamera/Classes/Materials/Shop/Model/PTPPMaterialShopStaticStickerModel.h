@@ -8,7 +8,7 @@
 
 #import "SOHTTPPageRequestModel.h"
 
-@interface PTPPMaterialShopStickerModel : SOHTTPPageRequestModel
+@interface PTPPMaterialShopStaticStickerModel : SOHTTPPageRequestModel
 @property (nonatomic, strong) NSString *materialType;
 + (instancetype)shareModel;
 @end

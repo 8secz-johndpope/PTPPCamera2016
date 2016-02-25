@@ -32,6 +32,7 @@
 @property (nonatomic, copy) NSString *coverPic;
 @property (nonatomic, copy) NSString *releaseTime;
 @property (nonatomic, assign) BOOL isNew;
+@property (nonatomic, assign) BOOL isDownloading;
 
 + (instancetype)itemWithDict:(NSDictionary *)dict;
 @end

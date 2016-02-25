@@ -25,6 +25,7 @@
 +(NSString *)getRootFolderPathForCache;
 +(NSString *)getRootFolderPathForARStickers;
 +(NSString *)getRootFolderPathForStaitcStickers;
++(NSString *)getRootFolderPathForJigsawTemplate;
 +(NSString *)getNSBundlePathForFileName:(NSString *)fileName ofType:(NSString *)fileType;
 
 +(NSArray *)getListOfFilePathAtDirectory :(NSString *)directory;

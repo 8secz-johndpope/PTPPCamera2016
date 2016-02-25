@@ -7,19 +7,22 @@
 //
 
 #import <UIKit/UIKit.h>
+
 typedef NS_ENUM(NSInteger, PTPPMaterialDownloadStatus){
-    PTPPMaterialDownloadStatusReady = 1,
-    PTPPMaterialDownloadStatusInProgress = 2,
-    PTPPMaterialDownloadStatusFinished = 3
+    PTPPMaterialDownloadStatusReady = 0,
+    PTPPMaterialDownloadStatusInProgress = 1,
+    PTPPMaterialDownloadStatusFinished = 2
 };
 
 typedef NS_ENUM(NSInteger, PTPPMaterialEditStatus){
     PTPPMaterialEditStatusItemSelected = 1,
     PTPPMaterialEditStatusItemDeselected = 2
 };
+typedef void(^DownloadAction)();
 
 @interface PTPPMaterialShopItemCell : UICollectionViewCell
--(void)toggleDownloadButton;
+
+@property (nonatomic, copy) DownloadAction downloadAction;
 @property (nonatomic, assign) PTPPMaterialDownloadStatus downloadStatus;
 @property (nonatomic, assign) PTPPMaterialEditStatus editStatus;
 @property (nonatomic, assign) BOOL selectionMode;
@@ -27,4 +30,7 @@ typedef NS_ENUM(NSInteger, PTPPMaterialEditStatus){
 @property (nonatomic, strong) UIButton *downloadStatusView;
 @property (nonatomic, strong) UIButton *editStatusView;
 @property (nonatomic, strong) UIImageView *latestArrivalTag;
+@property (nonatomic, strong) UIActivityIndicatorView *cellLoadingView;
+
+-(void)toggleDownloadButton;
 @end

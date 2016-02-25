@@ -9,7 +9,7 @@
 #import "PTPPMaterialShopItemCell.h"
 #import "SOKit.h"
 @interface PTPPMaterialShopItemCell ()
-
+@property (nonatomic, strong) UIActivityIndicatorView *loadingView;
 @end
 
 @implementation PTPPMaterialShopItemCell
@@ -19,28 +19,41 @@
     if (self) {
         [self.contentView addSubview:self.stickerPreview];
         [self.contentView addSubview:self.downloadStatusView];
+        [self.downloadStatusView addSubview:self.loadingView];
         [self.contentView addSubview:self.editStatusView];
         [self.contentView addSubview:self.latestArrivalTag];
+        [self.contentView addSubview:self.cellLoadingView];
     }
     return self;
 }
 
 -(void)toggleDownloadButton{
-
+    if (self.downloadStatus == PTPPMaterialDownloadStatusReady) {
+        if (self.downloadAction) {
+            self.downloadAction();
+        }
+    }
 }
 
 -(void)setDownloadStatus:(PTPPMaterialDownloadStatus)downloadStatus{
+    _downloadStatus = downloadStatus;
     _downloadStatusView.hidden = NO;
     _editStatusView.hidden = YES;
     switch (downloadStatus) {
         case PTPPMaterialDownloadStatusReady:
             [self.downloadStatusView setImage:[UIImage imageNamed:@"btn_22_01"] forState:UIControlStateNormal];
+            self.loadingView.hidden = YES;
+            [self.loadingView stopAnimating];
             break;
         case PTPPMaterialDownloadStatusInProgress:
             [self.downloadStatusView setImage:[UIImage imageNamed:@"btn_22_02"] forState:UIControlStateNormal];
+            self.loadingView.hidden = NO;
+            [self.loadingView startAnimating];
             break;
         case PTPPMaterialDownloadStatusFinished:
             [self.downloadStatusView setImage:[UIImage imageNamed:@"btn_22_03"] forState:UIControlStateNormal];
+            self.loadingView.hidden = YES;
+            [self.loadingView stopAnimating];
             break;
         default:
             break;
@@ -102,6 +115,22 @@
         _latestArrivalTag.image = [UIImage imageNamed:@"img_tag_new"];
     }
     return _latestArrivalTag;
+}
+
+-(UIActivityIndicatorView *)loadingView{
+    if (!_loadingView) {
+        _loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+        _loadingView.hidden = YES;
+    }
+    return _loadingView;
+}
+
+-(UIActivityIndicatorView *)cellLoadingView{
+    if (!_cellLoadingView) {
+        _cellLoadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+        _cellLoadingView.hidden = YES;
+    }
+    return _cellLoadingView;
 }
 
 @end
