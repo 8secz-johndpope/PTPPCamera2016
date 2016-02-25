@@ -60,7 +60,7 @@ static NSString *PTStaticStickerPickerSecondaryCellID = @"PTStaticStickerPickerS
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
     if (collectionView == self.collectionViewPrimary) {
-        return self.filePathSet.count;
+        return self.filePathSet.count+1;
     }else{
         NSString *contentFilePathList = [self.filePathSet safeObjectAtIndex:self.activeID];
         NSArray *contentFilePathArray = [PTPPLocalFileManager getListOfFilePathAtDirectory:contentFilePathList];
@@ -100,6 +100,9 @@ static NSString *PTStaticStickerPickerSecondaryCellID = @"PTStaticStickerPickerS
         }
         cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTStaticStickerPickerPrimaryCellID forIndexPath:indexPath];
         BOOL selected = (self.activeID == indexPath.row);
+        if (self.filePathSet.count == indexPath.row) {
+            primaryIcon = [UIImage imageNamed:@"icon_capture_20_34"];
+        }
         [((PTStaticStickerPickerCell *)cell) setAttributeWithImage:primaryIcon framePadding:5 selected:selected];
     }else{
         
@@ -114,6 +117,12 @@ static NSString *PTStaticStickerPickerSecondaryCellID = @"PTStaticStickerPickerS
 
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     if (collectionView == self.collectionViewPrimary) {
+        if (self.filePathSet.count == indexPath.row) {
+            if (self.topupBlock) {
+                self.topupBlock();
+            }
+            return;
+        }
         self.activeID = indexPath.row;
         [self updatePrimaryTheme];
         [self.collectionViewPrimary reloadData];

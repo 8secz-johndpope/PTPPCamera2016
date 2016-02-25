@@ -21,7 +21,8 @@
 @property (nonatomic, strong) UIButton *dismissButton;
 @property (nonatomic, strong) UIButton *clearButton;
 @property (nonatomic, strong) UIView *splitter;
-@property (nonatomic, strong) NSArray *stickerSet;
+@property (nonatomic, strong) NSArray *preinstalledSet;
+@property (nonatomic, strong) NSMutableArray *stickerSet;
 @property (nonatomic, strong) NSMutableArray *stickerControlSet;
 @end
 
@@ -42,8 +43,9 @@ static NSString *PTLiveStickerPickerCellID = @"PTLiveStickerPickerCellID";
     return self;
 }
 
--(void)setAttributeWithFilterSet:(NSArray *)stickerSet{
-    self.stickerSet = stickerSet;
+-(void)setAttributeWithLocalCacheWithPreinstalledSet:(NSArray *)preinstalledSet{
+    self.preinstalledSet = preinstalledSet;
+    self.stickerSet = [[NSMutableArray alloc] initWithArray:preinstalledSet];
     [self setNeedsLayout];
     [self.collectionView reloadData];
 }
@@ -56,18 +58,6 @@ static NSString *PTLiveStickerPickerCellID = @"PTLiveStickerPickerCellID";
 }
 
 #pragma mark - Private methods
-//-(void)initiateDownloadProcess{
-//    NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0];
-//    NSString *downloadFolder = [documentsPath stringByAppendingPathComponent:@"ARStickers"];
-//    NSArray *urlStrings = @[@"http://123.56.159.214/downloads/demo2.zip"];
-//    for (NSString *urlString in urlStrings)
-//    {
-//        NSString *downloadFilename = [downloadFolder stringByAppendingPathComponent:[urlString lastPathComponent]];
-//        NSURL *url = [NSURL URLWithString:urlString];
-//        
-//        [self.downloadManager addDownloadWithFilename:downloadFilename URL:url];
-//    }
-//}
 
 
 #pragma mark - Touch Events
@@ -86,29 +76,6 @@ static NSString *PTLiveStickerPickerCellID = @"PTLiveStickerPickerCellID";
 }
 
 #pragma mark - DownloadManager Delegate Methods
--(void)didFinishLoadingAllForManager:(DownloadManager *)downloadManager{
-   
-    NSLog(@"Download All Finish");
-    [PTPPLocalFileManager unzipAllFilesForARStickers];
-}
-
-- (void)downloadManager:(DownloadManager *)downloadManager downloadDidFail:(Download *)download;
-{
-    NSLog(@"%s %@ error=%@", __FUNCTION__, download.filename, download.error);
-}
-
-- (void)downloadManager:(DownloadManager *)downloadManager downloadDidReceiveData:(Download *)download;
-{
-    for (NSInteger row = 0; row < [downloadManager.downloads count]; row++)
-    {
-        if (download == downloadManager.downloads[row])
-        {
-            //[self updateProgressViewForIndexPath:[NSIndexPath indexPathForRow:row inSection:0] download:download];
-            NSLog(@"File %ld Download Progress:%.2f", (long)row,(double) download.progressContentLength / (double) download.expectedContentLength);
-            break;
-        }
-    }
-}
 
 #pragma mark - UICollectionViewDataSource / UICollectionViewDelegateFlowLayout
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView{
@@ -141,7 +108,15 @@ static NSString *PTLiveStickerPickerCellID = @"PTLiveStickerPickerCellID";
     UICollectionViewCell *cell;
     cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTLiveStickerPickerCellID forIndexPath:indexPath];
     BOOL selected = [self.selectedStickerName isEqualToString:[self.stickerSet safeObjectAtIndex:indexPath.row]];
-    [((PTLiveStickerPickerCell *)cell) setAttributeWithImage:[UIImage imageNamed:[NSString stringWithFormat:@"%@_icon",[self.stickerSet safeObjectAtIndex:indexPath.row]]] selected:selected];
+    UIImage *primaryIcon = nil;
+    NSString *contentFilePathList = [self.stickerSet safeObjectAtIndex:indexPath.row];
+    NSArray *contentFilePathArray = [PTPPLocalFileManager getListOfFilePathAtDirectory:contentFilePathList];
+    for(NSString *contentFileURL in contentFilePathArray){
+        if ([contentFileURL rangeOfString:@"_icon"].location != NSNotFound) {
+            primaryIcon = [[UIImage alloc] initWithContentsOfFile:contentFileURL];
+        }
+    }
+    [((PTLiveStickerPickerCell *)cell) setAttributeWithImage:primaryIcon selected:selected];
     return cell;
 }
 
@@ -149,7 +124,7 @@ static NSString *PTLiveStickerPickerCellID = @"PTLiveStickerPickerCellID";
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     self.selectedStickerName = [self.stickerSet safeObjectAtIndex:indexPath.row];
     if (self.stickerSelected) {
-        self.stickerSelected([self.stickerSet safeObjectAtIndex:indexPath.row],YES);
+        self.stickerSelected([self.stickerSet safeObjectAtIndex:indexPath.row],NO);
     }
     [self.collectionView reloadData];
 }

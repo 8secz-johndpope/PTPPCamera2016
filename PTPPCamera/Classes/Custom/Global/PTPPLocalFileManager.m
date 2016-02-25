@@ -21,32 +21,28 @@
             NSLog(@"Sticker not existed");
         }
     }
-        return downloadFolder;
+    return downloadFolder;
 }
 
 #pragma mark - Unzip, write/read plist
-+(void)unzipAllFilesForARStickers{
-    NSFileManager *fileManager= [NSFileManager defaultManager];
-    NSString *downloadFolder = [self getRootFolderPathForARStickers];
-    NSArray* dirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:downloadFolder
-                                                                        error:NULL];
++(BOOL)unzipAllFilesForARStickers:(NSArray *)fileNameArray{
     
-    [dirs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        NSString *filename = (NSString *)obj;
-        NSString *extension = [[filename pathExtension] lowercaseString];
-        if ([extension isEqualToString:@"zip"]) {
-            ZipArchive *zipArchive = [[ZipArchive alloc] init];
-            [zipArchive UnzipOpenFile:[downloadFolder stringByAppendingPathComponent:filename]];
-            BOOL unZipSuccess = [zipArchive UnzipFileTo:downloadFolder overWrite:YES];
-            [zipArchive UnzipCloseFile];
-            if (unZipSuccess) {
-                NSLog(@"File %@ unzip successful",filename);
-            }else{
-                NSLog(@"File %@ unzip failed",filename);
-            }
-            [fileManager removeItemAtPath:[downloadFolder stringByAppendingPathComponent:filename] error:NULL];
+    NSString *downloadFolder = [self getRootFolderPathForARStickers];
+    for(NSString *fileName in fileNameArray){
+        
+        ZipArchive *zipArchive = [[ZipArchive alloc] init];
+        [zipArchive UnzipOpenFile:[self getNSBundlePathForFileName:fileName ofType:@"zip"]];
+        BOOL unZipSuccess = [zipArchive UnzipFileTo:[downloadFolder stringByAppendingPathComponent:fileName] overWrite:YES];
+        [zipArchive UnzipCloseFile];
+        if (unZipSuccess) {
+            NSLog(@"File %@ unzip successful",fileName);
+        }else{
+            NSLog(@"File %@ unzip failed",fileName);
+            return NO;
         }
-    }];
+        //[fileManager removeItemAtPath:[downloadFolder stringByAppendingPathComponent:filename] error:NULL];
+    }
+    return YES;
 }
 
 +(BOOL)unzipFileFromPath:(NSString *)filePath desPath:(NSString *)despath{
@@ -193,7 +189,7 @@
         }
         
     }];
-     NSLog(@"********************************END**************************************");
+    NSLog(@"********************************END**************************************");
 }
 
 @end

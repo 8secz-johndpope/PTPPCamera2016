@@ -438,11 +438,12 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 
         if (stickerName != nil) {
             weakSelf.selectedARSticker = stickerName;
-            if(isFromBundle){
-                [weakSelf loadLiveStickerFromXMLFile:stickerName];
-            }else{
-#warning load from directory
-            }
+//            if(isFromBundle){
+//                [weakSelf loadLiveStickerFromXMLFile:stickerName];
+//            }else{
+//#warning load from directory
+//            }
+            
             [SOAutoHideMessageView showMessage:@"请将正脸置于取景器内" inView:weakSelf.view];
         }
     };
@@ -969,7 +970,17 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 -(PTPPLiveStickerScrollView *)liveStickerScrollView{
     if (!_liveStickerScrollView) {
         _liveStickerScrollView = [[PTPPLiveStickerScrollView alloc] initWithFrame:CGRectMake(0, 0, Screenwidth, kFilterScrollHeight)];
-        [_liveStickerScrollView setAttributeWithFilterSet:@[@"hz",@"cn", @"mhl", @"xm", @"fd", @"kq", @"xhx",@"hy"]]; //Hard coded
+        NSArray *preinstalledSet = @[@"hz",@"cn", @"mhl", @"xm", @"fd", @"kq", @"xhx",@"hy"];
+        NSMutableArray *rearrangedSet = [[NSMutableArray alloc] init];
+        NSArray *fileList = [PTPPLocalFileManager getListOfFilePathAtDirectory:[PTPPLocalFileManager getRootFolderPathForARStickers]];
+        for(NSString *stickerName in preinstalledSet){
+            for(NSString *path in fileList){
+                if ([[path lastPathComponent] isEqualToString:stickerName]) {
+                    [rearrangedSet addObject:path];
+                }
+            }
+        }
+        [_liveStickerScrollView setAttributeWithLocalCacheWithPreinstalledSet:rearrangedSet];
     }
     return _liveStickerScrollView;
 }

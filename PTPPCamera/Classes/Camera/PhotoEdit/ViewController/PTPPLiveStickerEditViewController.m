@@ -86,11 +86,11 @@
         weakSelf.bottomSticker.animationImages = nil;
         if (stickerName != nil) {
             weakSelf.selectedARSticker = stickerName;
-            if(isFromBundle){
-                [weakSelf loadLiveStickerFromXMLFile:stickerName];
-            }else{
-#warning load from directory
-            }
+//            if(isFromBundle){
+//                [weakSelf loadLiveStickerFromXMLFile:stickerName];
+//            }else{
+//#warning load from directory
+//            }
             [weakSelf updateStickerPosition];
         }
     };
@@ -374,7 +374,8 @@ static int calDistance(int fx, int fy, int tx, int ty){
 -(PTPPLiveStickerScrollView *)liveStickerScrollView{
     if (!_liveStickerScrollView) {
         _liveStickerScrollView = [[PTPPLiveStickerScrollView alloc] initWithFrame:CGRectMake(0, 0, Screenwidth, kFilterScrollHeight)];
-        [_liveStickerScrollView setAttributeWithFilterSet:@[@"hz",@"cn", @"mhl", @"xm", @"fd", @"kq", @"xhx",@"hy"]]; //Hard coded
+//        [_liveStickerScrollView setAttributeWithFilterSet:@[@"hz",@"cn", @"mhl", @"xm", @"fd", @"kq", @"xhx",@"hy"]]; //Hard coded
+        [_liveStickerScrollView setAttributeWithLocalCacheWithPreinstalledSet:@[@"hz",@"cn", @"mhl", @"xm", @"fd", @"kq", @"xhx",@"hy"]];
     }
     return _liveStickerScrollView;
 }

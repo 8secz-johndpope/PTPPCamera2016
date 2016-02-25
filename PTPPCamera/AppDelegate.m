@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "PTPPLiveCameraViewController.h"
+#import "PTPPLocalFileManager.h"
 @interface AppDelegate ()
 
 @end
@@ -17,11 +18,16 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    [self preloading];
     PTPPLiveCameraViewController *liveCameraVC = [[PTPPLiveCameraViewController alloc] init];
     UINavigationController *navi = [[UINavigationController alloc] initWithRootViewController:liveCameraVC];
     self.window.rootViewController = navi;
     [self.window makeKeyAndVisible];
     return YES;
+}
+
+-(void)preloading{
+    [PTPPLocalFileManager unzipAllFilesForARStickers:@[@"hz",@"cn", @"mhl", @"xm", @"fd", @"kq", @"xhx",@"hy"]];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {

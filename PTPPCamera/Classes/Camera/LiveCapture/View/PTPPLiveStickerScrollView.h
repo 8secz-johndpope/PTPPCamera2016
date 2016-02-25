@@ -13,5 +13,5 @@ typedef void (^StickerSelected)(NSString *filePath, BOOL isFromBundle);
 @property (nonatomic, copy) LiveStickerFinishBlock finishBlock;
 @property (nonatomic, copy) StickerSelected stickerSelected;
 @property (nonatomic, strong) NSString *selectedStickerName;
--(void)setAttributeWithFilterSet:(NSArray *)stickerSet;
+-(void)setAttributeWithLocalCacheWithPreinstalledSet:(NSArray *)preinstalledSet;
 @end

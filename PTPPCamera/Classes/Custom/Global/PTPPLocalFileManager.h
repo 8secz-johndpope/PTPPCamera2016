@@ -20,7 +20,7 @@ static NSString *JigsawTemplatePlistFile = @"JigsawTemplate.plist";
 @interface PTPPLocalFileManager : NSObject
 +(NSString *)getFolderPathForARStickerName:(NSString *)ARStickerName;
 
-+(void)unzipAllFilesForARStickers;
++(BOOL)unzipAllFilesForARStickers:(NSArray *)fileNameArray;
 +(BOOL)unzipFileFromPath:(NSString *)filePath desPath:(NSString *)despath;
 +(BOOL)removeItemAtPath:(NSString *)filePath;
 +(void)removeItemFromPlist:(NSString *)plistFileName withPackageID:(NSString *)packageID;

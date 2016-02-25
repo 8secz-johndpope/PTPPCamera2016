@@ -8,6 +8,7 @@
 
 #import "PTPPStaticImageEditViewController.h"
 #import "PTPPLiveStickerEditViewController.h"
+#import "PTPPMaterialShopViewController.h"
 #import "PTPPStaticImageEditToolBar.h"
 #import "PTPPCameraFilterScrollView.h"
 #import "PTPPStaticStickersScrollView.h"
@@ -357,7 +358,29 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 }
 
 -(void)saveAndExport{
-    
+    [self handleSingleTap];
+    CGFloat newWidth = 0;
+    CGFloat newHeight = 0;
+    if (self.basePhotoView.image.size.width>self.basePhotoView.image.size.height) {
+        newWidth =  Screenwidth;
+        CGFloat ratio = self.basePhotoView.image.size.height/self.basePhotoView.image.size.width;
+        newHeight = newWidth * ratio;
+    }else{
+        newHeight = Screenheight;
+        CGFloat ratio = self.basePhotoView.image.size.width/self.basePhotoView.image.size.height;
+        newWidth = newHeight * ratio;
+    }
+
+    [SVProgressHUD showWithMaskType:SVProgressHUDMaskTypeGradient];
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(newWidth,newHeight), YES, [UIScreen mainScreen].scale);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextConcatCTM(context, CGAffineTransformMakeTranslation(-(self.basePhotoView.width-newWidth)/2,-(self.basePhotoView.height-newHeight)/2));
+    [self.canvasView.layer renderInContext:context];
+    UIImage *screenShot = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    UIImageWriteToSavedPhotosAlbum(screenShot, nil, nil, nil);
+    [SVProgressHUD showSuccessWithStatus:@"保存成功" duration:1.0];
+
 }
 
 -(void)toggleStaticStickerMenu{
@@ -381,6 +404,14 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
                   wmView.transform = CGAffineTransformMakeScale(1.0, 1.0);
               } completion:^(BOOL finished) {}];
 
+    };
+    self.stickerScrollView.topupBlock = ^{
+        PTPPMaterialShopViewController *shopVC = [[PTPPMaterialShopViewController alloc] init];
+        shopVC.activeSection = 0;
+        [weakSelf.navigationController pushViewController:shopVC animated:YES];
+        if (weakSelf.stickerScrollView.finishBlock) {
+            weakSelf.stickerScrollView.finishBlock();
+        }
     };
     self.stickerScrollView.finishBlock = ^(){
         for(WaterMarkView *wmView in weakSelf.staticStickerView.subviews){
