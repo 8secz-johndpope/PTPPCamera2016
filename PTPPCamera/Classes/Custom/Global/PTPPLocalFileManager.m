@@ -9,9 +9,7 @@
 #import "PTPPLocalFileManager.h"
 #import "ZipArchive.h"
 
-static NSString *StaticStickerPlistFile = @"StaticStickers.plist";
-static NSString *ARStickerPlistFile = @"ARStickers.plist";
-static NSString *JigsawTemplatePlistFile = @"JigsawTemplate.plist";
+
 @implementation PTPPLocalFileManager
 
 //Retreive local cache folder path given a particular sticker file name
@@ -70,25 +68,29 @@ static NSString *JigsawTemplatePlistFile = @"JigsawTemplate.plist";
     return NO;
 }
 
-+(BOOL)updateDownloadedStaticStickerListWithPackageID:(NSString *)packageID fileName:(NSString *)fileName{
-    return  [self writePropertyListTo:StaticStickerPlistFile WithPackageID:packageID fileName:fileName];
++(BOOL)removeItemAtPath:(NSString *)filePath{
+    NSFileManager *fileManager= [NSFileManager defaultManager];
+    return [fileManager removeItemAtPath:filePath error:NULL];
 }
 
-+(BOOL)updateDownloadedARStickerListWithPackageID:(NSString *)packageID fileName:(NSString *)fileName{
-    return  [self writePropertyListTo:ARStickerPlistFile WithPackageID:packageID fileName:fileName];
++(void)removeItemFromPlist:(NSString *)plistFileName withPackageID:(NSString *)packageID{
+    NSString *xmlFilePath = [[self getRootFolderPathForCache] stringByAppendingPathComponent:plistFileName];
+    NSMutableDictionary *xmlDict = [[NSMutableDictionary alloc] initWithContentsOfFile:xmlFilePath];
+    if (xmlDict == nil) {
+        return;
+    }
+    [xmlDict removeObjectForKey:packageID];
+    [xmlDict writeToFile:xmlFilePath atomically:YES];
 }
 
-+(BOOL)updateDownloadedJigsawTemplateListWithPackageID:(NSString *)packageID fileName:(NSString *)fileName{
-    return  [self writePropertyListTo:JigsawTemplatePlistFile WithPackageID:packageID fileName:fileName];
-}
-
-+(BOOL)writePropertyListTo:(NSString *)plistFileName WithPackageID:(NSString *)packageID fileName:(NSString *)fileName{
++(BOOL)writePropertyListTo:(NSString *)plistFileName WithPackageID:(NSString *)packageID fileName:(NSString *)fileName themeName:(NSString *)themeName fileSize:(NSString *)fileSize totalNum:(NSString *)totalNum coverPic:(NSString *)coverPic{
     NSString *xmlFilePath = [[self getRootFolderPathForCache] stringByAppendingPathComponent:plistFileName];
     NSMutableDictionary *xmlDict = [[NSMutableDictionary alloc] initWithContentsOfFile:xmlFilePath];
     if (!xmlDict) {
         xmlDict = [[NSMutableDictionary alloc] init];
     }
-    [xmlDict safeSetObject:fileName forKey:packageID];
+    NSDictionary *fileSettingDict = [[NSDictionary alloc] initWithObjectsAndKeys:fileName, kLocalFileName, themeName, kLocalThemeName, fileSize, kLocalFileSize, totalNum, kLocalTotalNum, coverPic, kLocalCoverPic,nil];
+    [xmlDict safeSetObject:fileSettingDict forKey:packageID];
     return  [xmlDict writeToFile:xmlFilePath atomically:YES];
 }
 
@@ -106,8 +108,8 @@ static NSString *JigsawTemplatePlistFile = @"JigsawTemplate.plist";
 
 +(BOOL)checkIfDownloadedList:(NSDictionary *)downloadedList containsFileName:(NSString *)targetFileName{
     for(NSString *key in [downloadedList allKeys]){
-        NSString *currentFileName = [downloadedList safeStringForKey:key];
-        if ([currentFileName isEqualToString:targetFileName]) {
+        NSDictionary *currentFile = [downloadedList safeObjectForKey:key];
+        if ([[currentFile safeObjectForKey:kLocalFileName] isEqualToString:targetFileName]) {
             return YES;
         }
     }
@@ -141,6 +143,19 @@ static NSString *JigsawTemplatePlistFile = @"JigsawTemplate.plist";
 
 +(NSString *)getNSBundlePathForFileName:(NSString *)fileName ofType:(NSString *)fileType{
     return [[NSBundle mainBundle] pathForResource:fileName ofType:fileType];
+}
+
++(NSString *)folderSize:(NSString *)folderPath {
+    NSArray *filesArray = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath:folderPath error:nil];
+    NSEnumerator *filesEnumerator = [filesArray objectEnumerator];
+    NSString *fileName;
+    unsigned long long int fileSize = 0;
+    while (fileName = [filesEnumerator nextObject]) {
+        NSDictionary *fileDictionary = [[NSFileManager defaultManager] attributesOfItemAtPath:[folderPath stringByAppendingPathComponent:fileName] error:nil];
+        fileSize += [fileDictionary fileSize];
+    }
+    NSString *folderSizeStr = [NSByteCountFormatter stringFromByteCount:fileSize countStyle:NSByteCountFormatterCountStyleFile];
+    return folderSizeStr;
 }
 
 #pragma mark - ls

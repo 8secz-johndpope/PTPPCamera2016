@@ -137,7 +137,7 @@
  * @see url
  */
 
-- (void)addDownloadWithFilename:(NSString *)filename URL:(NSURL *)url packageID:(NSString *)packageID;
+- (void)addDownloadWithFilename:(NSString *)filename URL:(NSURL *)url package:(PTPPMaterialShopStickerItem *)package;
 
 /// Cancel all downloads in progress or pending.
 

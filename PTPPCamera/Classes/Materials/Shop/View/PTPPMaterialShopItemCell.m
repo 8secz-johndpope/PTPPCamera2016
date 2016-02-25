@@ -104,7 +104,8 @@
 -(UIButton *)editStatusView{
     if (!_editStatusView) {
         _editStatusView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 22, 22)];
-        [_editStatusView addTarget:self action:@selector(toggleDownloadButton) forControlEvents:UIControlEventTouchUpInside];
+        //[_editStatusView addTarget:self action:@selector(toggleDownloadButton) forControlEvents:UIControlEventTouchUpInside];
+        _editStatusView.userInteractionEnabled = NO;
     }
     return _editStatusView;
 }

@@ -12,15 +12,19 @@
 #import "PTPPMaterialShopARStickerItemCell.h"
 #import "PTPPMaterialShopJigsawItemCell.h"
 #import "PTPPMaterialManagementBottomView.h"
+#import "PTPPMaterialShopStickerItem.h"
+#import "PTPPLocalFileManager.h"
 
 #define kCollectionViewEdgePadding 10
 #define kCellSpacing 5
 
-@interface PTPPMaterialManagementEditViewController ()<UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, PTPPMaterialManagementBottomViewDelegate>
+@interface PTPPMaterialManagementEditViewController ()<UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, PTPPMaterialManagementBottomViewDelegate, UIAlertViewDelegate>
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UICollectionViewFlowLayout *layout;
 @property (nonatomic, strong) PTPPMaterialManagementBottomView *bottomView;
 
+@property (nonatomic, strong) NSDictionary *settingDict;
+@property (nonatomic, strong) NSMutableArray <PTPPMaterialShopStickerItem*> *localFileArray;
 @property (nonatomic, assign) BOOL selectionMode;
 @end
 
@@ -39,14 +43,13 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
     [self.navigationController setNavigationBarHidden:NO];
     [self.navigationController.navigationBar setBarTintColor:UIColorFromRGB(0xff5a5d)];
     [self setTitle:@"素材中心" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:18] selector:nil];
-
-    [self showRightItemWithText:@"管理" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(toggleEditMode) animation:NO];
-    
+    //[self showRightItemWithText:@"管理" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(toggleEditMode) animation:NO];
+    [self.view addSubview:self.collectionView];
+    [self toggleEditMode];
     [self showLeftItemWithImage:[UIImage imageNamed:@"back_white"] selector:@selector(goBack) animation:YES];
     self.collectionView.frame = CGRectMake(0, 0, Screenwidth, Screenheight-HEIGHT_NAV);
+    [self readLocalFileSettings];
     
-    
-    [self.view addSubview:self.collectionView];
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -59,6 +62,40 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - Private Methods
+-(void)readLocalFileSettings{
+    [self.localFileArray removeAllObjects];
+    switch (self.activeSection) {
+        case 0:
+            self.settingDict = [PTPPLocalFileManager getDownloadedStaticStickerList];
+            break;
+        case 1:
+            self.settingDict = [PTPPLocalFileManager getDownloadedARStickerList];
+            break;
+        case 2:
+            self.settingDict = [PTPPLocalFileManager getDownloadedJigsawTemplateList];
+            break;
+        default:
+            break;
+    }
+    for(NSString *key in [self.settingDict allKeys]){
+        NSDictionary *currentFileSetting = [self.settingDict safeObjectForKey:key];
+        PTPPMaterialShopStickerItem *item = [[PTPPMaterialShopStickerItem alloc] init];
+        item.packageID = key;
+        item.packageName = [currentFileSetting safeStringForKey:kLocalThemeName];
+        item.packageSize = [currentFileSetting safeStringForKey:kLocalFileSize];
+        item.totalNum = [currentFileSetting safeStringForKey:kLocalTotalNum];
+        item.coverPic = [currentFileSetting safeStringForKey:kLocalCoverPic];
+        [self.localFileArray addObject:item];
+    }
+    if (self.localFileArray.count == 0) {
+        self.bottomView.hidden = YES;
+    }else{
+        self.bottomView.hidden = NO;
+    }
+    [self.collectionView reloadData];
+}
+
 #pragma mark - Touch events
 -(void)goBack{
     [self.navigationController popViewControllerAnimated:YES];
@@ -66,10 +103,10 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
 
 -(void)toggleEditMode{
     if (!self.selectionMode) {
-        [self showRightItemWithText:@"取消" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(toggleEditMode) animation:NO];
+        //[self showRightItemWithText:@"取消" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(toggleEditMode) animation:NO];
         [self.view addSubview:self.bottomView];
     }else{
-        [self showRightItemWithText:@"管理" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(toggleEditMode) animation:NO];
+        //[self showRightItemWithText:@"管理" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(toggleEditMode) animation:NO];
         [self.bottomView removeFromSuperview];
     }
     self.selectionMode = !self.selectionMode;
@@ -82,29 +119,35 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
 }
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
-    return 15;
+    return self.localFileArray.count;
 }
 
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     UICollectionViewCell *cell;
-    NSString *imageURL = @"http://pic25.nipic.com/20121128/2457331_222533059344_2.jpg";
+    PTPPMaterialShopStickerItem* item = [self.localFileArray safeObjectAtIndex:indexPath.row];
+    PTPPMaterialEditStatus editStatus;
+    if (item.isSelected) {
+        editStatus = PTPPMaterialEditStatusItemSelected;
+    }else{
+        editStatus = PTPPMaterialEditStatusItemDeselected;
+    }
     switch (self.activeSection) {
         case 0:
             cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShopStickerItemCellID forIndexPath:indexPath];
-                [((PTPPMaterialShopStickerItemCell *)cell)  setAttributeWithImageURL:imageURL stickerName:@"贴纸的名称" stickerCount:@"13" binarySize:@"1.2MB" editStatus:PTPPMaterialEditStatusItemDeselected isNew:NO];
+                [((PTPPMaterialShopStickerItemCell *)cell)  setAttributeWithImageURL:item.coverPic stickerName:item.packageName stickerCount:item.totalNum binarySize:item.packageSize editStatus:editStatus isNew:NO];
             
             ((PTPPMaterialShopStickerItemCell *)cell).selectionMode = self.selectionMode;
             break;
         case 1:
             cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShoptARStickerItemCellID forIndexPath:indexPath];
-            [((PTPPMaterialShopARStickerItemCell *)cell) setAttributeWithImageURL:imageURL editStatus:PTPPMaterialEditStatusItemDeselected isNew:NO];
+            [((PTPPMaterialShopARStickerItemCell *)cell) setAttributeWithImageURL:item.coverPic editStatus:editStatus isNew:NO];
            
             ((PTPPMaterialShopARStickerItemCell *)cell).selectionMode = self.selectionMode;
             break;
         case 2:
             cell = [collectionView dequeueReusableCellWithReuseIdentifier:PTPPMaterialShopJigsawItemCellID forIndexPath:indexPath];
             
-            [((PTPPMaterialShopJigsawItemCell *)cell) setAttributeWithImageURL:imageURL editStatus:PTPPMaterialEditStatusItemDeselected isNew:YES];
+            [((PTPPMaterialShopJigsawItemCell *)cell) setAttributeWithImageURL:item.coverPic editStatus:editStatus isNew:YES];
             ((PTPPMaterialShopJigsawItemCell *)cell).selectionMode = self.selectionMode;
             break;
         default:
@@ -115,10 +158,9 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
 }
 
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
-    if (self.activeSection == 1) {
-        PTPPMaterialStickerDetailViewController *stickerDetailVC = [[PTPPMaterialStickerDetailViewController alloc] init];
-        [self.navigationController pushViewController:stickerDetailVC animated:YES];
-    }
+    PTPPMaterialShopStickerItem* item = [self.localFileArray safeObjectAtIndex:indexPath.row];
+    [item setSelected:!item.isSelected];
+    [self.collectionView reloadData];
 }
 
 -(UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section{
@@ -140,14 +182,54 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
     return kCellSpacing;
 }
 
+#pragma mark - UIAlertViewDelegate
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if (buttonIndex == 1) {
+        [self confirmDeleteSelected];
+    }
+}
 
 #pragma mark - PTPPMaterialManagementBottomViewDelegate
 -(void)didToggleSelectAll:(PTPPMaterialManagementBottomView *)bottomView{
-    
+    for(PTPPMaterialShopStickerItem* item in self.localFileArray){
+        [item setSelected:YES];
+    }
+    [self.collectionView reloadData];
 }
 
 -(void)didToggleDelete:(PTPPMaterialManagementBottomView *)bottomView{
-    
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"确定要删除选中项吗" message:nil delegate:self cancelButtonTitle:@"不" otherButtonTitles:@"确定", nil];
+    [alertView show];
+}
+
+-(void)confirmDeleteSelected{
+    for(PTPPMaterialShopStickerItem* item in self.localFileArray){
+        if (item.isSelected) {
+            NSString *rootFolder = nil;
+            NSString *plistName = nil;
+            switch (self.activeSection) {
+                case 0:
+                    rootFolder = [PTPPLocalFileManager getRootFolderPathForStaitcStickers];
+                    plistName = StaticStickerPlistFile;
+                    break;
+                case 1:
+                    rootFolder = [PTPPLocalFileManager getRootFolderPathForARStickers];
+                    plistName = ARStickerPlistFile;
+                    break;
+                case 2:
+                    rootFolder = [PTPPLocalFileManager getRootFolderPathForJigsawTemplate];
+                    plistName = JigsawTemplatePlistFile;
+                    break;
+                    
+                default:
+                    break;
+            }
+            [PTPPLocalFileManager removeItemAtPath:[rootFolder stringByAppendingPathComponent:[[[self.settingDict safeObjectForKey:item.packageID] safeStringForKey:kLocalFileName] stringByDeletingPathExtension]]];
+            [PTPPLocalFileManager removeItemFromPlist:plistName withPackageID:item.packageID];
+            
+        }
+    }
+    [self readLocalFileSettings];
 }
 
 -(PTPPMaterialManagementBottomView *)bottomView{
@@ -179,5 +261,11 @@ static NSString *PTPPMaterialShopJigsawItemCellID = @"PTPPMaterialShopJigsawItem
     return _collectionView;
 }
 
+-(NSMutableArray *)localFileArray{
+    if (!_localFileArray) {
+        _localFileArray = [[NSMutableArray alloc] init];
+    }
+    return _localFileArray;
+}
 
 @end

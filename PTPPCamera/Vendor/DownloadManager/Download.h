@@ -23,7 +23,7 @@
 //  THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
-
+#import "PTPPMaterialShopStickerItem.h"
 @class Download;
 
 /** The `Download` class defines a delegate protocol, `DownloadDelegate`,
@@ -89,7 +89,7 @@
  *
  * @see initWithFilename:URL:delegate:
  */
-@property (nonatomic, copy) NSString *packageID;
+@property (nonatomic, copy) PTPPMaterialShopStickerItem *package;
 @property (nonatomic, copy) NSString *filename;
 
 /** The remote URL of the file being downloaded. Generally not set manually, but rather by call to `initWithFilename:URL:delegate:`.

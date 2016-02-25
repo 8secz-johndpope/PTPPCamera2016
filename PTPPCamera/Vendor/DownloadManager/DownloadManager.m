@@ -67,10 +67,10 @@
     return self;
 }
 
-- (void)addDownloadWithFilename:(NSString *)filename URL:(NSURL *)url packageID:(NSString *)packageID
+- (void)addDownloadWithFilename:(NSString *)filename URL:(NSURL *)url package:(PTPPMaterialShopStickerItem *)package
 {
     Download *download = [[Download alloc] initWithFilename:filename URL:url delegate:self];
-    download.packageID = packageID;
+    download.package = package;
     [self.downloads addObject:download];
     
     [self start];

@@ -88,7 +88,7 @@ static NSString *PTPPMaterialStickerDetailHeaderViewID = @"PTPPMaterialStickerDe
     NSString *downloadFilename = [downloadFolder stringByAppendingPathComponent:[urlString lastPathComponent]];
     NSURL *url = [NSURL URLWithString:urlString];
         
-    [[DownloadManager shareManager] addDownloadWithFilename:downloadFilename URL:url packageID:self.packageID];
+    [[DownloadManager shareManager] addDownloadWithFilename:downloadFilename URL:url package:self.stickerDetailItem];
     
 }
 
@@ -100,7 +100,7 @@ static NSString *PTPPMaterialStickerDetailHeaderViewID = @"PTPPMaterialStickerDe
     
     [PTPPLocalFileManager unzipFileFromPath:download.filename desPath:[[PTPPLocalFileManager getRootFolderPathForStaitcStickers] stringByAppendingPathComponent:[[download.filename lastPathComponent] stringByDeletingPathExtension]]];
     [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
-    [PTPPLocalFileManager updateDownloadedStaticStickerListWithPackageID:self.packageID fileName:[download.filename lastPathComponent]];
+    [PTPPLocalFileManager writePropertyListTo:StaticStickerPlistFile WithPackageID:self.packageID fileName:[download.filename lastPathComponent] themeName:self.stickerDetailItem.packageName fileSize:self.stickerDetailItem.packageSize totalNum:self.stickerDetailItem.totalNum coverPic:self.stickerDetailItem.coverPic];
     [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForCache]];
     [self.collectionView reloadData];
 }

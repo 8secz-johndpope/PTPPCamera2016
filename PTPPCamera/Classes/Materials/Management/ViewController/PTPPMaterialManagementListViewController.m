@@ -8,10 +8,14 @@
 
 #import "PTPPMaterialManagementListViewController.h"
 #import "PTPPMaterialManagementEditViewController.h"
+#import "PTPPLocalFileManager.h"
 #import "PTMacro.h"
 
 @interface PTPPMaterialManagementListViewController () <UITableViewDelegate, UITableViewDataSource>
 @property (nonatomic, strong) UITableView *tableView;
+@property (nonatomic, strong) NSArray *staticStickerArray;
+@property (nonatomic, strong) NSArray *ARStickerArray;
+@property (nonatomic, strong) NSArray *jigsawTemplateArray;
 @end
 
 @implementation PTPPMaterialManagementListViewController
@@ -29,6 +33,14 @@
     [self showLeftItemWithImage:[UIImage imageNamed:@"back_white"] selector:@selector(goBack) animation:YES];
 
     [self.view addSubview:self.tableView];
+}
+
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    self.staticStickerArray = nil;
+    self.ARStickerArray = nil;
+    self.jigsawTemplateArray = nil;
+    [self.tableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -53,18 +65,24 @@
     NSString *cellID = @"cellID";
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellID];
     switch (indexPath.row) {
-        case 0:
+        case 0:{
             cell.textLabel.text = @"贴纸";
-            cell.detailTextLabel.text = @"2套(共2.4 MB)";
+            NSString *folderSize = [PTPPLocalFileManager folderSize:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+            cell.detailTextLabel.text = [NSString stringWithFormat:@"%lu套(共%@)",(unsigned long)self.staticStickerArray.count,folderSize];
             break;
-        case 1:
+        }
+        case 1:{
             cell.textLabel.text = @"动态贴图";
-            cell.detailTextLabel.text = @"2张(共2.4 MB)";
+            NSString *folderSize = [PTPPLocalFileManager folderSize:[PTPPLocalFileManager getRootFolderPathForARStickers]];
+            cell.detailTextLabel.text = [NSString stringWithFormat:@"%lu张(共%@)",(unsigned long)self.ARStickerArray.count,folderSize];
             break;
-        case 2:
+        }
+        case 2:{
             cell.textLabel.text = @"拼图模版";
-            cell.detailTextLabel.text = @"2张(共2.4 MB)";
+            NSString *folderSize = [PTPPLocalFileManager folderSize:[PTPPLocalFileManager getRootFolderPathForJigsawTemplate]];
+            cell.detailTextLabel.text = [NSString stringWithFormat:@"%lu张(共%@)",(unsigned long)self.jigsawTemplateArray.count,folderSize];
             break;
+        }
         default:
             break;
     }
@@ -74,12 +92,33 @@
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     UIView *splitter = [[UIView alloc] initWithFrame:CGRectMake(20, 60, Screenwidth, 0.5)];
     splitter.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.1];
-    [cell.contentView addSubview:splitter];
+    [cell addSubview:splitter];
     return cell;
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    NSInteger count;
+    switch (indexPath.row) {
+        case 0:{
+            count = self.staticStickerArray.count;
+            break;
+        }
+        case 1:{
+            count = self.ARStickerArray.count;
+            break;
+        }
+        case 2:{
+            count = self.jigsawTemplateArray.count;
+            break;
+        }
+        default:
+            break;
+    }
+    if (count == 0) {
+        return;
+    }
+    
     PTPPMaterialManagementEditViewController *libraryManagementVC = [[PTPPMaterialManagementEditViewController alloc] init];
     libraryManagementVC.activeSection = indexPath.row;
     [self.navigationController pushViewController:libraryManagementVC animated:YES];
@@ -102,6 +141,27 @@
         _tableView.dataSource = self;
     }
     return _tableView;
+}
+
+-(NSArray *)staticStickerArray{
+    if (!_staticStickerArray) {
+        _staticStickerArray = [PTPPLocalFileManager getListOfFilePathAtDirectory:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+    }
+    return _staticStickerArray;
+}
+
+-(NSArray *)ARStickerArray{
+    if (!_ARStickerArray) {
+        _ARStickerArray = [PTPPLocalFileManager getListOfFilePathAtDirectory:[PTPPLocalFileManager getRootFolderPathForARStickers]];
+    }
+    return _ARStickerArray;
+}
+
+-(NSArray *)jigsawTemplateArray{
+    if (!_jigsawTemplateArray) {
+        _jigsawTemplateArray = [PTPPLocalFileManager getListOfFilePathAtDirectory:[PTPPLocalFileManager getRootFolderPathForJigsawTemplate]];
+    }
+    return _jigsawTemplateArray;
 }
 
 @end

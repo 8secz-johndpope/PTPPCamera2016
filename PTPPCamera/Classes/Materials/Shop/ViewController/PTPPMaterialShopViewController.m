@@ -99,6 +99,7 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidFinishLoading:) name:kDownloadDidFinishLoading object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidReceiveData:) name:kDownloadDidReceiveData object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidFail:) name:kDownloadDidFail object:nil];
+    [self.collectionView reloadData];
 }
 
 -(void)viewWillDisappear:(BOOL)animated{
@@ -121,17 +122,17 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
         case 0:
             desPath = [PTPPLocalFileManager getRootFolderPathForStaitcStickers] ;
             [PTPPLocalFileManager unzipFileFromPath:download.filename desPath:[desPath stringByAppendingPathComponent:[[download.filename lastPathComponent] stringByDeletingPathExtension]]];
-            [PTPPLocalFileManager updateDownloadedStaticStickerListWithPackageID:download.packageID fileName:[download.filename lastPathComponent]];
+            [PTPPLocalFileManager writePropertyListTo:StaticStickerPlistFile WithPackageID:download.package.packageID fileName:[download.filename lastPathComponent] themeName:download.package.packageName fileSize:download.package.packageSize totalNum:download.package.totalNum coverPic:download.package.coverPic];
             break;
         case 1:
             desPath = [PTPPLocalFileManager getRootFolderPathForARStickers] ;
             [PTPPLocalFileManager unzipFileFromPath:download.filename desPath:[desPath stringByAppendingPathComponent:[[download.filename lastPathComponent] stringByDeletingPathExtension]]];
-            [PTPPLocalFileManager updateDownloadedARStickerListWithPackageID:download.packageID fileName:[download.filename lastPathComponent]];
+            [PTPPLocalFileManager writePropertyListTo:ARStickerPlistFile WithPackageID:download.package.packageID fileName:[download.filename lastPathComponent] themeName:download.package.packageName fileSize:download.package.packageSize totalNum:download.package.totalNum coverPic:download.package.coverPic];
             break;
         case 2:
             desPath = [PTPPLocalFileManager getRootFolderPathForJigsawTemplate] ;
             [PTPPLocalFileManager unzipFileFromPath:download.filename desPath:[desPath stringByAppendingPathComponent:[[download.filename lastPathComponent] stringByDeletingPathExtension]]];
-            [PTPPLocalFileManager updateDownloadedJigsawTemplateListWithPackageID:download.packageID fileName:[download.filename lastPathComponent]];
+            [PTPPLocalFileManager writePropertyListTo:JigsawTemplatePlistFile WithPackageID:download.package.packageID fileName:[download.filename lastPathComponent] themeName:download.package.packageName fileSize:download.package.packageSize totalNum:download.package.totalNum coverPic:download.package.coverPic];
             break;
             
         default:
@@ -228,8 +229,8 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     [self.jigsawTemplateModel loadDataAtPageIndex:self.jigsawTemplateModel.pageIndex];
 }
 
--(void)downloadMaterialFromSourceURL:(NSString *)sourceURL saveAtDestPath:(NSString *)destPathURL packageID:(NSString *)packageID {
-    [[DownloadManager shareManager] addDownloadWithFilename:destPathURL URL:[NSURL URLWithString:sourceURL] packageID:packageID];
+-(void)downloadMaterialFromSourceURL:(NSString *)sourceURL saveAtDestPath:(NSString *)destPathURL package:(PTPPMaterialShopStickerItem *)package {
+    [[DownloadManager shareManager] addDownloadWithFilename:destPathURL URL:[NSURL URLWithString:sourceURL] package:package];
     [self.collectionView reloadData];
 }
 
@@ -282,11 +283,13 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
             PTPPMaterialDownloadStatus downloadStatus;
             if (downloaded) {
                 downloadStatus = PTPPMaterialDownloadStatusFinished;
+                staticStickerItem.isDownloading = NO;
             }else{
                 if (staticStickerItem.isDownloading) {
                     downloadStatus = PTPPMaterialDownloadStatusInProgress;
                 }else{
                     downloadStatus = PTPPMaterialDownloadStatusReady;
+                    staticStickerItem.isDownloading = NO;
                 }
             }
             if (indexPath.row == self.staticStickerArray.count) {
@@ -300,7 +303,7 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
                 [((PTPPMaterialShopStickerItemCell *)cell) setAttributeWithImageURL:staticStickerItem.coverPic stickerName:staticStickerItem.packageName stickerCount:staticStickerItem.totalNum binarySize:staticStickerItem.packageSize downloadStatus:downloadStatus isNew:staticStickerItem.isNew];
                 ((PTPPMaterialShopStickerItemCell *)cell).downloadAction = ^{
                     staticStickerItem.isDownloading = YES;
-                    [weakSelf downloadMaterialFromSourceURL:urlString saveAtDestPath:downloadFilename packageID:staticStickerItem.packageID];
+                    [weakSelf downloadMaterialFromSourceURL:urlString saveAtDestPath:downloadFilename package:staticStickerItem];
                 };
             }
             break;
@@ -316,11 +319,13 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
             PTPPMaterialDownloadStatus downloadStatus;
             if (downloaded) {
                 downloadStatus = PTPPMaterialDownloadStatusFinished;
+                ARStickerItem.isDownloading = NO;
             }else{
                 if (ARStickerItem.isDownloading) {
                     downloadStatus = PTPPMaterialDownloadStatusInProgress;
                 }else{
                     downloadStatus = PTPPMaterialDownloadStatusReady;
+                    ARStickerItem.isDownloading = NO;
                 }
             }
             if (indexPath.row == self.ARStickerArray.count) {
@@ -334,7 +339,7 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
                 [((PTPPMaterialShopARStickerItemCell *)cell) setAttributeWithImageURL:ARStickerItem.coverPic downloadStatus:downloadStatus isNew:ARStickerItem.isNew];
                 ((PTPPMaterialShopStickerItemCell *)cell).downloadAction = ^{
                     ARStickerItem.isDownloading = YES;
-                    [weakSelf downloadMaterialFromSourceURL:urlString saveAtDestPath:downloadFilename packageID:ARStickerItem.packageID];
+                    [weakSelf downloadMaterialFromSourceURL:urlString saveAtDestPath:downloadFilename package:ARStickerItem];
                 };
             }
             break;
@@ -350,11 +355,13 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
             PTPPMaterialDownloadStatus downloadStatus;
             if (downloaded) {
                 downloadStatus = PTPPMaterialDownloadStatusFinished;
+                jigsawTemplateItem.isDownloading = NO;
             }else{
                 if (jigsawTemplateItem.isDownloading) {
                     downloadStatus = PTPPMaterialDownloadStatusInProgress;
                 }else{
                     downloadStatus = PTPPMaterialDownloadStatusReady;
+                    jigsawTemplateItem.isDownloading = NO;
                 }
             }
             if (indexPath.row == self.jigsawTemplateArray.count) {
@@ -368,7 +375,7 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
                 [((PTPPMaterialShopJigsawItemCell *)cell) setAttributeWithImageURL:jigsawTemplateItem.coverPic downloadStatus:downloadStatus isNew:jigsawTemplateItem.isNew];
                 ((PTPPMaterialShopStickerItemCell *)cell).downloadAction = ^{
                     jigsawTemplateItem.isDownloading = YES;
-                    [weakSelf downloadMaterialFromSourceURL:urlString saveAtDestPath:downloadFilename packageID:jigsawTemplateItem.packageID];
+                    [weakSelf downloadMaterialFromSourceURL:urlString saveAtDestPath:downloadFilename package:jigsawTemplateItem];
                 };
             }
             break;
@@ -493,14 +500,6 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
         _sliderView.delegate = self;
     }
     return _sliderView;
-}
-
--(PTPPMaterialManagementBottomView *)bottomView{
-    if (!_bottomView) {
-        _bottomView = [[PTPPMaterialManagementBottomView alloc] initWithFrame:CGRectMake(0, Screenheight-HEIGHT_NAV-HEIGHT_NAV, Screenwidth, HEIGHT_NAV)];
-        _bottomView.viewDelegate = self;
-    }
-    return _bottomView;
 }
 
 -(UICollectionViewFlowLayout *)layout{
