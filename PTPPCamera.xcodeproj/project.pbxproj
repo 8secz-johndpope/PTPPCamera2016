@@ -14,6 +14,8 @@
 		C60FD1731C732ABD00F5886B /* UIImage+PECrop.m in Sources */ = {isa = PBXBuildFile; fileRef = C60FD16E1C732ABD00F5886B /* UIImage+PECrop.m */; };
 		C630EA8B1C7FEC8900C6515C /* PTPPImageUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = C630EA8A1C7FEC8900C6515C /* PTPPImageUtil.m */; };
 		C630EA8E1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.m in Sources */ = {isa = PBXBuildFile; fileRef = C630EA8D1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.m */; };
+		C630EA951C80533F00C6515C /* PTPPJigsawTemplateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C630EA941C80533F00C6515C /* PTPPJigsawTemplateViewController.m */; };
+		C630EA981C805ABB00C6515C /* PTPPJigsawTemplateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C630EA971C805ABB00C6515C /* PTPPJigsawTemplateModel.m */; };
 		C6433C1C1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */; };
 		C6433C1F1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1E1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m */; };
 		C6433C221C72F40300AF82AD /* PTFilterManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C211C72F40300AF82AD /* PTFilterManager.m */; };
@@ -949,6 +951,10 @@
 		C630EA8A1C7FEC8900C6515C /* PTPPImageUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPImageUtil.m; sourceTree = "<group>"; };
 		C630EA8C1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ELCImageSelectionBottomPreview.h; sourceTree = "<group>"; };
 		C630EA8D1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ELCImageSelectionBottomPreview.m; sourceTree = "<group>"; };
+		C630EA931C80533F00C6515C /* PTPPJigsawTemplateViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPJigsawTemplateViewController.h; sourceTree = "<group>"; };
+		C630EA941C80533F00C6515C /* PTPPJigsawTemplateViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPJigsawTemplateViewController.m; sourceTree = "<group>"; };
+		C630EA961C805ABB00C6515C /* PTPPJigsawTemplateModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPJigsawTemplateModel.h; sourceTree = "<group>"; };
+		C630EA971C805ABB00C6515C /* PTPPJigsawTemplateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPJigsawTemplateModel.m; sourceTree = "<group>"; };
 		C6433C1A1C72BFC900AF82AD /* PTPPStaticImageEditViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPStaticImageEditViewController.h; sourceTree = "<group>"; };
 		C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPStaticImageEditViewController.m; sourceTree = "<group>"; };
 		C6433C1D1C72C66D00AF82AD /* PTPPStaticImageEditToolBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPStaticImageEditToolBar.h; sourceTree = "<group>"; };
@@ -2370,6 +2376,41 @@
 				C60FD16E1C732ABD00F5886B /* UIImage+PECrop.m */,
 			);
 			path = PEPhotoCropEditor;
+			sourceTree = "<group>";
+		};
+		C630EA8F1C80532800C6515C /* JigsawTemplate */ = {
+			isa = PBXGroup;
+			children = (
+				C630EA901C80532800C6515C /* Model */,
+				C630EA911C80532800C6515C /* View */,
+				C630EA921C80532800C6515C /* ViewController */,
+			);
+			path = JigsawTemplate;
+			sourceTree = "<group>";
+		};
+		C630EA901C80532800C6515C /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				C630EA961C805ABB00C6515C /* PTPPJigsawTemplateModel.h */,
+				C630EA971C805ABB00C6515C /* PTPPJigsawTemplateModel.m */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		C630EA911C80532800C6515C /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		C630EA921C80532800C6515C /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				C630EA931C80533F00C6515C /* PTPPJigsawTemplateViewController.h */,
+				C630EA941C80533F00C6515C /* PTPPJigsawTemplateViewController.m */,
+			);
+			path = ViewController;
 			sourceTree = "<group>";
 		};
 		C6433C161C72BF6100AF82AD /* PhotoEdit */ = {
@@ -4357,6 +4398,7 @@
 		C647C8831C71C40200E596EA /* Camera */ = {
 			isa = PBXGroup;
 			children = (
+				C630EA8F1C80532800C6515C /* JigsawTemplate */,
 				C6433C161C72BF6100AF82AD /* PhotoEdit */,
 				C647C8841C71C40200E596EA /* LiveCapture */,
 			);
@@ -5302,6 +5344,7 @@
 				C647BBE61C7181BE00E596EA /* NSData+Additions.m in Sources */,
 				C647BFA11C71BBBB00E596EA /* GPUImageHazeFilter.m in Sources */,
 				C647C0091C71BBBB00E596EA /* GPUImageVignetteFilter.m in Sources */,
+				C630EA951C80533F00C6515C /* PTPPJigsawTemplateViewController.m in Sources */,
 				C647BBED1C7181BE00E596EA /* UIButton+SOButton.m in Sources */,
 				C6681E4C1C7BF39D009BC942 /* PTPPMaterialShopViewController.m in Sources */,
 				C6681E671C7C32D4009BC942 /* PTPPStaticStickersScrollView.m in Sources */,
@@ -5384,6 +5427,7 @@
 				C647BD0A1C718C4B00E596EA /* PTMJHeader.m in Sources */,
 				C647C0071C71BBBB00E596EA /* GPUImageVideoCamera.m in Sources */,
 				C647BF701C71BBBB00E596EA /* GPUImageBulgeDistortionFilter.m in Sources */,
+				C630EA981C805ABB00C6515C /* PTPPJigsawTemplateModel.m in Sources */,
 				C6433C1F1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m in Sources */,
 				C647BC051C7181BE00E596EA /* SOBaseLabel.m in Sources */,
 				C647BBF81C7181BE00E596EA /* SOGlobal.m in Sources */,

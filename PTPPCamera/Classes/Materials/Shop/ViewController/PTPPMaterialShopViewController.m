@@ -11,6 +11,7 @@
 #import "PTPPMaterialShopViewController.h"
 #import "PTPPMaterialManagementListViewController.h"
 #import "PTPPMaterialStickerDetailViewController.h"
+#import "PTPPJigsawTemplateViewController.h"
 #import "PTMaterialShopLoadingCell.h"
 #import "PTPPMaterialShopStickerItemCell.h"
 #import "PTPPMaterialShopARStickerItemCell.h"
@@ -296,6 +297,9 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     if (self.chosenImages.count>0) {
         if (self.proceedToImageEdit) {
             //Go to jigsaw template
+            PTPPJigsawTemplateViewController *jigsawTemplateVC = [[PTPPJigsawTemplateViewController alloc] init];
+            jigsawTemplateVC.images = self.chosenImages;
+            [self.navigationController pushViewController:jigsawTemplateVC animated:YES];
         }
     }
 }

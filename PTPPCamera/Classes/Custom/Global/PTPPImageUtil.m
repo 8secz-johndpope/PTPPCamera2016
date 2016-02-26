@@ -11,6 +11,7 @@
 #import "PTPPImageUtil.h"
 #import "PTFilterManager.h"
 
+
 @implementation PTPPImageUtil
 
 + (UIImage *)croppIngimageByImageName:(UIImage *)imageToCrop toRect:(CGRect)rect
@@ -128,5 +129,76 @@
                                  orientation:imageOrientation];
     return img;
 }
+
++ (UIImage *)image:(UIImage *)image rotatedByDegrees:(CGFloat)degrees
+{
+    // calculate the size of the rotated view's containing box for our drawing space
+    UIView *rotatedViewBox = [[UIView alloc] initWithFrame:CGRectMake(0,0,image.size.width, image.size.height)];
+    CGAffineTransform t = CGAffineTransformMakeRotation(DegreesToRadians(degrees));
+    rotatedViewBox.transform = t;
+    CGSize rotatedSize = rotatedViewBox.frame.size;
+    CGFloat ratio = rotatedSize.height/rotatedSize.width;
+    NSInteger factorOf16 = rotatedSize.width/2;
+    NSInteger newWidth = factorOf16*2;
+    NSInteger newHeight = newWidth*ratio;
+    rotatedSize = CGSizeMake(newWidth, newHeight);
+    // Create the bitmap context
+    UIGraphicsBeginImageContext(rotatedSize);
+    CGContextRef bitmap = UIGraphicsGetCurrentContext();
+    
+    // Move the origin to the middle of the image so we will rotate and scale around the center.
+    CGContextTranslateCTM(bitmap, rotatedSize.width/2, rotatedSize.height/2);
+    
+    //   // Rotate the image context
+    CGContextRotateCTM(bitmap, DegreesToRadians(degrees));
+    
+    // Now, draw the rotated/scaled image into the context
+    CGContextScaleCTM(bitmap, 1.0, -1.0);
+    CGContextDrawImage(bitmap, CGRectMake(-image.size.width / 2, -image.size.height / 2, image.size.width, image.size.height), [image CGImage]);
+    
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+    
+}
+
++ (UIImage *)image:(UIImage *)image flip:(NSInteger)flipDirection{
+    
+    CGImageRef inImage = image.CGImage;
+    CGContextRef ctx = CGBitmapContextCreate(NULL,
+                                             CGImageGetWidth(inImage),
+                                             CGImageGetHeight(inImage),
+                                             CGImageGetBitsPerComponent(inImage),
+                                             CGImageGetBytesPerRow(inImage),
+                                             CGImageGetColorSpace(inImage),
+                                             CGImageGetBitmapInfo(inImage)
+                                             );
+    CGRect cropRect = CGRectMake(0, 0, image.size.width, image.size.height);
+    CGImageRef TheOtherHalf = CGImageCreateWithImageInRect(image.CGImage, cropRect);
+    CGContextDrawImage(ctx, CGRectMake(0, 0, CGImageGetWidth(inImage), CGImageGetHeight(inImage)), inImage);
+    
+    if (flipDirection == 0) {
+        // Horizontal flip
+        CGAffineTransform transform = CGAffineTransformMakeTranslation(image.size.width, 0.0);
+        transform = CGAffineTransformScale(transform, -1.0, 1.0);
+        CGContextConcatCTM(ctx, transform);
+    }else{
+        // Vertical flip
+        CGAffineTransform transform = CGAffineTransformMakeTranslation(0.0, image.size.height);
+        transform = CGAffineTransformScale(transform, 1.0, -1.0);
+        CGContextConcatCTM(ctx, transform);
+    }
+    
+    
+    CGContextDrawImage(ctx, cropRect, TheOtherHalf);
+    
+    CGImageRef imageRef = CGBitmapContextCreateImage(ctx);
+    CGContextRelease(ctx);
+    UIImage *finalImage = [UIImage imageWithCGImage:imageRef];
+    CGImageRelease(imageRef);
+    
+    return finalImage;
+}
+
 
 @end

@@ -16,7 +16,7 @@
 #import "PECropView.h"
 #import "PTPPLocalFileManager.h"
 #import "WaterMarkView.h"
-
+#import "PTPPImageUtil.h"
 #define kFilterScrollHeight 150
 #define kCropScrollHeight 120
 
@@ -41,7 +41,7 @@
 @property (nonatomic, assign) BOOL isRotating;
 @end
 
-static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
+
 @implementation PTPPStaticImageEditViewController
 
 #pragma mark - Life Cycles
@@ -211,7 +211,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     animateImageView.frame = self.basePhotoView.bounds;
     [self.basePhotoView addSubview:animateImageView];
     self.basePhotoView.image = nil;
-    self.basePhoto = [self image:self.basePhoto rotatedByDegrees:degrees];
+    self.basePhoto = [PTPPImageUtil image:self.basePhoto rotatedByDegrees:degrees];
     [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
           initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseIn  animations:^(){
               
@@ -232,7 +232,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     animateImageView.frame = self.basePhotoView.bounds;
     [self.basePhotoView addSubview:animateImageView];
     self.basePhotoView.image = nil;
-    self.basePhoto = [self image:image flip:direction];
+    self.basePhoto = [PTPPImageUtil image:image flip:direction];
     CATransform3D t;
     if (direction == 0) {
         t = CATransform3DMakeRotation(M_PI, 0.0, 1.0, 0.0);
@@ -252,75 +252,6 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 }
 
 
-- (UIImage *)image:(UIImage *)image rotatedByDegrees:(CGFloat)degrees
-{
-    // calculate the size of the rotated view's containing box for our drawing space
-    UIView *rotatedViewBox = [[UIView alloc] initWithFrame:CGRectMake(0,0,image.size.width, image.size.height)];
-    CGAffineTransform t = CGAffineTransformMakeRotation(DegreesToRadians(degrees));
-    rotatedViewBox.transform = t;
-    CGSize rotatedSize = rotatedViewBox.frame.size;
-    CGFloat ratio = rotatedSize.height/rotatedSize.width;
-    NSInteger factorOf16 = rotatedSize.width/2;
-    NSInteger newWidth = factorOf16*2;
-    NSInteger newHeight = newWidth*ratio;
-    rotatedSize = CGSizeMake(newWidth, newHeight);
-    // Create the bitmap context
-    UIGraphicsBeginImageContext(rotatedSize);
-    CGContextRef bitmap = UIGraphicsGetCurrentContext();
-    
-    // Move the origin to the middle of the image so we will rotate and scale around the center.
-    CGContextTranslateCTM(bitmap, rotatedSize.width/2, rotatedSize.height/2);
-    
-    //   // Rotate the image context
-    CGContextRotateCTM(bitmap, DegreesToRadians(degrees));
-    
-    // Now, draw the rotated/scaled image into the context
-    CGContextScaleCTM(bitmap, 1.0, -1.0);
-    CGContextDrawImage(bitmap, CGRectMake(-image.size.width / 2, -image.size.height / 2, image.size.width, image.size.height), [image CGImage]);
-    
-    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return newImage;
-    
-}
-
--(UIImage *)image:(UIImage *)image flip:(NSInteger)flipDirection{
-    
-    CGImageRef inImage = image.CGImage;
-    CGContextRef ctx = CGBitmapContextCreate(NULL,
-                                             CGImageGetWidth(inImage),
-                                             CGImageGetHeight(inImage),
-                                             CGImageGetBitsPerComponent(inImage),
-                                             CGImageGetBytesPerRow(inImage),
-                                             CGImageGetColorSpace(inImage),
-                                             CGImageGetBitmapInfo(inImage)
-                                             );
-    CGRect cropRect = CGRectMake(0, 0, image.size.width, image.size.height);
-    CGImageRef TheOtherHalf = CGImageCreateWithImageInRect(image.CGImage, cropRect);
-    CGContextDrawImage(ctx, CGRectMake(0, 0, CGImageGetWidth(inImage), CGImageGetHeight(inImage)), inImage);
-    
-    if (flipDirection == 0) {
-        // Horizontal flip
-        CGAffineTransform transform = CGAffineTransformMakeTranslation(image.size.width, 0.0);
-        transform = CGAffineTransformScale(transform, -1.0, 1.0);
-        CGContextConcatCTM(ctx, transform);
-    }else{
-        // Vertical flip
-        CGAffineTransform transform = CGAffineTransformMakeTranslation(0.0, image.size.height);
-        transform = CGAffineTransformScale(transform, 1.0, -1.0);
-        CGContextConcatCTM(ctx, transform);
-    }
-    
-    
-    CGContextDrawImage(ctx, cropRect, TheOtherHalf);
-    
-    CGImageRef imageRef = CGBitmapContextCreateImage(ctx);
-    CGContextRelease(ctx);
-    UIImage *finalImage = [UIImage imageWithCGImage:imageRef];
-    CGImageRelease(imageRef);
-    
-    return finalImage;
-}
 
 -(void)displayToolBar:(BOOL)state basePhotoViewHeight:(CGFloat)height{
     if (state) {

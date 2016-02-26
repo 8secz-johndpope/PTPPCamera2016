@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "AssetHelper.h"
 
+static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 @interface PTPPImageUtil : NSObject
 + (UIImage *)croppIngimageByImageName:(UIImage *)imageToCrop toRect:(CGRect)rect;
 + (CGFloat) pointPairToBearingDegrees:(CGPoint)startingPoint secondPoint:(CGPoint) endingPoint;
@@ -16,6 +17,7 @@
 + (NSDictionary *)getFilterResultFromInputImage:(UIImage *)inputImage filterIndex:(NSInteger)index;
 + (UIImage *)getThumbnailFromALAsset:(ALAsset *)asset;
 + (UIImage *)getOriginalImageFromALAsset:(ALAsset *)asset;
-
++ (UIImage *)image:(UIImage *)image rotatedByDegrees:(CGFloat)degrees;
++ (UIImage *)image:(UIImage *)image flip:(NSInteger)flipDirection;
 + (BOOL)checkCameraCanUse;
 @end
