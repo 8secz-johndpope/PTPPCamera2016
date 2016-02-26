@@ -294,7 +294,9 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     
     self.chosenImages = images;
     if (self.chosenImages.count>0) {
-   
+        if (self.proceedToImageEdit) {
+            //Go to jigsaw template
+        }
     }
 }
 

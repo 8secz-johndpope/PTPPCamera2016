@@ -154,6 +154,9 @@
     [self.parent selectedAssets:selectedAssetsImages];
 }
 
+-(void)toggleNextWithSelectedAssets:(NSArray *)selectedAssets{
+    [self.parent selectedAssets:selectedAssets];
+}
 
 - (BOOL)shouldSelectAsset:(ELCAsset *)asset
 {
@@ -179,7 +182,7 @@
         }
     }else{
         //NSLog(@"Asset Selected:%@",asset.asset);
-        [self.bottomPreview addPhotoAsset:asset.asset];
+        [self.bottomPreview addPhotoAsset:asset];
     }
     if (self.immediateReturn) {
         NSArray *singleAssetArray = @[asset];
@@ -312,6 +315,10 @@
 -(ELCImageSelectionBottomPreview *)bottomPreview{
     if (!_bottomPreview) {
         _bottomPreview = [[ELCImageSelectionBottomPreview alloc] initWithFrame:CGRectMake(0, Screenheight - kBottomHeight, Screenwidth, self.tableView.contentInset.bottom)];
+        __weak typeof(self) weakSelf = self;
+        _bottomPreview.finishSelection = ^(NSArray *selectedAssets){
+            [weakSelf toggleNextWithSelectedAssets:selectedAssets];
+        };
     }
     return _bottomPreview;
 }

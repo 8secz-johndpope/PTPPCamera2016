@@ -6,6 +6,8 @@
 //  Copyright © 2016 Putao. All rights reserved.
 //
 
+
+
 #import "ELCImageSelectionBottomPreview.h"
 #import "PTPPImageUtil.h"
 #define kScrollViewPadding 10
@@ -16,9 +18,10 @@
 @property (nonatomic, strong) UILabel *selectionCount;
 @property (nonatomic, strong) UILabel *nextLabel;
 @property (nonatomic, strong) UIScrollView *scrollView;
-@property (nonatomic, strong) NSMutableArray <ALAsset *>*assetArray;
+@property (nonatomic, strong) NSMutableArray <ELCAsset *>*assetArray;
 @property (nonatomic, strong) NSMutableArray *thumbnailArray;
 @property (nonatomic, assign) NSInteger currentCount;
+@property (nonatomic, assign) NSInteger maxCount;
 @end
 
 @implementation ELCImageSelectionBottomPreview
@@ -29,7 +32,7 @@
         self.backgroundColor = [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1.0];
         [self addSubview:self.topBar];
         [self.topBar addSubview:self.topTitle];
-        [self.topBar addSubview:self.nextButton];
+        [self addSubview:self.nextButton];
         [self.nextButton addSubview:self.selectionCount];
         [self.nextButton addSubview:self.nextLabel];
         self.currentCount = self.assetArray.count;
@@ -40,14 +43,19 @@
 
 -(void)setAttributeWithMaxCount:(NSInteger)maxCount{
     self.topTitle.text = [NSString stringWithFormat:@"请选择1-%ld张照片进行拼图",(long)maxCount];
+    self.maxCount  = maxCount;
     [self setNeedsLayout];
 }
 
--(void)addPhotoAsset:(ALAsset *)asset{
+-(void)addPhotoAsset:(ELCAsset *)asset{
+    if (self.currentCount == self.maxCount) {
+        [SVProgressHUD showErrorWithStatus:[NSString stringWithFormat:@"最多只能选择%ld张照片",(long)self.maxCount] duration:1.0];
+        return;
+    }
     [self.assetArray addObject:asset];
     CGSize thumbnailSize = CGSizeMake(self.scrollView.height-kScrollViewPadding*2, self.scrollView.height-kScrollViewPadding*2);
     UIButton *thumbnailButton = [[UIButton alloc] initWithFrame:CGRectMake(kScrollViewPadding*(self.thumbnailArray.count+1)+thumbnailSize.width*self.thumbnailArray.count, kScrollViewPadding, thumbnailSize.width, thumbnailSize.height)];
-    [thumbnailButton setImage:[PTPPImageUtil getThumbnailFromALAsset:asset] forState:UIControlStateNormal];
+    [thumbnailButton setImage:[PTPPImageUtil getThumbnailFromALAsset:asset.asset] forState:UIControlStateNormal];
     UIImageView *deleteIcon = [[UIImageView alloc] initWithFrame:CGRectMake(thumbnailSize.width-20, 0, 20, 20)];
     deleteIcon.image = [UIImage imageNamed:@"icon_20_27"];
     thumbnailButton.tag = self.thumbnailArray.count;
@@ -113,11 +121,16 @@
     for(UIButton *button in self.thumbnailArray){
         button.frame = CGRectMake(kScrollViewPadding*(index+1)+button.width*index, kScrollViewPadding, button.width, button.height);
         button.tag = index;
-        [button setImage:[PTPPImageUtil getThumbnailFromALAsset:[self.assetArray safeObjectAtIndex:index]] forState:UIControlStateNormal];
-        
         index++;
     }
+    self.currentCount = self.assetArray.count;
     NSLog(@"%@",self.assetArray);
+}
+
+-(void)toggleNext{
+    if (self.finishSelection) {
+        self.finishSelection(self.assetArray);
+    }
 }
 
 -(void)layoutSubviews{
@@ -155,6 +168,7 @@
     if (!_nextButton) {
         _nextButton = [[UIButton alloc] initWithFrame:CGRectMake(self.width-Screenwidth/4, 0, Screenwidth/4, HEIGHT_NAV)];
         _nextButton.backgroundColor = THEME_COLOR;
+        [_nextButton addTarget:self action:@selector(toggleNext) forControlEvents:UIControlEventTouchUpInside];
     }
     return _nextButton;
 }
@@ -168,6 +182,7 @@
         _selectionCount.textColor = THEME_COLOR;
         _selectionCount.layer.cornerRadius = 4;
         _selectionCount.layer.masksToBounds = YES;
+        _selectionCount.userInteractionEnabled = NO;
     }
     return _selectionCount;
 }
@@ -177,6 +192,7 @@
         _nextLabel = [[UILabel alloc] init];
         _nextLabel.text = @"下一步";
         _nextLabel.textColor = [UIColor whiteColor];
+        _nextLabel.userInteractionEnabled = NO;
     }
     return _nextLabel;
 }
