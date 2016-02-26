@@ -31,6 +31,7 @@
 	[self.navigationItem setTitle:NSLocalizedString(@"载入中", nil)];
 
     UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self.parent action:@selector(cancelImagePicker)];
+    [cancelButton setTintColor:[UIColor whiteColor]];
 	[self.navigationItem setRightBarButtonItem:cancelButton];
 
     NSMutableArray *tempArray = [[NSMutableArray alloc] init];
@@ -94,6 +95,8 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     
+    [self.navigationController.navigationBar setBarTintColor:THEME_COLOR];
+    [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTableView) name:ALAssetsLibraryChangedNotification object:nil];
     [self.tableView reloadData];
 }

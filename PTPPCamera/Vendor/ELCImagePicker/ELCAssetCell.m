@@ -69,7 +69,7 @@
             overlayView.labIndex.text = [NSString stringWithFormat:@"%@", @(asset.index + 1)];
         } else {
             if (overlayImage == nil) {
-                overlayImage = [UIImage imageNamed:@"overlay.png"];
+                //overlayImage = [UIImage imageNamed:@"overlay.png"];
             }
             ELCOverlayImageView *overlayView = [[ELCOverlayImageView alloc] initWithImage:overlayImage];
             overlayView.frame = CGRectMake(0, 0, (Screenwidth-2*5)/4, (Screenwidth-2*5)/4);

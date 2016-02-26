@@ -27,7 +27,14 @@
 }
 
 -(void)preloading{
-    [PTPPLocalFileManager unzipAllFilesForARStickers:@[@"hz",@"cn", @"mhl", @"xm", @"fd", @"kq", @"xhx",@"hy"]];
+    BOOL stickersPreinstalled = [[NSUserDefaults standardUserDefaults] boolForKey:@"stickersPreinstalled"];
+    if (!stickersPreinstalled) {
+        BOOL installedSuccessful = [PTPPLocalFileManager unzipAllFilesForARStickers:@[@"hz",@"cn", @"mhl", @"xm", @"fd", @"kq", @"xhx",@"hy"]];
+        if (installedSuccessful) {
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"stickersPreinstalled"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+    }
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {

@@ -6,6 +6,7 @@
 //  Copyright © 2016 putao. All rights reserved.
 //
 
+#import "ELCImagePickerHeader.h"
 #import "PTPPLocalFileManager.h"
 #import "PTPPMaterialShopViewController.h"
 #import "PTPPMaterialManagementListViewController.h"
@@ -25,7 +26,7 @@
 #define kCollectionViewEdgePadding 10
 #define kCellSpacing 5
 
-@interface PTPPMaterialShopViewController () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, PTCustomMenuSliderViewDelegate, SOModelDelegate>
+@interface PTPPMaterialShopViewController () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, PTCustomMenuSliderViewDelegate, SOModelDelegate,ELCImagePickerControllerDelegate>
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UICollectionViewFlowLayout *layout;
 @property (nonatomic, strong) PTCustomMenuSliderView *sliderView;
@@ -41,6 +42,7 @@
 @property (nonatomic, strong) PTPPMaterialShopJigsawTemplateModel *jigsawTemplateModel;
 @property (nonatomic, strong) NSMutableArray <PTPPMaterialShopStickerItem*>*jigsawTemplateArray;
 
+@property (nonatomic, copy) NSArray *chosenImages;
 @property (nonatomic, assign) BOOL loadingStaticSticker;
 @property (nonatomic, assign) BOOL loadingARSticker;
 @property (nonatomic, assign) BOOL loadingJigsawTemplate;
@@ -83,15 +85,25 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     self.view.backgroundColor = UIColorFromRGB(0xeeeeee);
     [self.navigationController setNavigationBarHidden:NO];
     [self.navigationController.navigationBar setBarTintColor:UIColorFromRGB(0xff5a5d)];
-    [self setTitle:@"素材中心" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:18] selector:nil];
-    [self showRightItemWithText:@"素材管理" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(toggleMaterialManagement) animation:NO];
+    if (self.proceedToImageEdit) {
+        [self setTitle:@"选择模版" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:18] selector:nil];
+    }else{
+        [self setTitle:@"素材中心" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:18] selector:nil];
+        [self showRightItemWithText:@"素材管理" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(toggleMaterialManagement) animation:NO];
+    }
+
     [self showLeftItemWithImage:[UIImage imageNamed:@"back_white"] selector:@selector(goBack) animation:YES];
-    [self.sliderView setAttributeWithItems:@[@"贴纸",@"动态贴图",@"拼图模版"] buttonWidth:Screenwidth/3 themeColor:UIColorFromRGB(0xff5a5d) idleColor:[UIColor grayColor] trackerWidth:20];
-    [self.view addSubview:self.sliderView];
-    self.collectionView.frame = CGRectMake(0, self.sliderView.bottom, self.collectionView.width, self.collectionView.height);
+    if (!self.hideMenu) {
+        [self.sliderView setAttributeWithItems:@[@"贴纸",@"动态贴图",@"拼图模版"] buttonWidth:Screenwidth/3 themeColor:UIColorFromRGB(0xff5a5d) idleColor:[UIColor grayColor] trackerWidth:20];
+        [self.view addSubview:self.sliderView];
+        self.collectionView.frame = CGRectMake(0, self.sliderView.bottom, self.collectionView.width, self.collectionView.height);
+    }else{
+        self.collectionView.frame = CGRectMake(0, 0, self.collectionView.width, Screenheight-HEIGHT_NAV);
+    }
+    
     [self.view addSubview:self.collectionView];
     [self sliderView:self.sliderView didSelecteAtIndex:self.activeSection];
-    
+    [self.sliderView scrollToIndexWithActiveSection:self.activeSection];
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -233,6 +245,64 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     [[DownloadManager shareManager] addDownloadWithFilename:destPathURL URL:[NSURL URLWithString:sourceURL] package:package];
     [self.collectionView reloadData];
 }
+
+- (void)displayMultiPickerForGroup:(ALAssetsGroup *)group{
+    if (group == nil) {
+        return;
+    }
+    ELCAssetTablePicker *tablePicker = [[ELCAssetTablePicker alloc] initWithStyle:UITableViewStylePlain];
+    tablePicker.singleSelection = NO;
+    tablePicker.immediateReturn = NO;
+    tablePicker.selectionPreviewMode = YES;
+    
+    ELCImagePickerController *elcPicker = [[ELCImagePickerController alloc] initWithRootViewController:tablePicker];
+    elcPicker.maximumImagesCount = 100;
+    elcPicker.imagePickerDelegate = self;
+    elcPicker.returnsOriginalImage = YES; //Only return the fullScreenImage, not the fullResolutionImage
+    elcPicker.returnsImage = YES; //Return UIimage if YES. If NO, only return asset location information
+    elcPicker.onOrder = NO; //For single image selection, do not display and return order of selected images
+    tablePicker.parent = elcPicker;
+    
+    // Move me
+    tablePicker.assetGroup = group;
+    [tablePicker.assetGroup setAssetsFilter:[ALAssetsFilter allAssets]];
+    
+    [self presentViewController:elcPicker animated:YES completion:nil];
+}
+
+#pragma mark ELCImagePickerControllerDelegate Methods
+
+- (void)elcImagePickerController:(ELCImagePickerController *)picker didFinishPickingMediaWithInfo:(NSArray *)info
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+    
+    NSMutableArray *images = [NSMutableArray arrayWithCapacity:[info count]];
+    for (NSDictionary *dict in info) {
+        if ([dict objectForKey:UIImagePickerControllerMediaType] == ALAssetTypePhoto){
+            if ([dict objectForKey:UIImagePickerControllerOriginalImage]){
+                UIImage* image=[dict objectForKey:UIImagePickerControllerOriginalImage];
+                [images addObject:image];
+                
+                UIImageView *imageview = [[UIImageView alloc] initWithImage:image];
+                [imageview setContentMode:UIViewContentModeScaleAspectFit];
+                
+            } else {
+                NSLog(@"UIImagePickerControllerReferenceURL = %@", dict);
+            }
+        }
+    }
+    
+    self.chosenImages = images;
+    if (self.chosenImages.count>0) {
+   
+    }
+}
+
+- (void)elcImagePickerControllerDidCancel:(ELCImagePickerController *)picker
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 
 #pragma mark - UICollectionViewDataSource / UICollectionViewDelegateFlowLayout
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView{
@@ -393,6 +463,11 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
         stickerDetailVC.materialType = @"sticker_pic";
         stickerDetailVC.packageID = stickerItem.packageID;
         [self.navigationController pushViewController:stickerDetailVC animated:YES];
+    }
+    if (self.activeSection == 2) {
+        if (self.proceedToImageEdit) {
+            [self displayMultiPickerForGroup:self.assetsGroup];
+        }
     }
 }
 

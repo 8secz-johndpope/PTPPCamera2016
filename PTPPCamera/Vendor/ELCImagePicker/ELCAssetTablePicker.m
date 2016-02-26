@@ -36,17 +36,20 @@
 {
     [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
 	[self.tableView setAllowsSelection:NO];
-
+    if (self.selectionPreviewMode) {
+        self.tableView.contentInset = UIEdgeInsetsMake(0, 0, 150, 0);
+    }
+    
     NSMutableArray *tempArray = [[NSMutableArray alloc] init];
     self.elcAssets = tempArray;
 	
     UIBarButtonItem *doneButtonItem = nil;
-    if (self.immediateReturn) {
+    //if (self.immediateReturn) {
         doneButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStyleDone target:self action:@selector(doneAction:)];
-        
-    }else{
-        doneButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneAction:)];
-    }
+//        
+//    }else{
+//        doneButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneAction:)];
+//    }
     
     [doneButtonItem setTintColor:[UIColor whiteColor]];
     [self.navigationItem setRightBarButtonItem:doneButtonItem];
@@ -57,8 +60,10 @@
     
     // Register for notifications when the photo library has changed
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(preparePhotos) name:ALAssetsLibraryChangedNotification object:nil];
+
     [self.navigationController.navigationBar setBarTintColor:THEME_COLOR];
     [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
+    [self.navigationController.navigationBar setTintColor:[UIColor whiteColor]];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -170,6 +175,8 @@
                 elcAsset.selected = NO;
             }
         }
+    }else{
+        NSLog(@"Asset Selected:%@",asset.asset);
     }
     if (self.immediateReturn) {
         NSArray *singleAssetArray = @[asset];

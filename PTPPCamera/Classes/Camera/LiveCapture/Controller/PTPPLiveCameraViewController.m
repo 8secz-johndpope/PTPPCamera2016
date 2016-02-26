@@ -8,6 +8,7 @@
 #import "PTVCTransitionLeftRightManager.h"
 #import "PTPPLiveStickerView.h"
 #import "PTPPLiveVideoShareViewController.h"
+#import "PTPPMaterialShopViewController.h"
 #import "PTPPNewHomeViewController.h"
 #import "ELCImagePickerHeader.h"
 #import "PTPPStaticImageEditViewController.h"
@@ -26,12 +27,16 @@
 #import "PTPPStickerXMLParser.h"
 #import "PTPPStickerAnimation.h"
 #import "PTPPLocalFileManager.h"
+#import "PTPPImageUtil.h"
 #import "PTFilterManager.h"
+
 #define kFilterScrollHeight 130
 #define kFilterDataLength 10
 #define kStickerScale 2
+
 @interface PTPPLiveCameraViewController ()<DetectFaceDelegate,UIViewControllerTransitioningDelegate, NSXMLParserDelegate, PTPPNewHomeProtocol, ELCImagePickerControllerDelegate>
 @property (nonatomic, strong) ALAssetsLibrary *specialLibrary;
+@property (nonatomic, strong) NSMutableArray *assetGroups;
 @property (nonatomic, copy) NSArray *chosenImages;
 @property (strong, nonatomic) DetectFace *detectFaceController;
 @property (nonatomic, strong) UIView *previewView;
@@ -102,7 +107,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 
     //Start Live camera face detection
     [self setupCameraControlPanel];
-    self.cameraCanUse = [self checkCameraCanUse];
+    self.cameraCanUse = [PTPPImageUtil checkCameraCanUse];
     self.assetsLibraryCanUse = [PTUtilTool checkALAssetsLibraryCanUse];
 
     self.liveStickerView.hidden = YES;
@@ -134,7 +139,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
             CGFloat widthRatio = image.size.width/(Screenwidth*[UIScreen mainScreen].scale);
             CGFloat heightRatio = image.size.height/(Screenheight*[UIScreen mainScreen].scale);
             //No AR stickers on screen, go to static photo edit process.
-            image = [self croppIngimageByImageName:image toRect:CGRectMake(0, self.cropMaskTop.bottom*heightRatio, Screenwidth*widthRatio, self.cropMaskBottom.top*heightRatio-self.cropMaskTop.bottom*heightRatio)];
+            image = [PTPPImageUtil croppIngimageByImageName:image toRect:CGRectMake(0, self.cropMaskTop.bottom*heightRatio, Screenwidth*widthRatio, self.cropMaskBottom.top*heightRatio-self.cropMaskTop.bottom*heightRatio)];
             PTPPStaticImageEditViewController *imageEditVC = [[PTPPStaticImageEditViewController alloc] initWithBasePhoto:image];
             if (weakSelf.navigationController) {
                 [weakSelf.navigationController pushViewController:imageEditVC animated:YES];
@@ -163,6 +168,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     [self updateTopControlOptions];
     if (self.assetsLibraryCanUse) {
         [self updateAlbumWithLatestPhoto];
+        [self assetGroups];
     }
 }
 
@@ -469,8 +475,19 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 }
 
 -(void)toggleJigsawTemplate{
-//    PTPaiPaiJigsawTemplateViewController *jigsawVC = [[PTPaiPaiJigsawTemplateViewController alloc] init];
-//    [self.navigationController pushViewController:jigsawVC animated:YES];
+//    if (!_assetsLibraryCanUse) {
+//        [self albumNotUseTapped];
+//        return;
+//    }
+//    if (self.assetGroups.count>0) {
+//        [self displayMultiPickerForGroup:[self.assetGroups objectAtIndex:0]];
+//    }
+    PTPPMaterialShopViewController *shopVC = [[PTPPMaterialShopViewController alloc] init];
+    shopVC.activeSection = 2;
+    shopVC.hideMenu = YES;
+    shopVC.proceedToImageEdit = YES;
+    shopVC.assetsGroup = [self.assetGroups safeObjectAtIndex:0];
+    [self.navigationController pushViewController:shopVC animated:YES];
 }
 
 #pragma mark Private methods
@@ -483,49 +500,12 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     inputImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     for (NSInteger i=0; i<10; i++) {
-        NSDictionary *dic = [self getFilterResultFromInputImage:inputImage filterIndex:i];
+        NSDictionary *dic = [PTPPImageUtil getFilterResultFromInputImage:inputImage filterIndex:i];
         [self.filterSet addObject:dic];
     }
 }
 
--(NSDictionary *)getFilterResultFromInputImage:(UIImage *)inputImage filterIndex:(NSInteger)index{
-    NSDictionary *dic = nil;
-    switch (index) {
-        case 0:
-            dic = [[NSDictionary alloc] initWithObjectsAndKeys:inputImage,PTFILTERIMAGE,@"原始",PTFILTERNAME, nil];
-            break;
-        case 1:
-            dic = [PTFilterManager PTFilter:inputImage BLCXwithInfo:0.1];
-            break;
-        case 2:
-            dic = [PTFilterManager PTFilter:inputImage SXGNwithInfo:2.0];
-            break;
-        case 3:
-            dic = [PTFilterManager PTFilter:inputImage JSLSwithInfo:1.2 saturation:0.6 temperature:4500.0];
-            break;
-        case 4:
-            dic = [PTFilterManager PTFilter:inputImage SLDCwithInfo:1.2];
-            break;
-        case 5:
-            dic = [PTFilterManager PTFilter:inputImage ZJLNwithInfo:1.2];
-            break;
-        case 6:
-            dic = [PTFilterManager PTFilterWithMSHK:inputImage];
-            break;
-        case 7:
-            dic = [PTFilterManager PTFilterWithBLWX:inputImage];
-            break;
-        case 8:
-            dic = [PTFilterManager PTFilter:inputImage WNRYwithInfo:1.2];
-            break;
-        case 9:
-            dic = [PTFilterManager PTFilter:inputImage YMYGwithInfo:1.2 temperature:7200.0];
-            break;
-        default:
-            break;
-    }
-    return dic;
-}
+
 
 
 //Read Sticker files from local directory
@@ -712,27 +692,6 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     });
 }
 
--(BOOL )checkCameraCanUse{
-    BOOL flag = NO;
-    //Capture 捕捉器,Video 视频
-    AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
-    switch (status) {
-        case AVAuthorizationStatusAuthorized://批准
-            flag=YES;
-            break;
-        case AVAuthorizationStatusRestricted: //Restricted 受限制
-        case AVAuthorizationStatusDenied://拒绝
-            flag=NO;
-            break;
-        case AVAuthorizationStatusNotDetermined: //不确定
-            flag=YES;
-            break;
-    }
-    if (!flag) {
-        NSLog(@"设备不支持或禁用拍照功能,请按照提示打开相机");
-    }
-    return flag;
-}
 
 -(void) updateAlbumWithLatestPhoto {
     __block UIImage *image=nil;
@@ -762,27 +721,9 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
         [self albumNotUseTapped];
         return;
     }
-
-    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-    self.specialLibrary = library;
-    NSMutableArray *groups = [NSMutableArray array];
-    [_specialLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
-        if (group) {
-            [groups addObject:group];
-        } else {
-            // this is the end
-            [self displayPickerForGroup:[groups objectAtIndex:0]];
-        }
-    } failureBlock:^(NSError *error) {
-        self.chosenImages = nil;
-        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Album Error: %@ - %@", [error localizedDescription], [error localizedRecoverySuggestion]] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-        [alert show];
-        
-        NSLog(@"A problem occured %@", [error description]);
-        // an error here means that the asset groups were inaccessable.
-        // Maybe the user or system preferences refused access.
-    }];
-
+    if (self.assetGroups.count>0) {
+        [self displayPickerForGroup:[self.assetGroups objectAtIndex:0]];
+    }
 }
 
 - (void)displayPickerForGroup:(ALAssetsGroup *)group
@@ -809,23 +750,11 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 
 -(void)albumNotUseTapped
 {
-//    PTPaiPaiALAuthorizationStatusDeniedViewController *deniedVC = [[PTPaiPaiALAuthorizationStatusDeniedViewController alloc]init];
-//    if (self.navigationController) {
-//        [self.navigationController pushViewController:deniedVC animated:YES];
-//    }
+    NSLog(@"Unable to access photo album");
 }
 
-- (UIImage *)croppIngimageByImageName:(UIImage *)imageToCrop toRect:(CGRect)rect
-{
-    CGImageRef imageRef = CGImageCreateWithImageInRect([imageToCrop CGImage], CGRectMake(rect.origin.x*[UIScreen mainScreen].scale, rect.origin.y*[UIScreen mainScreen].scale, rect.size.width*[UIScreen mainScreen].scale, rect.size.height*[UIScreen mainScreen].scale));
-    UIImage *cropped = [UIImage imageWithCGImage:imageRef scale:imageToCrop.scale orientation:imageToCrop.imageOrientation];
-    CGImageRelease(imageRef);
-    
-    return cropped;
-}
 
 #pragma mark DetectFaceDelegate
-
 - (void)detectedFaceController:(DetectFace *)controller features:(NSArray *)featuresArray forVideoBox:(CGRect)clap withPreviewBox:(CGRect)previewBox processedImage:(UIImage *)processedImage
 {
     
@@ -860,25 +789,9 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     [self.liveStickerView updateLiveStickerFrameWithFaceFeatures:featuresArray forVideoBox:clap withPreviewBox:previewBox];
 }
 
-- (CGFloat) pointPairToBearingDegrees:(CGPoint)startingPoint secondPoint:(CGPoint) endingPoint
-{
-    CGPoint originPoint = CGPointMake(endingPoint.x - startingPoint.x, endingPoint.y - startingPoint.y); // get origin point to origin by subtracting end from start
-    float bearingRadians = atan2f(originPoint.y, originPoint.x); // get bearing in radians
-    float bearingDegrees = bearingRadians * (180.0 / M_PI); // convert to degrees
-    bearingDegrees = (bearingDegrees > 0.0 ? bearingDegrees : (360.0 + bearingDegrees)); // correct discontinuity
-    return bearingDegrees-180;
-}
-
--(CGFloat)getDistanceFromPointA:(CGPoint)pointA pointB:(CGPoint)pointB{
-    double dx = (pointB.x-pointA.x);
-    double dy = (pointB.y-pointA.y);
-    double dist = sqrt(dx*dx + dy*dy);
-    return dist;
-}
 
 
 #pragma mark - UIVieControllerTransitioningDelegate -
-
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
                                                                    presentingController:(UIViewController *)presenting
                                                                        sourceController:(UIViewController *)source{
@@ -930,6 +843,32 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 
 
 #pragma mark - Getters/Setters
+
+-(ALAssetsLibrary *)specialLibrary{
+    if (!_specialLibrary) {
+        _specialLibrary = [[ALAssetsLibrary alloc] init];
+    }
+    return _specialLibrary;
+}
+
+-(NSMutableArray *)assetGroups{
+    if (!_assetGroups) {
+        _assetGroups = [[NSMutableArray alloc] init];
+        [self.specialLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
+            if (group) {
+                [_assetGroups addObject:group];
+            }
+        } failureBlock:^(NSError *error) {
+            self.chosenImages = nil;
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"错误" message:[NSString stringWithFormat:@"相册读取错误: %@ - %@", [error localizedDescription], [error localizedRecoverySuggestion]] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+            [alert show];
+            NSLog(@"A problem occured %@", [error description]);
+            // an error here means that the asset groups were inaccessable.
+            // Maybe the user or system preferences refused access.
+        }];
+    }
+    return _assetGroups;
+}
 
 -(PTPPLiveStickerView *)liveStickerView{
     if (!_liveStickerView) {

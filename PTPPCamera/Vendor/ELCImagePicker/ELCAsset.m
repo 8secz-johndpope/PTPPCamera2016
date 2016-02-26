@@ -28,7 +28,7 @@
 
 - (void)toggleSelection
 {
-    self.selected = !self.selected;
+    //self.selected = !self.selected;
 }
 
 - (void)setSelected:(BOOL)selected
@@ -46,7 +46,7 @@
             }
         }
     }
-    _selected = selected;
+    //_selected = selected;
     if (selected) {
         if (_parent != nil && [_parent respondsToSelector:@selector(assetSelected:)]) {
             [_parent assetSelected:self];

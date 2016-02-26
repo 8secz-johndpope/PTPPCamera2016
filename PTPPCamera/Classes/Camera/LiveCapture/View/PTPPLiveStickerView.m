@@ -7,6 +7,7 @@
 //
 
 #import "PTPPLiveStickerView.h"
+#import "PTPPImageUtil.h"
 #import "DetectFace.h"
 #import "NoiseFilter.h"
 #define kFilterDataLength 10
@@ -91,7 +92,7 @@
             CGFloat stickerDistance = self.eyeAnimation.distance;
             CGPoint stickerCenter = CGPointMake(self.eyeAnimation.centerX, self.eyeAnimation.centerY);
             CGFloat frameDuration = self.eyeAnimation.duration;
-            CGFloat actualDistance = [self getDistanceFromPointA:self.leftEye.center pointB:self.rightEye.center]*kStickerScale;
+            CGFloat actualDistance = [PTPPImageUtil getDistanceFromPointA:self.leftEye.center pointB:self.rightEye.center]*kStickerScale;
             CGFloat ratio = actualDistance/stickerDistance;
             if (self.eyeSticker.animationImages.count == 0) {
                 self.eyeSticker.animationImages = self.eyeAnimation.imageList;
@@ -115,7 +116,7 @@
             CGFloat stickerDistance = self.mouthAnimation.distance;
             CGPoint stickerCenter = CGPointMake(self.mouthAnimation.centerX, self.mouthAnimation.centerY);
             CGFloat frameDuration = self.mouthAnimation.duration;
-            CGFloat actualDistance = [self getDistanceFromPointA:self.leftEye.center pointB:self.rightEye.center]*kStickerScale;
+            CGFloat actualDistance = [PTPPImageUtil getDistanceFromPointA:self.leftEye.center pointB:self.rightEye.center]*kStickerScale;
             CGFloat ratio = actualDistance/stickerDistance;
             CGRect mouthFrame = CGRectMake(ff.mouthPosition.x-stickerWidth*ratio/2, ff.mouthPosition.y-stickerHeight*ratio/2, stickerWidth*ratio, stickerHeight*ratio);
             if (self.mouthSticker.animationImages.count == 0) {
@@ -141,27 +142,11 @@
         }
         
         //倾斜角度
-        self.faceAngle = [self pointPairToBearingDegrees:self.leftEye.center secondPoint:self.rightEye.center];
+        self.faceAngle = [PTPPImageUtil pointPairToBearingDegrees:self.leftEye.center secondPoint:self.rightEye.center];
         [UIView animateWithDuration:0.3 animations:^{
             self.foregroundView.transform = CGAffineTransformMakeRotation((self.faceAngle/180.0*M_PI));
         }];
     }
-}
-
-- (CGFloat) pointPairToBearingDegrees:(CGPoint)startingPoint secondPoint:(CGPoint) endingPoint
-{
-    CGPoint originPoint = CGPointMake(endingPoint.x - startingPoint.x, endingPoint.y - startingPoint.y); // get origin point to origin by subtracting end from start
-    float bearingRadians = atan2f(originPoint.y, originPoint.x); // get bearing in radians
-    float bearingDegrees = bearingRadians * (180.0 / M_PI); // convert to degrees
-    bearingDegrees = (bearingDegrees > 0.0 ? bearingDegrees : (360.0 + bearingDegrees)); // correct discontinuity
-    return bearingDegrees-180;
-}
-
--(CGFloat)getDistanceFromPointA:(CGPoint)pointA pointB:(CGPoint)pointB{
-    double dx = (pointB.x-pointA.x);
-    double dy = (pointB.y-pointA.y);
-    double dist = sqrt(dx*dx + dy*dy);
-    return dist;
 }
 
 -(NoiseFilter *)leftEyeFilterX{

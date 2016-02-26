@@ -12,6 +12,8 @@
 		C60FD1711C732ABD00F5886B /* PECropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C60FD16A1C732ABD00F5886B /* PECropViewController.m */; };
 		C60FD1721C732ABD00F5886B /* PEResizeControl.m in Sources */ = {isa = PBXBuildFile; fileRef = C60FD16C1C732ABD00F5886B /* PEResizeControl.m */; };
 		C60FD1731C732ABD00F5886B /* UIImage+PECrop.m in Sources */ = {isa = PBXBuildFile; fileRef = C60FD16E1C732ABD00F5886B /* UIImage+PECrop.m */; };
+		C630EA8B1C7FEC8900C6515C /* PTPPImageUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = C630EA8A1C7FEC8900C6515C /* PTPPImageUtil.m */; };
+		C630EA8E1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.m in Sources */ = {isa = PBXBuildFile; fileRef = C630EA8D1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.m */; };
 		C6433C1C1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */; };
 		C6433C1F1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1E1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m */; };
 		C6433C221C72F40300AF82AD /* PTFilterManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C211C72F40300AF82AD /* PTFilterManager.m */; };
@@ -943,6 +945,10 @@
 		C60FD16C1C732ABD00F5886B /* PEResizeControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PEResizeControl.m; sourceTree = "<group>"; };
 		C60FD16D1C732ABD00F5886B /* UIImage+PECrop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+PECrop.h"; sourceTree = "<group>"; };
 		C60FD16E1C732ABD00F5886B /* UIImage+PECrop.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+PECrop.m"; sourceTree = "<group>"; };
+		C630EA891C7FEC8900C6515C /* PTPPImageUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPImageUtil.h; sourceTree = "<group>"; };
+		C630EA8A1C7FEC8900C6515C /* PTPPImageUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPImageUtil.m; sourceTree = "<group>"; };
+		C630EA8C1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ELCImageSelectionBottomPreview.h; sourceTree = "<group>"; };
+		C630EA8D1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ELCImageSelectionBottomPreview.m; sourceTree = "<group>"; };
 		C6433C1A1C72BFC900AF82AD /* PTPPStaticImageEditViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPStaticImageEditViewController.h; sourceTree = "<group>"; };
 		C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPStaticImageEditViewController.m; sourceTree = "<group>"; };
 		C6433C1D1C72C66D00AF82AD /* PTPPStaticImageEditToolBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPStaticImageEditToolBar.h; sourceTree = "<group>"; };
@@ -3018,6 +3024,8 @@
 				C647BC871C718C4B00E596EA /* UserDefaultsHelper.m */,
 				C691C9471C7AA2DB004C5F53 /* PTPPLocalFileManager.h */,
 				C691C9481C7AA2DB004C5F53 /* PTPPLocalFileManager.m */,
+				C630EA891C7FEC8900C6515C /* PTPPImageUtil.h */,
+				C630EA8A1C7FEC8900C6515C /* PTPPImageUtil.m */,
 			);
 			path = Global;
 			sourceTree = "<group>";
@@ -3134,6 +3142,8 @@
 				C647BD3C1C718E5100E596EA /* ELCImagePickerHeader.h */,
 				C647BD3D1C718E5100E596EA /* ELCOverlayImageView.h */,
 				C647BD3E1C718E5100E596EA /* ELCOverlayImageView.m */,
+				C630EA8C1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.h */,
+				C630EA8D1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.m */,
 				C647BD3F1C718E5100E596EA /* Resources */,
 			);
 			path = ELCImagePicker;
@@ -5233,6 +5243,7 @@
 				C647BBF41C7181BE00E596EA /* UIView+CustomBadge.m in Sources */,
 				C647BFBF1C71BBBB00E596EA /* GPUImageMissEtikateFilter.m in Sources */,
 				C647BFB21C71BBBB00E596EA /* GPUImageLevelsFilter.m in Sources */,
+				C630EA8E1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.m in Sources */,
 				C647BFD81C71BBBB00E596EA /* GPUImagePolkaDotFilter.m in Sources */,
 				C647BBE31C7181BE00E596EA /* UIView+WebCacheOperation.m in Sources */,
 				C647BF7A1C71BBBB00E596EA /* GPUImageColorInvertFilter.m in Sources */,
@@ -5531,6 +5542,7 @@
 				C60FD16F1C732ABD00F5886B /* PECropRectView.m in Sources */,
 				C647BFA61C71BBBB00E596EA /* GPUImageHistogramFilter.m in Sources */,
 				C647C8DA1C71C93C00E596EA /* MLTransitionAnimation.m in Sources */,
+				C630EA8B1C7FEC8900C6515C /* PTPPImageUtil.m in Sources */,
 				C647BC221C7181BE00E596EA /* SOSegmentButton.m in Sources */,
 				C647BBE11C7181BE00E596EA /* UIImageView+HighlightedWebCache.m in Sources */,
 				C6681E7F1C7C5F21009BC942 /* WaterMarkBorderView.m in Sources */,
