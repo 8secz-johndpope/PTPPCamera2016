@@ -254,9 +254,9 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     tablePicker.singleSelection = NO;
     tablePicker.immediateReturn = NO;
     tablePicker.selectionPreviewMode = YES;
-    
+    tablePicker.maxCount = 10;
     ELCImagePickerController *elcPicker = [[ELCImagePickerController alloc] initWithRootViewController:tablePicker];
-    elcPicker.maximumImagesCount = 100;
+    elcPicker.maximumImagesCount = 10;
     elcPicker.imagePickerDelegate = self;
     elcPicker.returnsOriginalImage = YES; //Only return the fullScreenImage, not the fullResolutionImage
     elcPicker.returnsImage = YES; //Return UIimage if YES. If NO, only return asset location information

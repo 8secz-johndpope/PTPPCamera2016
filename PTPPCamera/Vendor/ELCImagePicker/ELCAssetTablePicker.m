@@ -5,16 +5,18 @@
 //  Copyright 2011 ELC Technologies. All rights reserved.
 //
 
+#import "ELCImageSelectionBottomPreview.h"
 #import "ELCAssetTablePicker.h"
 #import "ELCAssetCell.h"
 #import "ELCAsset.h"
 #import "ELCAlbumPickerController.h"
 #import "ELCConsole.h"
 
+
 @interface ELCAssetTablePicker ()
 
 @property (nonatomic, assign) int columns;
-
+@property (nonatomic, strong) ELCImageSelectionBottomPreview *bottomPreview;
 @end
 
 @implementation ELCAssetTablePicker
@@ -36,10 +38,8 @@
 {
     [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
 	[self.tableView setAllowsSelection:NO];
-    if (self.selectionPreviewMode) {
-        self.tableView.contentInset = UIEdgeInsetsMake(0, 0, 150, 0);
-    }
-    
+    self.tableView.backgroundColor = self.bottomPreview.backgroundColor;
+ 
     NSMutableArray *tempArray = [[NSMutableArray alloc] init];
     self.elcAssets = tempArray;
 	
@@ -64,6 +64,8 @@
     [self.navigationController.navigationBar setBarTintColor:THEME_COLOR];
     [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
     [self.navigationController.navigationBar setTintColor:[UIColor whiteColor]];
+    
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -176,7 +178,8 @@
             }
         }
     }else{
-        NSLog(@"Asset Selected:%@",asset.asset);
+        //NSLog(@"Asset Selected:%@",asset.asset);
+        [self.bottomPreview addPhotoAsset:asset.asset];
     }
     if (self.immediateReturn) {
         NSArray *singleAssetArray = @[asset];
@@ -293,5 +296,24 @@
     return count;
 }
 
+-(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section{
+    if (self.selectionPreviewMode) {
+        return kBottomHeight;
+    }else{
+        return 0;
+    }
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section{
+    [self.bottomPreview setAttributeWithMaxCount:self.maxCount];
+    return self.bottomPreview;
+}
+
+-(ELCImageSelectionBottomPreview *)bottomPreview{
+    if (!_bottomPreview) {
+        _bottomPreview = [[ELCImageSelectionBottomPreview alloc] initWithFrame:CGRectMake(0, Screenheight - kBottomHeight, Screenwidth, self.tableView.contentInset.bottom)];
+    }
+    return _bottomPreview;
+}
 
 @end

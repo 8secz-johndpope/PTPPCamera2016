@@ -7,7 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "AssetHelper.h"
+#define kBottomHeight 140
 
 @interface ELCImageSelectionBottomPreview : UIView
-
+-(void)addPhotoAsset:(ALAsset *)asset;
+-(void)setAttributeWithMaxCount:(NSInteger)maxCount;
 @end

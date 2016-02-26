@@ -129,14 +129,14 @@
 
 - (ALAssetsFilter *)assetFilter
 {
-    if([self.mediaTypes containsObject:(NSString *)kUTTypeImage] && [self.mediaTypes containsObject:(NSString *)kUTTypeMovie])
+    if([self.mediaTypes containsObject:(NSString *)kUTTypeImage])
     {
         return [ALAssetsFilter allAssets];
     }
-    else if([self.mediaTypes containsObject:(NSString *)kUTTypeMovie])
-    {
-        return [ALAssetsFilter allVideos];
-    }
+//    else if([self.mediaTypes containsObject:(NSString *)kUTTypeMovie])
+//    {
+//        return [ALAssetsFilter allVideos];
+//    }
     else
     {
         return [ALAssetsFilter allPhotos];

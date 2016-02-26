@@ -7,6 +7,7 @@
 //
 
 #import <AVFoundation/AVFoundation.h>
+
 #import "PTPPImageUtil.h"
 #import "PTFilterManager.h"
 
@@ -96,6 +97,36 @@
         NSLog(@"设备不支持或禁用拍照功能,请按照提示打开相机");
     }
     return flag;
+}
+
++ (UIImage *)getThumbnailFromALAsset:(ALAsset *)asset{
+    CGImageRef thumbnailRef = asset.thumbnail;
+    UIImageOrientation orientation = UIImageOrientationUp;
+    NSNumber *orientationValue = [asset valueForProperty:@"ALAssetPropertyOrientation"];
+    if (orientationValue != nil) {
+        orientation = [orientationValue intValue];
+    }
+    UIImage *img = [self convertUIImageFromCGImageRef:thumbnailRef orientation:orientation];
+    return img;
+}
+
++ (UIImage *)getOriginalImageFromALAsset:(ALAsset *)asset{
+    ALAssetRepresentation *assetRep = [asset defaultRepresentation];
+    CGImageRef imgRef = [assetRep fullResolutionImage];
+    UIImageOrientation orientation = UIImageOrientationUp;
+    NSNumber *orientationValue = [asset valueForProperty:@"ALAssetPropertyOrientation"];
+    if (orientationValue != nil) {
+        orientation = [orientationValue intValue];
+    }
+    UIImage *img = [self convertUIImageFromCGImageRef:imgRef orientation:orientation];
+    return img;
+}
+
++(UIImage *)convertUIImageFromCGImageRef:(CGImageRef)imageRef orientation:(UIImageOrientation)imageOrientation{
+    UIImage *img = [UIImage imageWithCGImage:imageRef
+                                       scale:1.0f
+                                 orientation:imageOrientation];
+    return img;
 }
 
 @end

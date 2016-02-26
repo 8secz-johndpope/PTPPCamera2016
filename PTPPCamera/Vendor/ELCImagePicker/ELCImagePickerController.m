@@ -29,7 +29,7 @@
         self.returnsImage = YES;
         self.returnsOriginalImage = YES;
         [albumPicker setParent:self];
-        self.mediaTypes = @[(NSString *)kUTTypeImage, (NSString *)kUTTypeMovie];
+        self.mediaTypes = @[(NSString *)kUTTypeImage];
     }
     return self;
 }
