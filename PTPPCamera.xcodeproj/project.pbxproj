@@ -16,6 +16,9 @@
 		C630EA8E1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.m in Sources */ = {isa = PBXBuildFile; fileRef = C630EA8D1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.m */; };
 		C630EA951C80533F00C6515C /* PTPPJigsawTemplateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C630EA941C80533F00C6515C /* PTPPJigsawTemplateViewController.m */; };
 		C630EA981C805ABB00C6515C /* PTPPJigsawTemplateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C630EA971C805ABB00C6515C /* PTPPJigsawTemplateModel.m */; };
+		C6338D731C841EFF00B7320B /* whitening.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6338D721C841EFF00B7320B /* whitening.framework */; };
+		C6338D7A1C8442A000B7320B /* PTPPJigsawView.m in Sources */ = {isa = PBXBuildFile; fileRef = C6338D791C8442A000B7320B /* PTPPJigsawView.m */; };
+		C6338D7D1C84535E00B7320B /* PTPPJigsawCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C6338D7C1C84535E00B7320B /* PTPPJigsawCell.m */; };
 		C6433C1C1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */; };
 		C6433C1F1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1E1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m */; };
 		C6433C221C72F40300AF82AD /* PTFilterManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C211C72F40300AF82AD /* PTFilterManager.m */; };
@@ -868,7 +871,7 @@
 		C647C8801C71C2C200E596EA /* tt_spBg_iOS_04.jpg in Resources */ = {isa = PBXBuildFile; fileRef = C647C45E1C71C2C200E596EA /* tt_spBg_iOS_04.jpg */; };
 		C647C8811C71C2C200E596EA /* tt_spBg_iOS_05.jpg in Resources */ = {isa = PBXBuildFile; fileRef = C647C45F1C71C2C200E596EA /* tt_spBg_iOS_05.jpg */; };
 		C647C8821C71C2C200E596EA /* voice_button_play.png in Resources */ = {isa = PBXBuildFile; fileRef = C647C4601C71C2C200E596EA /* voice_button_play.png */; };
-		C647C8B11C71C40200E596EA /* DetectFace.m in Sources */ = {isa = PBXBuildFile; fileRef = C647C8871C71C40200E596EA /* DetectFace.m */; };
+		C647C8B11C71C40200E596EA /* DetectFace.mm in Sources */ = {isa = PBXBuildFile; fileRef = C647C8871C71C40200E596EA /* DetectFace.mm */; };
 		C647C8B31C71C40200E596EA /* PTPPLiveCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C647C88B1C71C40200E596EA /* PTPPLiveCameraViewController.m */; };
 		C647C8B41C71C40200E596EA /* PTPPLiveStickerPreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C647C88D1C71C40200E596EA /* PTPPLiveStickerPreviewViewController.m */; };
 		C647C8B51C71C40200E596EA /* PTPPLiveVideoShareViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C647C88F1C71C40200E596EA /* PTPPLiveVideoShareViewController.m */; };
@@ -955,6 +958,11 @@
 		C630EA941C80533F00C6515C /* PTPPJigsawTemplateViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPJigsawTemplateViewController.m; sourceTree = "<group>"; };
 		C630EA961C805ABB00C6515C /* PTPPJigsawTemplateModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPJigsawTemplateModel.h; sourceTree = "<group>"; };
 		C630EA971C805ABB00C6515C /* PTPPJigsawTemplateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPJigsawTemplateModel.m; sourceTree = "<group>"; };
+		C6338D721C841EFF00B7320B /* whitening.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = whitening.framework; sourceTree = "<group>"; };
+		C6338D781C8442A000B7320B /* PTPPJigsawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPJigsawView.h; sourceTree = "<group>"; };
+		C6338D791C8442A000B7320B /* PTPPJigsawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPJigsawView.m; sourceTree = "<group>"; };
+		C6338D7B1C84535E00B7320B /* PTPPJigsawCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPJigsawCell.h; sourceTree = "<group>"; };
+		C6338D7C1C84535E00B7320B /* PTPPJigsawCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPJigsawCell.m; sourceTree = "<group>"; };
 		C6433C1A1C72BFC900AF82AD /* PTPPStaticImageEditViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPStaticImageEditViewController.h; sourceTree = "<group>"; };
 		C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPStaticImageEditViewController.m; sourceTree = "<group>"; };
 		C6433C1D1C72C66D00AF82AD /* PTPPStaticImageEditToolBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPStaticImageEditToolBar.h; sourceTree = "<group>"; };
@@ -2196,7 +2204,7 @@
 		C647C45F1C71C2C200E596EA /* tt_spBg_iOS_05.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tt_spBg_iOS_05.jpg; sourceTree = "<group>"; };
 		C647C4601C71C2C200E596EA /* voice_button_play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = voice_button_play.png; sourceTree = "<group>"; };
 		C647C8861C71C40200E596EA /* DetectFace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetectFace.h; sourceTree = "<group>"; };
-		C647C8871C71C40200E596EA /* DetectFace.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetectFace.m; sourceTree = "<group>"; };
+		C647C8871C71C40200E596EA /* DetectFace.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DetectFace.mm; sourceTree = "<group>"; };
 		C647C88A1C71C40200E596EA /* PTPPLiveCameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPLiveCameraViewController.h; sourceTree = "<group>"; };
 		C647C88B1C71C40200E596EA /* PTPPLiveCameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPLiveCameraViewController.m; sourceTree = "<group>"; };
 		C647C88C1C71C40200E596EA /* PTPPLiveStickerPreviewViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPLiveStickerPreviewViewController.h; sourceTree = "<group>"; };
@@ -2347,6 +2355,7 @@
 				C647BABA1C7180A600E596EA /* libsqlite3.0.tbd in Frameworks */,
 				C647BDD41C718E5100E596EA /* ShareSDKUI.framework in Frameworks */,
 				C647BABB1C7180A600E596EA /* libsqlite3.tbd in Frameworks */,
+				C6338D731C841EFF00B7320B /* whitening.framework in Frameworks */,
 				C647BDD01C718E5100E596EA /* ShareSDK.framework in Frameworks */,
 				C647BAB71C71809D00E596EA /* libz.tbd in Frameworks */,
 				C647BAB51C71808300E596EA /* MobileCoreServices.framework in Frameworks */,
@@ -2400,6 +2409,10 @@
 		C630EA911C80532800C6515C /* View */ = {
 			isa = PBXGroup;
 			children = (
+				C6338D781C8442A000B7320B /* PTPPJigsawView.h */,
+				C6338D791C8442A000B7320B /* PTPPJigsawView.m */,
+				C6338D7B1C84535E00B7320B /* PTPPJigsawCell.h */,
+				C6338D7C1C84535E00B7320B /* PTPPJigsawCell.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2517,6 +2530,7 @@
 		C647BAAB1C71802B00E596EA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C6338D721C841EFF00B7320B /* whitening.framework */,
 				C647BDE71C7191AA00E596EA /* AdSupport.framework */,
 				C647BAD61C7180FF00E596EA /* AssetsLibrary.framework */,
 				C647BAD41C7180F900E596EA /* CoreImage.framework */,
@@ -4419,7 +4433,7 @@
 			isa = PBXGroup;
 			children = (
 				C647C8861C71C40200E596EA /* DetectFace.h */,
-				C647C8871C71C40200E596EA /* DetectFace.m */,
+				C647C8871C71C40200E596EA /* DetectFace.mm */,
 				C647C88A1C71C40200E596EA /* PTPPLiveCameraViewController.h */,
 				C647C88B1C71C40200E596EA /* PTPPLiveCameraViewController.m */,
 				C647C88C1C71C40200E596EA /* PTPPLiveStickerPreviewViewController.h */,
@@ -5247,6 +5261,7 @@
 				C647BD1D1C718C4B00E596EA /* PTGloba.m in Sources */,
 				C647BD041C718C4B00E596EA /* PTGridView.m in Sources */,
 				C647BBE51C7181BE00E596EA /* SOAESCrypt.m in Sources */,
+				C6338D7A1C8442A000B7320B /* PTPPJigsawView.m in Sources */,
 				C647BDD81C718E5100E596EA /* mztools.m in Sources */,
 				C647BDBF1C718E5100E596EA /* MJRefreshBackStateFooter.m in Sources */,
 				C647BFD71C71BBBB00E596EA /* GPUImagePolarPixellateFilter.m in Sources */,
@@ -5379,7 +5394,7 @@
 				C647BBE21C7181BE00E596EA /* UIImageView+WebCache.m in Sources */,
 				C647C8B91C71C40200E596EA /* PTPPStickerAnimation.m in Sources */,
 				C647C0011C71BBBB00E596EA /* GPUImageTwoInputFilter.m in Sources */,
-				C647C8B11C71C40200E596EA /* DetectFace.m in Sources */,
+				C647C8B11C71C40200E596EA /* DetectFace.mm in Sources */,
 				C647BCED1C718C4B00E596EA /* UITabBar+badge.m in Sources */,
 				C647BF721C71BBBB00E596EA /* GPUImageCGAColorspaceFilter.m in Sources */,
 				C647BDB41C718E5100E596EA /* KKNavigationController.m in Sources */,
@@ -5430,6 +5445,7 @@
 				C630EA981C805ABB00C6515C /* PTPPJigsawTemplateModel.m in Sources */,
 				C6433C1F1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m in Sources */,
 				C647BC051C7181BE00E596EA /* SOBaseLabel.m in Sources */,
+				C6338D7D1C84535E00B7320B /* PTPPJigsawCell.m in Sources */,
 				C647BBF81C7181BE00E596EA /* SOGlobal.m in Sources */,
 				C647C8E61C71C9AC00E596EA /* PTPPNewHomeViewController.m in Sources */,
 				C647BFFB1C71BBBB00E596EA /* GPUImageThresholdSketchFilter.m in Sources */,
@@ -5742,12 +5758,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LIBRARY = "libc++";
 				CODE_SIGN_IDENTITY = "iPhone Developer: Jiaqing Zou (T8ET437L2T)";
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/PTPPCamera/Vendor/ShareSDK_simple_3.1.5/libraries/extends/QQSDK",
 					"$(PROJECT_DIR)/PTPPCamera/Vendor/ShareSDK_simple_3.1.5/libraries",
+					"$(PROJECT_DIR)/PTPPCamera/Frameworks",
 				);
+				GCC_INPUT_FILETYPE = automatic;
+				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PREFIX_HEADER = PTPPCamera/PrefixHeader.pch;
 				INFOPLIST_FILE = PTPPCamera/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
@@ -5771,11 +5792,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LIBRARY = "libc++";
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/PTPPCamera/Vendor/ShareSDK_simple_3.1.5/libraries/extends/QQSDK",
 					"$(PROJECT_DIR)/PTPPCamera/Vendor/ShareSDK_simple_3.1.5/libraries",
+					"$(PROJECT_DIR)/PTPPCamera/Frameworks",
 				);
+				GCC_INPUT_FILETYPE = automatic;
 				GCC_PREFIX_HEADER = PTPPCamera/PrefixHeader.pch;
 				INFOPLIST_FILE = PTPPCamera/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;

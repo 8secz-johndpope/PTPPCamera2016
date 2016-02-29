@@ -23,6 +23,7 @@
 #import "PTPPMaterialShopARStickerModel.h"
 #import "PTPPMaterialShopJigsawTemplateModel.h"
 #import "DownloadManager.h"
+#import "PTPPStickerXMLParser.h"
 
 #define kCollectionViewEdgePadding 10
 #define kCellSpacing 5
@@ -43,6 +44,7 @@
 @property (nonatomic, strong) PTPPMaterialShopJigsawTemplateModel *jigsawTemplateModel;
 @property (nonatomic, strong) NSMutableArray <PTPPMaterialShopStickerItem*>*jigsawTemplateArray;
 
+@property (nonatomic, strong) PTPPMaterialShopStickerItem *selectedJigsawItem;
 @property (nonatomic, copy) NSArray *chosenImages;
 @property (nonatomic, assign) BOOL loadingStaticSticker;
 @property (nonatomic, assign) BOOL loadingARSticker;
@@ -247,7 +249,7 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     [self.collectionView reloadData];
 }
 
-- (void)displayMultiPickerForGroup:(ALAssetsGroup *)group{
+- (void)displayMultiPickerForGroup:(ALAssetsGroup *)group maxCount:(NSInteger)maxCount{
     if (group == nil) {
         return;
     }
@@ -255,9 +257,8 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     tablePicker.singleSelection = NO;
     tablePicker.immediateReturn = NO;
     tablePicker.selectionPreviewMode = YES;
-    tablePicker.maxCount = 10;
+    tablePicker.maxCount = maxCount;
     ELCImagePickerController *elcPicker = [[ELCImagePickerController alloc] initWithRootViewController:tablePicker];
-    elcPicker.maximumImagesCount = 10;
     elcPicker.imagePickerDelegate = self;
     elcPicker.returnsOriginalImage = YES; //Only return the fullScreenImage, not the fullResolutionImage
     elcPicker.returnsImage = YES; //Return UIimage if YES. If NO, only return asset location information
@@ -299,6 +300,7 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
             //Go to jigsaw template
             PTPPJigsawTemplateViewController *jigsawTemplateVC = [[PTPPJigsawTemplateViewController alloc] init];
             jigsawTemplateVC.images = self.chosenImages;
+            jigsawTemplateVC.selectedJigsawItem = self.selectedJigsawItem;
             [self.navigationController pushViewController:jigsawTemplateVC animated:YES];
         }
     }
@@ -472,7 +474,22 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     }
     if (self.activeSection == 2) {
         if (self.proceedToImageEdit) {
-            [self displayMultiPickerForGroup:self.assetsGroup];
+            self.selectedJigsawItem = [self.jigsawTemplateArray safeObjectAtIndex:indexPath.row];
+            NSString *jigsawFolder = [[PTPPLocalFileManager getRootFolderPathForJigsawTemplate] stringByAppendingPathComponent:[[PTPPLocalFileManager getFileNameFromPackageID:self.selectedJigsawItem.packageID inDownloadedList:[PTPPLocalFileManager getDownloadedJigsawTemplateList]] stringByDeletingPathExtension]];
+            NSArray *fileContents = [PTPPLocalFileManager getListOfFilePathAtDirectory:jigsawFolder];
+            NSString *xmlFilePath = nil;
+            for(NSString *path in fileContents){
+                if ([path.pathExtension isEqualToString:@"xml"]) {
+                    xmlFilePath = [path stringByDeletingPathExtension];
+                }
+            }
+            if (!xmlFilePath) {
+                NSLog(@"Cannot locate jigsaw template");
+                return;
+            }
+            NSDictionary *resultDict = [PTPPStickerXMLParser dictionaryFromXMLFilePath:xmlFilePath];
+            NSArray *parsingDictArray = [[resultDict safeObjectForKey:@"jigsaw"] safeObjectForKey:@"maskList"];
+            [self displayMultiPickerForGroup:self.assetsGroup maxCount:parsingDictArray.count];
         }
     }
 }

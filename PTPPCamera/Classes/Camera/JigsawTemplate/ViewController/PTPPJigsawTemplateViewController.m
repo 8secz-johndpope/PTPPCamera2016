@@ -8,11 +8,18 @@
 
 #import "PTPPJigsawTemplateViewController.h"
 #import "PTPPLocalFileManager.h"
+#import "PTPPStickerXMLParser.h"
+#import "PTPPJigsawTemplateModel.h"
+#import "PTPPJigsawView.h"
 
 @interface PTPPJigsawTemplateViewController ()
 @property (nonatomic, strong) UIView *topBar;
 @property (nonatomic, strong) UIButton *backButton;
 @property (nonatomic, strong) UIButton *saveButton;
+@property (nonatomic, strong) UIView *canvasView;
+@property (nonatomic, strong) UIImageView *jigsawTemplateView;
+@property (nonatomic, strong) PTPPJigsawView *jigsawView;
+@property (nonatomic, strong) PTPPJigsawTemplateModel *jigsawTemplateModel;
 @end
 
 @implementation PTPPJigsawTemplateViewController
@@ -28,8 +35,12 @@
     [self.view addSubview:self.topBar];
     [self.topBar addSubview:self.backButton];
     [self.topBar addSubview:self.saveButton];
-    [self updateFrame];
+    [self.view addSubview:self.canvasView];
+    [self.canvasView addSubview:self.jigsawView];
+    [self.canvasView addSubview:self.jigsawTemplateView];
+    
     [self readLocalFileSetting];
+    [self updateFrame];
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -51,6 +62,12 @@
     self.topBar.frame = CGRectMake(0, 0, Screenwidth, HEIGHT_NAV);
     self.backButton.frame = CGRectMake(10, 0, 30, 40);
     self.saveButton.frame = CGRectMake(Screenwidth-100, 0, 100, HEIGHT_NAV);
+    CGFloat sizeRatio = self.jigsawTemplateModel.imageSize.height/self.jigsawTemplateModel.imageSize.width;
+    self.canvasView.frame = CGRectMake(10, self.topBar.bottom+10, Screenwidth-20, (Screenwidth-20)*sizeRatio);
+    self.jigsawTemplateView.frame = self.canvasView.bounds;
+    self.jigsawTemplateView.image = self.jigsawTemplateModel.baseImage;
+    self.jigsawView.frame = self.canvasView.bounds;
+    [self.jigsawView setAttributeWithTemplateModel:self.jigsawTemplateModel images:self.images];
 }
 
 
@@ -65,8 +82,24 @@
 
 #pragma mark - Private Methods
 -(void)readLocalFileSetting{
-    NSArray *folderList = [PTPPLocalFileManager getListOfFilePathAtDirectory:[PTPPLocalFileManager getRootFolderPathForJigsawTemplate]];
-    NSArray *fileContents = [PTPPLocalFileManager getListOfFilePathAtDirectory:[folderList safeObjectAtIndex:0]];
+    NSString *jigsawFolder = [[PTPPLocalFileManager getRootFolderPathForJigsawTemplate] stringByAppendingPathComponent:[[PTPPLocalFileManager getFileNameFromPackageID:self.selectedJigsawItem.packageID inDownloadedList:[PTPPLocalFileManager getDownloadedJigsawTemplateList]] stringByDeletingPathExtension]];
+    NSArray *fileContents = [PTPPLocalFileManager getListOfFilePathAtDirectory:jigsawFolder];
+    NSString *xmlFilePath = nil;
+    for(NSString *path in fileContents){
+        if ([path.pathExtension isEqualToString:@"xml"]) {
+            xmlFilePath = [path stringByDeletingPathExtension];
+        }
+    }
+    if (!xmlFilePath) {
+        NSLog(@"Cannot locate jigsaw template");
+        return;
+    }
+    NSDictionary *resultDict = [PTPPStickerXMLParser dictionaryFromXMLFilePath:xmlFilePath];
+    CGFloat width = [[[[resultDict safeObjectForKey:@"jigsaw"] safeObjectForKey:@"width"] safeStringForKey:@"text"] floatValue];
+    CGFloat height = [[[[resultDict safeObjectForKey:@"jigsaw"] safeObjectForKey:@"height"] safeStringForKey:@"text"] floatValue];
+    CGSize templateSize = CGSizeMake(width, height);
+    NSDictionary *parsingDict = [[[resultDict safeObjectForKey:@"jigsaw"] safeObjectForKey:@"maskList"] safeObjectAtIndex:self.images.count-1];
+    self.jigsawTemplateModel = [PTPPJigsawTemplateModel initWithDictionary:parsingDict templateSize:templateSize folderPath:jigsawFolder];
     
 }
 
@@ -96,6 +129,28 @@
         [_saveButton addTarget:self action:@selector(saveAndExport) forControlEvents:UIControlEventTouchUpInside];
     }
     return _saveButton;
+}
+
+-(UIView *)canvasView{
+    if (!_canvasView) {
+        _canvasView = [[UIView alloc] init];
+        _canvasView.backgroundColor = [UIColor clearColor];
+    }
+    return _canvasView;
+}
+
+-(UIImageView *)jigsawTemplateView{
+    if (!_jigsawTemplateView) {
+        _jigsawTemplateView = [[UIImageView alloc] init];
+    }
+    return _jigsawTemplateView;
+}
+
+-(PTPPJigsawView *)jigsawView{
+    if (!_jigsawView) {
+        _jigsawView = [[PTPPJigsawView alloc] init];
+    }
+    return _jigsawView;
 }
 
 @end

@@ -7,7 +7,9 @@
 //
 
 #import "SOBaseViewController.h"
+#import "PTPPMaterialShopStickerItem.h"
 
 @interface PTPPJigsawTemplateViewController : SOBaseViewController
+@property (nonatomic, strong) PTPPMaterialShopStickerItem *selectedJigsawItem;
 @property (nonatomic, strong) NSArray *images;
 @end

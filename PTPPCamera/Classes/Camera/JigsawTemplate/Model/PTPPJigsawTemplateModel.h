@@ -11,5 +11,6 @@
 @interface PTPPJigsawTemplateModel : NSObject
 @property (nonatomic, strong) UIImage *baseImage;
 @property (nonatomic, assign) CGSize imageSize;
-@property (nonatomic, strong) NSArray <NSString *>*maskArray;
+@property (nonatomic, strong) NSMutableArray <NSMutableArray *>*maskPointArray;
++(instancetype)initWithDictionary:(NSDictionary *)dictionary templateSize:(CGSize)templateSize folderPath:(NSString *)folderPath;
 @end

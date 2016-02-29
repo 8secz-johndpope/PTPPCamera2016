@@ -105,11 +105,15 @@
 +(BOOL)checkIfDownloadedList:(NSDictionary *)downloadedList containsFileName:(NSString *)targetFileName{
     for(NSString *key in [downloadedList allKeys]){
         NSDictionary *currentFile = [downloadedList safeObjectForKey:key];
-        if ([[currentFile safeObjectForKey:kLocalFileName] isEqualToString:targetFileName]) {
+        if ([[currentFile safeStringForKey:kLocalFileName] isEqualToString:targetFileName]) {
             return YES;
         }
     }
     return NO;
+}
+
++(NSString *)getFileNameFromPackageID:(NSString *)packageID inDownloadedList:(NSDictionary *)downloadedList{
+    return [[downloadedList safeObjectForKey:packageID] safeStringForKey:kLocalFileName];
 }
 
 #pragma mark - Fast access to root folder paths

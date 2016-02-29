@@ -30,6 +30,7 @@ static NSString *JigsawTemplatePlistFile = @"JigsawTemplate.plist";
 +(NSDictionary *)getDownloadedARStickerList;
 +(NSDictionary *)getDownloadedJigsawTemplateList;
 +(BOOL)checkIfDownloadedList:(NSDictionary *)downloadedList containsFileName:(NSString *)targetFileName;
++(NSString *)getFileNameFromPackageID:(NSString *)packageID inDownloadedList:(NSDictionary *)downloadedList;
 
 +(NSString *)getRootFolderPathForCache;
 +(NSString *)getRootFolderPathForARStickers;

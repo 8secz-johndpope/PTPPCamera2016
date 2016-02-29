@@ -5,6 +5,7 @@
 //  Created by CHEN KAIDI on 7/1/2016.
 //  Copyright © 2016 putao. All rights reserved.
 //
+
 #import "PTVCTransitionLeftRightManager.h"
 #import "PTPPLiveStickerView.h"
 #import "PTPPLiveVideoShareViewController.h"
@@ -953,6 +954,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 -(UIImageView *)filterView{
     if (!_filterView) {
         _filterView = [[UIImageView alloc] initWithFrame:self.view.bounds];
+        _filterView.contentMode = UIViewContentModeScaleAspectFill;
     }
     return _filterView;
 }
