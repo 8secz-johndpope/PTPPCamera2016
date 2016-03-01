@@ -51,7 +51,7 @@
                 if (group == nil) {
                     return;
                 }
-                
+                [group setAssetsFilter:[ALAssetsFilter allPhotos]];
                 // added fix for camera albums order
                 NSString *sGroupPropertyName = (NSString *)[group valueForProperty:ALAssetsGroupPropertyName];
                 NSUInteger nType = [[group valueForProperty:ALAssetsGroupPropertyType] intValue];
@@ -84,7 +84,7 @@
             };	
                     
             // Enumerate Albums
-            [self.library enumerateGroupsWithTypes:ALAssetsGroupAll
+            [self.library enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos
                                    usingBlock:assetGroupEnumerator 
                                  failureBlock:assetGroupEnumberatorFailure];
         

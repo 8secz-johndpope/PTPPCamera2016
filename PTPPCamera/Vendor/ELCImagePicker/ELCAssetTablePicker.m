@@ -38,7 +38,7 @@
 {
     [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
 	[self.tableView setAllowsSelection:NO];
-    self.tableView.backgroundColor = self.bottomPreview.backgroundColor;
+    self.tableView.backgroundColor = [UIColor whiteColor];
  
     NSMutableArray *tempArray = [[NSMutableArray alloc] init];
     self.elcAssets = tempArray;
@@ -65,7 +65,10 @@
     [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
     [self.navigationController.navigationBar setTintColor:[UIColor whiteColor]];
     
-    
+    if (self.selectionPreviewMode) {
+        [self.navigationController.view addSubview:self.bottomPreview];
+        [self.bottomPreview setAttributeWithMaxCount:self.maxCount];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -307,14 +310,10 @@
     }
 }
 
--(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section{
-    [self.bottomPreview setAttributeWithMaxCount:self.maxCount];
-    return self.bottomPreview;
-}
 
 -(ELCImageSelectionBottomPreview *)bottomPreview{
     if (!_bottomPreview) {
-        _bottomPreview = [[ELCImageSelectionBottomPreview alloc] initWithFrame:CGRectMake(0, Screenheight - kBottomHeight, Screenwidth, self.tableView.contentInset.bottom)];
+        _bottomPreview = [[ELCImageSelectionBottomPreview alloc] initWithFrame:CGRectMake(0, Screenheight - kBottomHeight, Screenwidth, kBottomHeight)];
         __weak typeof(self) weakSelf = self;
         _bottomPreview.finishSelection = ^(NSArray *selectedAssets){
             [weakSelf toggleNextWithSelectedAssets:selectedAssets];

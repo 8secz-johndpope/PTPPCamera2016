@@ -267,7 +267,7 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     
     // Move me
     tablePicker.assetGroup = group;
-    [tablePicker.assetGroup setAssetsFilter:[ALAssetsFilter allAssets]];
+    [tablePicker.assetGroup setAssetsFilter:[ALAssetsFilter allPhotos]];
     
     [self presentViewController:elcPicker animated:YES completion:nil];
 }

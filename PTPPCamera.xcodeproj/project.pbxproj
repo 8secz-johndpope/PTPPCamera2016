@@ -12,6 +12,8 @@
 		C60FD1711C732ABD00F5886B /* PECropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C60FD16A1C732ABD00F5886B /* PECropViewController.m */; };
 		C60FD1721C732ABD00F5886B /* PEResizeControl.m in Sources */ = {isa = PBXBuildFile; fileRef = C60FD16C1C732ABD00F5886B /* PEResizeControl.m */; };
 		C60FD1731C732ABD00F5886B /* UIImage+PECrop.m in Sources */ = {isa = PBXBuildFile; fileRef = C60FD16E1C732ABD00F5886B /* UIImage+PECrop.m */; };
+		C628200A1C8571110028A20F /* CombinationImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = C62820091C8571110028A20F /* CombinationImageView.m */; };
+		C628200D1C8577970028A20F /* CombinationMovingView.m in Sources */ = {isa = PBXBuildFile; fileRef = C628200C1C8577970028A20F /* CombinationMovingView.m */; };
 		C630EA8B1C7FEC8900C6515C /* PTPPImageUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = C630EA8A1C7FEC8900C6515C /* PTPPImageUtil.m */; };
 		C630EA8E1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.m in Sources */ = {isa = PBXBuildFile; fileRef = C630EA8D1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.m */; };
 		C630EA951C80533F00C6515C /* PTPPJigsawTemplateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C630EA941C80533F00C6515C /* PTPPJigsawTemplateViewController.m */; };
@@ -950,6 +952,10 @@
 		C60FD16C1C732ABD00F5886B /* PEResizeControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PEResizeControl.m; sourceTree = "<group>"; };
 		C60FD16D1C732ABD00F5886B /* UIImage+PECrop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+PECrop.h"; sourceTree = "<group>"; };
 		C60FD16E1C732ABD00F5886B /* UIImage+PECrop.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+PECrop.m"; sourceTree = "<group>"; };
+		C62820081C8571110028A20F /* CombinationImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CombinationImageView.h; sourceTree = "<group>"; };
+		C62820091C8571110028A20F /* CombinationImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CombinationImageView.m; sourceTree = "<group>"; };
+		C628200B1C8577970028A20F /* CombinationMovingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CombinationMovingView.h; sourceTree = "<group>"; };
+		C628200C1C8577970028A20F /* CombinationMovingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CombinationMovingView.m; sourceTree = "<group>"; };
 		C630EA891C7FEC8900C6515C /* PTPPImageUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPImageUtil.h; sourceTree = "<group>"; };
 		C630EA8A1C7FEC8900C6515C /* PTPPImageUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPImageUtil.m; sourceTree = "<group>"; };
 		C630EA8C1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ELCImageSelectionBottomPreview.h; sourceTree = "<group>"; };
@@ -2409,6 +2415,10 @@
 		C630EA911C80532800C6515C /* View */ = {
 			isa = PBXGroup;
 			children = (
+				C628200B1C8577970028A20F /* CombinationMovingView.h */,
+				C628200C1C8577970028A20F /* CombinationMovingView.m */,
+				C62820081C8571110028A20F /* CombinationImageView.h */,
+				C62820091C8571110028A20F /* CombinationImageView.m */,
 				C6338D781C8442A000B7320B /* PTPPJigsawView.h */,
 				C6338D791C8442A000B7320B /* PTPPJigsawView.m */,
 				C6338D7B1C84535E00B7320B /* PTPPJigsawCell.h */,
@@ -5331,6 +5341,7 @@
 				C647BC091C7181BE00E596EA /* SOAlertView.m in Sources */,
 				C647BF851C71BBBB00E596EA /* GPUImageDarkenBlendFilter.m in Sources */,
 				C647BDAA1C718E5100E596EA /* ELCAssetCell.m in Sources */,
+				C628200D1C8577970028A20F /* CombinationMovingView.m in Sources */,
 				C647BF7C1C71BBBB00E596EA /* GPUImageColorMatrixFilter.m in Sources */,
 				C647BBE41C7181BE00E596EA /* NSData+CommonCrypto.m in Sources */,
 				C647BFE51C71BBBB00E596EA /* GPUImageSepiaFilter.m in Sources */,
@@ -5580,6 +5591,7 @@
 				C647C8C11C71C40200E596EA /* PTPPCameraSettingPopupView.m in Sources */,
 				C647BCEA1C718C4B00E596EA /* UIImage+Help.m in Sources */,
 				C647BDB91C718E5100E596EA /* MJRefreshHeader.m in Sources */,
+				C628200A1C8571110028A20F /* CombinationImageView.m in Sources */,
 				C647BF7B1C71BBBB00E596EA /* GPUImageColorLocalBinaryPatternFilter.m in Sources */,
 				C647BF731C71BBBB00E596EA /* GPUImageChromaKeyBlendFilter.m in Sources */,
 				C647BFCA1C71BBBB00E596EA /* GPUImageNormalBlendFilter.m in Sources */,
