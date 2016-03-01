@@ -12,6 +12,5 @@
 @interface PTPPMaterialShopViewController : SOBaseViewController
 @property (nonatomic, assign) BOOL hideMenu;
 @property (nonatomic, assign) BOOL proceedToImageEdit;
-@property (nonatomic, strong) ALAssetsGroup *assetsGroup;
 @property (nonatomic, assign) NSInteger activeSection;
 @end

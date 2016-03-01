@@ -24,6 +24,7 @@
 #import "PTPPMaterialShopJigsawTemplateModel.h"
 #import "DownloadManager.h"
 #import "PTPPStickerXMLParser.h"
+#import "AssetHelper.h"
 
 #define kCollectionViewEdgePadding 10
 #define kCellSpacing 5
@@ -489,7 +490,7 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
             }
             NSDictionary *resultDict = [PTPPStickerXMLParser dictionaryFromXMLFilePath:xmlFilePath];
             NSArray *parsingDictArray = [[resultDict safeObjectForKey:@"jigsaw"] safeObjectForKey:@"maskList"];
-            [self displayMultiPickerForGroup:self.assetsGroup maxCount:parsingDictArray.count];
+            [self displayMultiPickerForGroup:[ASSETHELPER.assetArray objectAtIndex:0] maxCount:parsingDictArray.count];
         }
     }
 }

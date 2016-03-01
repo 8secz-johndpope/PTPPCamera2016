@@ -5,20 +5,27 @@
 //  Created by CHEN KAIDI on 29/2/2016.
 //  Copyright © 2016 Putao. All rights reserved.
 //
+#import "ELCImagePickerHeader.h"
 #import "CombinationImageView.h"
+#import "PTPPJigsawViewPopup.h"
 #import "CombinationMovingView.h"
 #import "PTPPJigsawView.h"
 #import "PTPPJigsawCell.h"
+#import "PTPPImageUtil.h"
+#import "AssetHelper.h"
 
-@interface PTPPJigsawView (){
+@interface PTPPJigsawView ()<ELCImagePickerControllerDelegate>
+{
     CombinationMovingView *movingView; //the view moving
     float distanceWidth;
     float distanceHeight;
     CombinationImageView *selectedView;
-    CombinationImageView *benginView;
+    CombinationImageView *beginView;
 }
+
 @property (nonatomic, strong) NSArray *images;
 @property (nonatomic, strong) PTPPJigsawTemplateModel *templateModel;
+@property (nonatomic, strong) PTPPJigsawViewPopup *popup;
 @end
 
 @implementation PTPPJigsawView
@@ -72,14 +79,20 @@
 //        PTPPJigsawCell *cell = [[PTPPJigsawCell alloc] initWithFrame:boundingRect];
 //        [cell setAttributeWithImage:[images safeObjectAtIndex:index] maskPointArray:pointArray];
 //        [self addSubview:cell];
+        
         CombinationImageView *elementView = [[CombinationImageView alloc] initWithFrame:boundingRect];
         elementView.tag = index+1000;           //self 视图tag默认为0
         elementView.realCellArea = path;
         [elementView setImageViewData:[images safeObjectAtIndex:index]];
-        UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(photoLongPressed:)];
-        longPress.numberOfTouchesRequired = 1;
-        [elementView addGestureRecognizer:longPress];
         [self addSubview:elementView];
+        if (images.count>1) {
+            UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(photoLongPressed:)];
+            longPress.numberOfTouchesRequired = 1;
+            [elementView addGestureRecognizer:longPress];
+        }
+        UITapGestureRecognizer *singleRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTap:)];
+        singleRecognizer.numberOfTapsRequired = 1; // 单击
+        [elementView addGestureRecognizer:singleRecognizer];
         index++;
     }
 }
@@ -135,7 +148,12 @@
         distanceWidth = point.x-subPoint.x;
         distanceHeight = point.y-subPoint.y;
         self.userInteractionEnabled = NO;
-        benginView = pressedView;
+        beginView = pressedView;
+        [UIView animateWithDuration:0.8 delay:0 usingSpringWithDamping:0.7
+              initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseIn  animations:^(){
+                  pressedView.transform = CGAffineTransformMakeScale(0.8, 0.8);
+              } completion:^(BOOL finished) { }];
+
     } else if(gesture.state == UIGestureRecognizerStateEnded || gesture.state == UIGestureRecognizerStateCancelled){
         self.userInteractionEnabled = YES;
         movingView.hidden = true;
@@ -148,9 +166,9 @@
 
         }
         if (selectedView!=nil) {
-            UIImage *temp = benginView.imageview.image;
-            [benginView setup];
-            [benginView setImageViewData:selectedView.imageview.image];
+            UIImage *temp = beginView.imageview.image;
+            [beginView setup];
+            [beginView setImageViewData:selectedView.imageview.image];
             [selectedView setup];
             [selectedView setImageViewData:temp];
             selectedView=nil;
@@ -196,5 +214,122 @@
     }
 }
 
+-(void)singleTap:(UITapGestureRecognizer *)gesture{
+
+    __weak typeof(self) weakSelf = self;
+    self.popup.hidden = !self.popup.hidden;
+    if (!self.popup.hidden) {
+        self.popup.transform = CGAffineTransformMakeScale(0.01, 0.01);
+        self.popup.alpha = 0.0;
+        [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.4
+              initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseIn  animations:^(){
+                  self.popup.transform = CGAffineTransformIdentity;
+                  self.popup.alpha = 1.0;
+              } completion:^(BOOL finished) { }];
+
+    }
+    CombinationImageView *pressedView = (id)[gesture view];
+    beginView = pressedView;
+   
+    self.popup.toolSelected = ^(NSInteger index){
+        switch (index) {
+            case 0:
+                [weakSelf swapSelectedImage];
+                weakSelf.popup.hidden = YES;
+                break;
+            case 1:
+                [weakSelf rotateSelectedImage];
+                break;
+            case 2:
+                [weakSelf flipSelectedImage];
+                break;
+            default:
+                break;
+        }
+    };
+   self.popup.center = [gesture locationInView:self];
+    
+}
+
+-(void)swapSelectedImage{
+    if (ASSETHELPER.assetArray.count>0) {
+        [self displayPickerForGroup:[ASSETHELPER.assetArray objectAtIndex:0]];
+    }
+}
+
+-(void)rotateSelectedImage{
+    UIImage *rotatedImage =  [PTPPImageUtil image:beginView.imageview.image rotatedByDegrees:90];
+    [beginView setup];
+    [beginView setImageViewData:rotatedImage];
+}
+
+-(void)flipSelectedImage{
+    UIImage *flippedImage =  [PTPPImageUtil image:beginView.imageview.image flip:0];
+    [beginView setup];
+    [beginView setImageViewData:flippedImage];
+}
+
+- (void)displayPickerForGroup:(ALAssetsGroup *)group
+{
+    ELCAssetTablePicker *tablePicker = [[ELCAssetTablePicker alloc] initWithStyle:UITableViewStylePlain];
+    tablePicker.singleSelection = YES;
+    tablePicker.immediateReturn = YES;
+    
+    ELCImagePickerController *elcPicker = [[ELCImagePickerController alloc] initWithRootViewController:tablePicker];
+    elcPicker.maximumImagesCount = 1;
+    elcPicker.imagePickerDelegate = self;
+    elcPicker.returnsOriginalImage = YES; //Only return the fullScreenImage, not the fullResolutionImage
+    elcPicker.returnsImage = YES; //Return UIimage if YES. If NO, only return asset location information
+    elcPicker.onOrder = NO; //For single image selection, do not display and return order of selected images
+    tablePicker.parent = elcPicker;
+    
+    // Move me
+    tablePicker.assetGroup = group;
+    [tablePicker.assetGroup setAssetsFilter:[ALAssetsFilter allPhotos]];
+    
+    [self.originalVC presentViewController:elcPicker animated:YES completion:nil];
+}
+
+- (void)elcImagePickerController:(ELCImagePickerController *)picker didFinishPickingMediaWithInfo:(NSArray *)info
+{
+    [self.originalVC dismissViewControllerAnimated:YES completion:nil];
+    
+    NSMutableArray *images = [NSMutableArray arrayWithCapacity:[info count]];
+    for (NSDictionary *dict in info) {
+        if ([dict objectForKey:UIImagePickerControllerMediaType] == ALAssetTypePhoto){
+            if ([dict objectForKey:UIImagePickerControllerOriginalImage]){
+                UIImage* image=[dict objectForKey:UIImagePickerControllerOriginalImage];
+                [images addObject:image];
+                
+                UIImageView *imageview = [[UIImageView alloc] initWithImage:image];
+                [imageview setContentMode:UIViewContentModeScaleAspectFit];
+                
+            } else {
+                NSLog(@"UIImagePickerControllerReferenceURL = %@", dict);
+            }
+        }
+    }
+    
+    UIImage *chosenImage = [images safeObjectAtIndex:0];
+    if (chosenImage) {
+        [beginView setup];
+        [beginView setImageViewData:chosenImage];
+    }
+}
+
+- (void)elcImagePickerControllerDidCancel:(ELCImagePickerController *)picker
+{
+    [self.originalVC dismissViewControllerAnimated:YES completion:nil];
+}
+
+
+-(PTPPJigsawViewPopup *)popup{
+    if (!_popup) {
+        _popup = [[PTPPJigsawViewPopup alloc] init];
+        [[UIApplication sharedApplication].keyWindow addSubview:self.popup];
+        self.popup.hidden = YES;
+    }
+    return _popup;
+}
 
 @end

@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "PTPPJigsawTemplateModel.h"
+#import "PTPPJigsawTemplateViewController.h"
 
 @interface PTPPJigsawView : UIView
+@property (nonatomic, weak) PTPPJigsawTemplateViewController *originalVC;
 -(void)setAttributeWithTemplateModel:(PTPPJigsawTemplateModel *)templateModel images:(NSArray *)images;
 @end

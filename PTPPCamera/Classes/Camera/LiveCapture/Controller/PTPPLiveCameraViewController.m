@@ -36,8 +36,7 @@
 #define kStickerScale 2
 
 @interface PTPPLiveCameraViewController ()<DetectFaceDelegate,UIViewControllerTransitioningDelegate, NSXMLParserDelegate, PTPPNewHomeProtocol, ELCImagePickerControllerDelegate>
-@property (nonatomic, strong) ALAssetsLibrary *specialLibrary;
-@property (nonatomic, strong) NSMutableArray *assetGroups;
+
 @property (nonatomic, copy) NSArray *chosenImages;
 @property (strong, nonatomic) DetectFace *detectFaceController;
 @property (nonatomic, strong) UIView *previewView;
@@ -169,7 +168,6 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     [self updateTopControlOptions];
     if (self.assetsLibraryCanUse) {
         [self updateAlbumWithLatestPhoto];
-        [self assetGroups];
     }
 }
 
@@ -487,7 +485,6 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     shopVC.activeSection = 2;
     shopVC.hideMenu = YES;
     shopVC.proceedToImageEdit = YES;
-    shopVC.assetsGroup = [self.assetGroups safeObjectAtIndex:0];
     [self.navigationController pushViewController:shopVC animated:YES];
 }
 
@@ -722,8 +719,8 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
         [self albumNotUseTapped];
         return;
     }
-    if (self.assetGroups.count>0) {
-        [self displayPickerForGroup:[self.assetGroups objectAtIndex:0]];
+    if (ASSETHELPER.assetArray.count>0) {
+        [self displayPickerForGroup:[ASSETHELPER.assetArray objectAtIndex:0]];
     }
 }
 
@@ -844,32 +841,6 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 
 
 #pragma mark - Getters/Setters
-
--(ALAssetsLibrary *)specialLibrary{
-    if (!_specialLibrary) {
-        _specialLibrary = [[ALAssetsLibrary alloc] init];
-    }
-    return _specialLibrary;
-}
-
--(NSMutableArray *)assetGroups{
-    if (!_assetGroups) {
-        _assetGroups = [[NSMutableArray alloc] init];
-        [self.specialLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
-            if (group) {
-                [_assetGroups addObject:group];
-            }
-        } failureBlock:^(NSError *error) {
-            self.chosenImages = nil;
-            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"错误" message:[NSString stringWithFormat:@"相册读取错误: %@ - %@", [error localizedDescription], [error localizedRecoverySuggestion]] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-            [alert show];
-            NSLog(@"A problem occured %@", [error description]);
-            // an error here means that the asset groups were inaccessable.
-            // Maybe the user or system preferences refused access.
-        }];
-    }
-    return _assetGroups;
-}
 
 -(PTPPLiveStickerView *)liveStickerView{
     if (!_liveStickerView) {

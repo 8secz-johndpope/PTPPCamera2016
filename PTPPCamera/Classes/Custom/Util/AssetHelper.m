@@ -9,6 +9,12 @@
 
 #import "PTMacro.h"
 
+@interface AssetHelper ()
+@property (nonatomic, strong) ALAssetsLibrary *specialLibrary;
+
+
+@end
+
 @implementation AssetHelper
 
 
@@ -19,11 +25,37 @@
     dispatch_once(&onceToken, ^{
         _sharedInstance = [[AssetHelper alloc] init];
         [_sharedInstance initAsset];
+        [_sharedInstance assetArray];
     });
     
     return _sharedInstance;
 }
 
+
+-(ALAssetsLibrary *)specialLibrary{
+    if (!_specialLibrary) {
+        _specialLibrary = [[ALAssetsLibrary alloc] init];
+    }
+    return _specialLibrary;
+}
+
+-(NSMutableArray *)assetArray{
+    if (!_assetArray) {
+        _assetArray = [[NSMutableArray alloc] init];
+        [self.specialLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
+            if (group) {
+                [_assetArray addObject:group];
+            }
+        } failureBlock:^(NSError *error) {
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"错误" message:[NSString stringWithFormat:@"相册读取错误: %@ - %@", [error localizedDescription], [error localizedRecoverySuggestion]] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+            [alert show];
+            NSLog(@"A problem occured %@", [error description]);
+            // an error here means that the asset groups were inaccessable.
+            // Maybe the user or system preferences refused access.
+        }];
+    }
+    return _assetArray;
+}
 
 - (void)initAsset
 {

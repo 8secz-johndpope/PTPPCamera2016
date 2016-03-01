@@ -149,6 +149,7 @@
 -(PTPPJigsawView *)jigsawView{
     if (!_jigsawView) {
         _jigsawView = [[PTPPJigsawView alloc] init];
+        _jigsawView.originalVC = self;
     }
     return _jigsawView;
 }

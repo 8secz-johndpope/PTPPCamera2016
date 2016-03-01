@@ -39,6 +39,7 @@
 @property (nonatomic, strong)   ALAssetsLibrary			*assetsLibrary;
 @property (nonatomic, strong)   NSMutableArray          *assetPhotos;
 @property (nonatomic, strong)   NSMutableArray          *assetGroups;
+@property (nonatomic, strong)   NSMutableArray          *assetArray;
 
 @property (readwrite)           BOOL                    bReverse;
 
