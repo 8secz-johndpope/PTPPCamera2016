@@ -139,7 +139,8 @@
             [SVProgressHUD dismissWithSuccess:@"已保存到本地相册" afterDelay:1.0];
             [weakSelf.mouthSticker startAnimating];
             [weakSelf.eyeSticker startAnimating];
-            [weakSelf.navigationController popViewControllerAnimated:YES];
+            PTPPMediaShareViewController *mediaShareVC = [[PTPPMediaShareViewController alloc] initWithImage:weakSelf.basePhoto videoPath:videoURL];
+            [weakSelf.navigationController pushViewController:mediaShareVC animated:YES];
         });
     };
     

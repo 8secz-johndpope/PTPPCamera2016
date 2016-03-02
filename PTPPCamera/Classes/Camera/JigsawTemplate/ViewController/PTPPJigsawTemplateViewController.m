@@ -7,6 +7,7 @@
 //
 
 #import "PTPPJigsawTemplateViewController.h"
+#import "PTPPMediaShareViewController.h"
 #import "PTPPMaterialShopViewController.h"
 #import "PTPPLocalFileManager.h"
 #import "PTPPStickerXMLParser.h"
@@ -76,7 +77,15 @@
 
 #pragma mark - Touch Events
 -(void)saveAndExport{
-
+    UIGraphicsBeginImageContextWithOptions(self.canvasView.bounds.size, YES, [UIScreen mainScreen].scale);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    [self.canvasView.layer renderInContext:context];
+    UIImage *screenShot = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    UIImageWriteToSavedPhotosAlbum(screenShot, nil, nil, nil);
+    [SVProgressHUD showSuccessWithStatus:@"保存成功" duration:1.0];
+    PTPPMediaShareViewController *mediaShareVC = [[PTPPMediaShareViewController alloc] initWithImage:screenShot];
+    [self.navigationController pushViewController:mediaShareVC animated:YES];
 }
 
 -(void)goBack{

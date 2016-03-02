@@ -6,13 +6,17 @@
 //  Copyright © 2016 putao. All rights reserved.
 //
 
+#import "UMSocialWechatHandler.h"
+#import "UMSocialSnsService.h"
+#import "UMSocialSnsPlatformManager.h"
+#import "UMSocialQQHandler.h"
 #import "PTPPMediaShareViewController.h"
 #import "PTRecommendAppBottomView.h"
 
 #import "PTPPVideoUploadManager.h"
 #import "NSString+Hashes.h"
 #import "SVProgressHUD.h"
-@interface PTPPMediaShareViewController ()<HTTPRequestDelegate>
+@interface PTPPMediaShareViewController ()<UMSocialUIDelegate,HTTPRequestDelegate>
 @property (nonatomic, strong) UIImageView *backgroundImage;
 @property (nonatomic, strong) SOImageTextControl *saveTitleView;
 @property (nonatomic, strong) UIImage *imgShare;
@@ -20,7 +24,11 @@
 @property (nonatomic, assign) NSInteger shareOption;
 @property (nonatomic, strong) NSString *videoWebLink;
 @property (nonatomic, strong) PTRecommendAppBottomView *recommendAppView;
+@property (nonatomic, strong) NSString *shareMediaType;
 @end
+
+static NSString *PTShareMediaTypeImage = @"PTShareMediaTypeImage";
+static NSString *PTShareMediaTypeVideo = @"PTShareMediaTypeVideo";
 
 @implementation PTPPMediaShareViewController
 
@@ -29,6 +37,16 @@
     if (self) {
         self.imgShare = img;
         self.videoURL = videoURL;
+        self.shareMediaType = PTShareMediaTypeVideo;
+    }
+    return self;
+}
+
+-(id)initWithImage:(UIImage *)img{
+    self = [super init];
+    if (self) {
+        self.imgShare = img;
+        self.shareMediaType = PTShareMediaTypeImage;
     }
     return self;
 }
@@ -101,7 +119,7 @@
                 shareButton.textLabel.text = @"QQ好友";
                 break;
             case 3:
-                shareButton.imageView.image = [UIImage imageNamed:@"icon_40_04"];
+                shareButton.imageView.image = [UIImage imageNamed:@"icon_40_05"];
                 shareButton.textLabel.text = @"新浪微博";
                 break;
             default:
@@ -122,79 +140,105 @@
 }
 
 -(void)didTapShareOption:(UIButton *)shareButton{
-    PTPPVideoUploadManager *pthttp = [[PTPPVideoUploadManager alloc] init];
-    [pthttp api_getVideoUploadTokenWithDelegate:self];
     self.shareOption = shareButton.tag;
-    [SVProgressHUD showWithStatus:@"处理中"];
+    if (self.shareMediaType == PTShareMediaTypeVideo) {
+        PTPPVideoUploadManager *pthttp = [[PTPPVideoUploadManager alloc] init];
+        [pthttp api_getVideoUploadTokenWithDelegate:self];
+        [SVProgressHUD showWithStatus:@"处理中"];
+    }else{
+        [self share];
+    }
+    
 }
 
--(void)shareVideo{
-//    switch (self.shareOption) {
-//        case 0:
-//            [self shareWxSession];
-//            break;
-//        case 1:
-//            [self shareWxTimeline];
-//            break;
-//        case 2:
-//            [self shareQQ];
-//            break;
-//        case 3:
-//            [self shareSina];
-//            break;
-//        default:
-//            break;
-//    }
+-(void)share{
+    switch (self.shareOption) {
+        case 0:
+            [self shareWxSession];
+            break;
+        case 1:
+            [self shareWxTimeline];
+            break;
+        case 2:
+            [self shareQQ];
+            break;
+        case 3:
+            [self shareSina];
+            break;
+        default:
+            break;
+    }
 }
 
 #pragma mark - 分享操作
-//-(void) shareWxSession{
-//    [MobClick event:PHOTOEDIT_VIEW_SHARE_WxSession];//分享给微信好友次数
-//    [self shareWithType:UmengWXSession];
-//}
-//-(void) shareWxTimeline{
-//    [MobClick event:PHOTOEDIT_VIEW_SHARE_WxTimeline]; //分享给微信朋友圈次数
-//    [self shareWithType:UmengWXTimeline];
-//}
-//
-//-(void) shareQQ{
-//    [MobClick event:PHOTOEDIT_VIEW_SHARE_QQ];    //分享给QQ空间次数
-//    [self shareWithType:UmengQQ];
-//}
-//
-//-(void) shareQzone{
-//    [MobClick event:PHOTOEDIT_VIEW_SHARE_Qzone];    //分享给QQ空间次数
-//    [self shareWithType:UmengQzone];
-//}
-//-(void) shareSina{
-//    [MobClick event:PHOTOEDIT_VIEW_SHARE_Sina];    //分享给新浪微博次数
-//    [self shareWithType:UmengSina];
-//}
-//
-//-(void) shareWithType:(NSString *)type {
-//    NSString *strShare = @"葡萄亲子相机";
-//    
-//    NSData *dataPhoto = UIImageJPEGRepresentation(self.imgShare, 0.7);
-//    UIImage *shareImage = [UIImage imageWithData:dataPhoto];
-//
-//    [[UMSocialData defaultData].urlResource setResourceType:UMSocialUrlResourceTypeVideo url:self.videoWebLink];
-//    [[UMSocialControllerService defaultControllerService] setShareText:strShare shareImage:shareImage socialUIDelegate:self];
-//    UMSocialSnsPlatform *snsPlatform = [UMSocialSnsPlatformManager getSocialPlatformWithName:type];
-//    snsPlatform.snsClickHandler(self,[UMSocialControllerService defaultControllerService],YES);
-//    
-//}
-//
-//-(void)didFinishGetUMSocialDataInViewController:(UMSocialResponseEntity *)response
-//{
-//    //根据`responseCode`得到发送结果,如果分享成功
-//    if(response.responseCode == UMSResponseCodeSuccess)
-//    {
-//        
-//    } else {
-//        // stay on this page
-//    }
-//    
-//}
+-(void) shareWxSession{
+
+    [self shareWithType:UmengWXSession];
+}
+-(void) shareWxTimeline{
+
+    [self shareWithType:UmengWXTimeline];
+}
+
+-(void) shareQQ{
+
+    [self shareWithType:UmengQQ];
+}
+
+-(void) shareQzone{
+
+    [self shareWithType:UmengQzone];
+}
+-(void) shareSina{
+
+    [self shareWithType:UmengSina];
+}
+
+-(void) shareWithType:(NSString *)type {
+    NSString *strShare = @"葡萄亲子相机";
+    
+    NSData *dataPhoto = UIImageJPEGRepresentation(self.imgShare, 0.7);
+    UIImage *shareImage = [UIImage imageWithData:dataPhoto];
+
+    if ([self.shareMediaType isEqualToString:PTShareMediaTypeVideo]) {
+        [[UMSocialData defaultData].urlResource setResourceType:UMSocialUrlResourceTypeVideo url:self.videoWebLink];
+        [[UMSocialControllerService defaultControllerService] setShareText:strShare shareImage:shareImage socialUIDelegate:self];
+        UMSocialSnsPlatform *snsPlatform = [UMSocialSnsPlatformManager getSocialPlatformWithName:type];
+        snsPlatform.snsClickHandler(self,[UMSocialControllerService defaultControllerService],YES);
+    }else{
+        if([type isEqualToString:UmengQQ]) {
+            [UMSocialData defaultData].extConfig.qqData.qqMessageType = UMSocialQQMessageTypeImage;
+        } else if([type isEqualToString:UmengWXSession]||[type isEqualToString:UmengWXTimeline]){
+            [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeImage;
+        }else if([type isEqualToString:UmengQzone]) {
+            strShare = [self getShareText];
+            [UMSocialData defaultData].extConfig.qqData.qqMessageType = UMSocialQQMessageTypeImage;
+        }
+        [[UMSocialControllerService defaultControllerService] setShareText:strShare shareImage:shareImage socialUIDelegate:self];
+        
+        UMSocialSnsPlatform *snsPlatform = [UMSocialSnsPlatformManager getSocialPlatformWithName:type];
+        snsPlatform.snsClickHandler(self,[UMSocialControllerService defaultControllerService],YES);
+    }
+}
+
+-(NSString *)getShareText{
+    NSArray *arrText = @[@"再不拍，孩子就长大了！",@"用镜头记录孩子成长点滴，满满的都是爱啊！",@"我对你的喜爱有如滔滔江水，连绵不绝，又如黄河泛滥一发不可收拾。",@"萌主驾到，速来围观！",@"家有萌娃，可爱，就是这么任性！"];
+    int random = arc4random() % 5;
+    
+    return arrText[random];
+}
+
+-(void)didFinishGetUMSocialDataInViewController:(UMSocialResponseEntity *)response
+{
+    //根据`responseCode`得到发送结果,如果分享成功
+    if(response.responseCode == UMSResponseCodeSuccess)
+    {
+        
+    } else {
+        // stay on this page
+    }
+    
+}
 
 -(void)request:(AFHTTPRequestOperation *)myRequest finshAction:(NSDictionary *)dic withURLTag:(NSString *)url{
     if ([url isEqualToString:@"0"]) {
@@ -204,6 +248,7 @@
             [SVProgressHUD dismissWithError:@"请求失败" afterDelay:2.0];
             return;
         }
+        NSLog(@"Video Upload Success");
         PTPPVideoUploadManager *pthttp = [[PTPPVideoUploadManager alloc] init];
         [pthttp api_getVideoLinkWithDelegate:self hash:hash ext:ext];
     }
@@ -213,6 +258,7 @@
             [SVProgressHUD dismissWithError:@"请求失败" afterDelay:2.0];
             return;
         }
+        NSLog(@"Video Upload token received");
         PTPPVideoUploadManager *pthttp = [[PTPPVideoUploadManager alloc] init];
         NSData *videoData = [[NSFileManager defaultManager] contentsAtPath:[self.videoURL path]];
         NSString *file_sha = [NSString getSha1String:videoData];
@@ -223,7 +269,7 @@
         [pthttp video_upload:self withUploadToken:uploadToken withPhotoFileName:[NSString stringWithFormat:@"%@",[NSDate date]] withVideoPath:self.videoURL withVideoSHA_1:file_sha withTag:0];
     }
     if ([url isEqualToString:API_VIDEO_WEB_SHARE]) {
-        NSLog(@"Video Upload Success");
+        NSLog(@"Video link get");
         NSString *originalLink = [[dic safeObjectForKey:@"data"] safeObjectForKey:@"media_url"];
         originalLink = [originalLink stringByAppendingString:@"&media_type=VIDEO"];
         self.videoWebLink = [[NSString stringWithFormat:@"%@%@",PTPP_BASE_URL,API_VIDEO_H5] stringByAppendingString:originalLink];
@@ -232,7 +278,7 @@
             return;
         }
         [SVProgressHUD dismiss];
-        [self shareVideo];
+        [self share];
     }
 }
 

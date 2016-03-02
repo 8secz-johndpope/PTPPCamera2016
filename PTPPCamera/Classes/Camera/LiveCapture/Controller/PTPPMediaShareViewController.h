@@ -10,4 +10,5 @@
 
 @interface PTPPMediaShareViewController : SOBaseViewController
 -(id)initWithImage:(UIImage *)img videoPath:(NSURL *)videoURL;
+-(id)initWithImage:(UIImage *)img;
 @end

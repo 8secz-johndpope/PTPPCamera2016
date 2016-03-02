@@ -59,6 +59,7 @@ static NSString *PTLiveStickerPickerCellID = @"PTLiveStickerPickerCellID";
     self.stickerSet = [[NSMutableArray alloc] initWithArray:preinstalledSet];
     [self setNeedsLayout];
     [self.collectionView reloadData];
+    [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForARStickers]];
 }
 
 -(void)layoutSubviews{
@@ -170,7 +171,7 @@ static NSString *PTLiveStickerPickerCellID = @"PTLiveStickerPickerCellID";
         NSArray *contentFilePathArray = [PTPPLocalFileManager getListOfFilePathAtDirectory:contentFilePathList];
         for(NSString *contentFileURL in contentFilePathArray){
             if ([contentFileURL rangeOfString:@"_icon"].location != NSNotFound) {
-                primaryIcon = [[UIImage alloc] initWithContentsOfFile:contentFileURL];
+                primaryIcon = [[UIImage alloc] initWithContentsOfFile:[contentFileURL stringByDeletingPathExtension]];
             }
         }
         [((PTLiveStickerPickerCell *)cell) setAttributeWithImage:primaryIcon selected:selected];

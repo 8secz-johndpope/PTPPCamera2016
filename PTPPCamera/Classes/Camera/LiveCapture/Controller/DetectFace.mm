@@ -275,21 +275,7 @@
     }
     outputImage = [outputImage imageByApplyingTransform:t];
     CGImageRef imageRef = [self.context createCGImage:outputImage fromRect:outputImage.extent];
-    UIImage *newPtImage = [UIImage imageWithCGImage:imageRef];
-    
-//    CFDataRef m_DataRef;
-//    m_DataRef = CGDataProviderCopyData(CGImageGetDataProvider(cgImage));
-//    UInt8 * m_PixelBuf = (UInt8 *) CFDataGetBytePtr(m_DataRef);
-//    
-//    NSString* tmpSrcpath =  [NSHomeDirectory() stringByAppendingString:@"/Documents/"];
-//    const char *tmpSrcPtah =  [tmpSrcpath cStringUsingEncoding:NSUTF8StringEncoding];
-//    
-//    PTU8* retData = new PTU8[(int)newPtImage.size.width * (int)newPtImage.size.height *3];
-//    AutoWhitening(m_PixelBuf, PTSize(newPtImage.size.width, newPtImage.size.height), PT_IMG_RGBA8888, retData, PTSize(newPtImage.size.width, newPtImage.size.height), PT_IMG_BGR888, false);
-//    
-//    NSArray *tempArray = [PTPPLocalFileManager getListOfFilePathAtDirectory:tmpSrcpath];
-//    NSString *imageURL = [tempArray objectAtIndex:1];
-//    delete [] retData;
+    UIImage *newPtImage;
 
 //    CFDataRef m_DataRef;
 //    m_DataRef = CGDataProviderCopyData(CGImageGetDataProvider(imageRef));
@@ -298,28 +284,29 @@
 //    NSString* tmpSrcpath =  [NSHomeDirectory() stringByAppendingString:@"/Documents/"];
 //    const char *tmpSrcPtah =  [tmpSrcpath cStringUsingEncoding:NSUTF8StringEncoding];
 //
-//    PTU8* retData = new PTU8[640 * 480 *3];//new PTU8[(int)rImage.size.width * (int)rImage.size.height *3];
-//    AutoWhitening(m_PixelBuf, PTSize(newPtImage.size.width, newPtImage.size.height), PT_IMG_RGBA8888, retData, PTSize(newPtImage.size.width, newPtImage.size.height), PT_IMG_BGR888, FALSE);
-//    NSLog(@"acvasda");
+//    PTU8* retData = new PTU8[(int)newPtImage.size.width * (int)newPtImage.size.height  *3];//new PTU8[(int)rImage.size.width * (int)rImage.size.height *3];
+//    AutoWhitening(m_PixelBuf, PTSize(newPtImage.size.width, newPtImage.size.height), PT_IMG_RGBA8888, retData, PTSize(newPtImage.size.width, newPtImage.size.height), PT_IMG_BGR888, TRUE);
 //    delete [] retData;
 //    
 //    CFRelease(m_DataRef);
-    CGImageRelease(imageRef);
+    
     
     if (self.activeFilterID>0) {
-        NSDictionary *filterResult = [self getFilterResultFromInputImage:newPtImage filterIndex:self.activeFilterID];
-        newPtImage = [filterResult safeObjectForKey:PTFILTERIMAGE];
+        @autoreleasepool {
+            newPtImage = [UIImage imageWithCGImage:imageRef];
+            NSDictionary *filterResult = [self getFilterResultFromInputImage:newPtImage filterIndex:self.activeFilterID];
+            newPtImage = [filterResult safeObjectForKey:PTFILTERIMAGE];
+        }
+        
     }else{
-        //newPtImage = [[UIImage alloc] initWithContentsOfFile:imageURL];
+        
     }
     
    
 //    __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        //weakSelf.previewLayer.contents = (__bridge id)(resultImage.CGImage);
 
-        
-        
+        CGImageRelease(imageRef);
         CGSize parentFrameSize = [self.previewView frame].size;
         NSString *gravity = [self.previewLayer videoGravity];
         CGRect previewBox = [DetectFace videoPreviewBoxForGravity:gravity frameSize:parentFrameSize apertureSize:clap.size];

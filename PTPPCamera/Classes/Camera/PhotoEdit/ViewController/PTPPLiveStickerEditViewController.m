@@ -5,13 +5,14 @@
 //  Created by CHEN KAIDI on 18/2/2016.
 //  Copyright © 2016 Putao. All rights reserved.
 //
-
+#import "DownloadManager.h"
+#import "PTPPLocalFileManager.h"
 #import "PTPPLiveStickerEditViewController.h"
 #import "PTPPLiveStickerScrollView.h"
 #import "PTPPLiveStickerView.h"
 #import "PTPPStickerXMLParser.h"
 #import "PTImageSequenceToVideoConverter.h"
-
+#import "PTPPMediaShareViewController.h"
 #define kFilterScrollHeight 130
 
 
@@ -73,10 +74,27 @@
     // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - Touch Events
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidFinishLoading:) name:kDownloadDidFinishLoading object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidReceiveData:) name:kDownloadDidReceiveData object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidFail:) name:kDownloadDidFail object:nil];
+}
 
+-(void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kDownloadDidFinishLoading object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kDownloadDidFail object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kDownloadDidReceiveData object:nil];
+}
+
+
+#pragma mark - Touch Events
 -(void)toggleLiveStickerOption{
     __weak typeof(self) weakSelf = self;
+    [self.liveStickerScrollView loadNewARStickerData];
+    self.liveStickerScrollView.selectedStickerName = self.selectedARSticker;
+    
     self.liveStickerScrollView.stickerSelected = ^(NSString *stickerName, BOOL isFromBundle){
         weakSelf.eyeAnimation = nil;
         weakSelf.mouthAnimation = nil;
@@ -86,37 +104,60 @@
         weakSelf.bottomSticker.animationImages = nil;
         if (stickerName != nil) {
             weakSelf.selectedARSticker = stickerName;
-//            if(isFromBundle){
-//                [weakSelf loadLiveStickerFromXMLFile:stickerName];
-//            }else{
-//#warning load from directory
-//            }
+            [SOAutoHideMessageView showMessage:@"请将正脸置于取景器内" inView:weakSelf.view];
+            [weakSelf loadLiveStickerWithFileName:stickerName];
             [weakSelf updateStickerPosition];
         }
     };
-    self.liveStickerScrollView.selectedStickerName = self.selectedARSticker;
-
-    
+    self.liveStickerScrollView.actionDownload = ^(NSString *sourceURL, NSString *destURL, PTPPMaterialShopStickerItem *item){
+        [weakSelf downloadMaterialFromSourceURL:sourceURL saveAtDestPath:destURL package:item];
+    };
     [self.view addSubview:self.liveStickerScrollView];
     self.liveStickerScrollView.frame = CGRectMake(0, Screenheight, self.liveStickerScrollView.width, self.liveStickerScrollView.height);
     [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
           initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseIn  animations:^(){
               weakSelf.liveStickerScrollView.frame = CGRectMake(0, Screenheight-kFilterScrollHeight+40, weakSelf.liveStickerScrollView.width, weakSelf.liveStickerScrollView.height);
-            
           } completion:^(BOOL finished) {}];
 }
 
-//Read Sticker files directly from NSBundle
--(BOOL)loadLiveStickerFromXMLFile:(NSString *)xmlFileName{
-    NSString *xmlFilePath = [[NSBundle mainBundle] pathForResource:xmlFileName ofType:@"xml"];
-    NSDictionary *resultDict = [PTPPStickerXMLParser dictionaryFromXMLFilePath:xmlFilePath];
-    if (!resultDict) {
+-(void)downloadMaterialFromSourceURL:(NSString *)sourceURL saveAtDestPath:(NSString *)destPathURL package:(PTPPMaterialShopStickerItem *)package {
+    [[DownloadManager shareManager] addDownloadWithFilename:destPathURL URL:[NSURL URLWithString:sourceURL] package:package];
+    [self.liveStickerScrollView.collectionView reloadData];
+}
+
+-(BOOL)loadLiveStickerWithFileName:(NSString *)fileName{
+    NSString *downloadFolder = nil;
+    NSString *xmlFilePath = nil;
+    if (fileName) {
+        downloadFolder = fileName;
+        if (!downloadFolder){
+            NSLog(@"Sticker not existed");
+            return NO;
+        }
+        //Print list of file in the directory
+        [PTPPLocalFileManager printListOfFilesAtDirectory:downloadFolder];
+        NSArray *fileList = [PTPPLocalFileManager getListOfFilePathAtDirectory:downloadFolder];
+        NSLog(@"download folder %@",downloadFolder);
+        for(NSString *filePath in fileList){
+            if ([filePath.pathExtension isEqualToString:@"xml"]) {
+                xmlFilePath = [filePath stringByDeletingPathExtension];
+                NSLog(@"XML:%@",xmlFilePath);
+            }
+        }
+    }else{
         NSLog(@"Sticker not existed");
         return NO;
     }
-    [self createStickerAnimationFromDictionarySettings:resultDict downloadFolder:nil];
+    
+    NSDictionary *resultDict = [PTPPStickerXMLParser dictionaryFromXMLFilePath:xmlFilePath];
+    if (!resultDict) {
+        NSLog(@"Sticker XML not existed");
+        return NO;
+    }
+    [self createStickerAnimationFromDictionarySettings:resultDict downloadFolder:downloadFolder];
     return YES;
 }
+
 
 -(void)createStickerAnimationFromDictionarySettings:(NSDictionary *)resultDict downloadFolder:(NSString *)downloadFolder{
 //    PTPPStickerAnimation *mouthAnimation;
@@ -133,6 +174,32 @@
     }
     //[self.liveStickerView setAttributeWithMouthAnimation:mouthAnimation eyeAnimation:eyeAnimation bottomAnimation:bottomAnimation];
 }
+
+#pragma mark - NSNotifications
+- (void)downloadDidFinishLoading:(NSNotification *)notification{
+    NSLog(@"download complete");
+    Download *download = notification.object;
+    NSString *desPath = nil;
+    
+    desPath = [PTPPLocalFileManager getRootFolderPathForARStickers] ;
+    [PTPPLocalFileManager unzipFileFromPath:download.filename desPath:[desPath stringByAppendingPathComponent:[[download.filename lastPathComponent] stringByDeletingPathExtension]]];
+    [PTPPLocalFileManager writePropertyListTo:ARStickerPlistFile WithPackageID:download.package.packageID fileName:[download.filename lastPathComponent] themeName:download.package.packageName fileSize:download.package.packageSize totalNum:download.package.totalNum coverPic:download.package.coverPic];
+    
+    [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+    [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForARStickers]];
+    [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForJigsawTemplate]];
+    
+    [self.liveStickerScrollView.collectionView reloadData];
+}
+
+- (void)downloadDidFail:(NSNotification *)notification{
+    NSLog(@"download failed");
+}
+
+- (void)downloadDidReceiveData:(NSNotification *)notification{
+    NSLog(@"download ongoing");
+}
+
 
 
 -(void)goBack{
@@ -157,7 +224,9 @@
             [SVProgressHUD dismissWithSuccess:@"已保存到本地相册" afterDelay:1.0];
             [weakSelf.mouthSticker startAnimating];
             [weakSelf.eyeSticker startAnimating];
-            [weakSelf.navigationController popViewControllerAnimated:YES];
+            //[weakSelf.navigationController popViewControllerAnimated:YES];
+            PTPPMediaShareViewController *mediaShareVC = [[PTPPMediaShareViewController alloc] initWithImage:weakSelf.basePhoto videoPath:videoURL];
+            [weakSelf.navigationController pushViewController:mediaShareVC animated:YES];
         });
     };
     
@@ -374,8 +443,17 @@ static int calDistance(int fx, int fy, int tx, int ty){
 -(PTPPLiveStickerScrollView *)liveStickerScrollView{
     if (!_liveStickerScrollView) {
         _liveStickerScrollView = [[PTPPLiveStickerScrollView alloc] initWithFrame:CGRectMake(0, 0, Screenwidth, kFilterScrollHeight)];
-//        [_liveStickerScrollView setAttributeWithFilterSet:@[@"hz",@"cn", @"mhl", @"xm", @"fd", @"kq", @"xhx",@"hy"]]; //Hard coded
-        [_liveStickerScrollView setAttributeWithLocalCacheWithPreinstalledSet:@[@"hz",@"cn", @"mhl", @"xm", @"fd", @"kq", @"xhx",@"hy"]];
+        NSArray *preinstalledSet = @[@"hz",@"cn", @"mhl", @"xm", @"fd", @"kq", @"xhx",@"hy"];
+        NSMutableArray *rearrangedSet = [[NSMutableArray alloc] init];
+        NSArray *fileList = [PTPPLocalFileManager getListOfFilePathAtDirectory:[PTPPLocalFileManager getRootFolderPathForARStickers]];
+        for(NSString *stickerName in preinstalledSet){
+            for(NSString *path in fileList){
+                if ([[path lastPathComponent] isEqualToString:stickerName]) {
+                    [rearrangedSet addObject:path];
+                }
+            }
+        }
+        [_liveStickerScrollView setAttributeWithLocalCacheWithPreinstalledSet:rearrangedSet];
     }
     return _liveStickerScrollView;
 }

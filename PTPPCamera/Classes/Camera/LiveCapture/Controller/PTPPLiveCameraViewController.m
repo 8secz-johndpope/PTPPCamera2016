@@ -951,6 +951,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     if (!_filterView) {
         _filterView = [[UIImageView alloc] initWithFrame:self.view.bounds];
         _filterView.contentMode = UIViewContentModeScaleAspectFill;
+        _filterView.hidden = YES;
     }
     return _filterView;
 }

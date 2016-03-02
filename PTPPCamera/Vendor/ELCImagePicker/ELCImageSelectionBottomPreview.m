@@ -166,7 +166,7 @@
 
 -(UIButton *)nextButton{
     if (!_nextButton) {
-        _nextButton = [[UIButton alloc] initWithFrame:CGRectMake(self.width-Screenwidth/4, 0, Screenwidth/4, HEIGHT_NAV)];
+        _nextButton = [[UIButton alloc] initWithFrame:CGRectMake(self.width-100, 0, 100, HEIGHT_NAV)];
         _nextButton.backgroundColor = THEME_COLOR;
         [_nextButton addTarget:self action:@selector(toggleNext) forControlEvents:UIControlEventTouchUpInside];
     }

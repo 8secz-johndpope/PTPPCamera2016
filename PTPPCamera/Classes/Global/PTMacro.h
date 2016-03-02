@@ -39,6 +39,14 @@
 #define LENGHT_NICK_NOR             2
 #define LENGHT_NICK_MAX             24
 
+//umeng share social
+#define UmengAppkey @"54853d37fd98c57554000b34"
+//#define UmengAppkey @"54853d37fd98c57554000b34"  //push
+#define UmengSina @"sina"
+#define UmengQQ @"qq"
+#define UmengWXTimeline @"wxtimeline"
+#define UmengWXSession @"wxsession"
+#define UmengQzone @"qzone"
 
 // noti
 #define NOTI_POST(name)             [[NSNotificationCenter defaultCenter] postNotificationName:(name) object:nil];

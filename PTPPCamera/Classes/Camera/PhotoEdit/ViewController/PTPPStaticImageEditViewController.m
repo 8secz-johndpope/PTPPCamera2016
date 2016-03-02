@@ -6,6 +6,7 @@
 //  Copyright © 2016 Putao. All rights reserved.
 //
 
+#import "PTPPMediaShareViewController.h"
 #import "PTPPStaticImageEditViewController.h"
 #import "PTPPLiveStickerEditViewController.h"
 #import "PTPPMaterialShopViewController.h"
@@ -72,16 +73,6 @@
     [self preloadCropSizeSet];
     [self preloadRotateSet];
     [self updateFrame];
-    
-//    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
-//    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"fqj" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
-//    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao2" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
-//    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao3" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
-//    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao4" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
-//    [PTPPLocalFileManager unzipFileFromPath:[PTPPLocalFileManager getNSBundlePathForFileName:@"qipao5" ofType:@"zip"] desPath:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
-    
-    [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
-    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -311,7 +302,9 @@
     UIGraphicsEndImageContext();
     UIImageWriteToSavedPhotosAlbum(screenShot, nil, nil, nil);
     [SVProgressHUD showSuccessWithStatus:@"保存成功" duration:1.0];
-
+    PTPPMediaShareViewController *mediaShareVC = [[PTPPMediaShareViewController alloc] initWithImage:screenShot];
+    [self.navigationController pushViewController:mediaShareVC animated:YES];
+    
 }
 
 -(void)toggleStaticStickerMenu{
