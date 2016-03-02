@@ -7,7 +7,7 @@
 //
 #import "ELCImagePickerHeader.h"
 #import "CombinationImageView.h"
-#import "PTPPJigsawViewPopup.h"
+
 #import "CombinationMovingView.h"
 #import "PTPPJigsawView.h"
 #import "PTPPJigsawCell.h"
@@ -25,7 +25,8 @@
 
 @property (nonatomic, strong) NSArray *images;
 @property (nonatomic, strong) PTPPJigsawTemplateModel *templateModel;
-@property (nonatomic, strong) PTPPJigsawViewPopup *popup;
+
+
 @end
 
 @implementation PTPPJigsawView
@@ -36,7 +37,7 @@
         self.backgroundColor = [UIColor clearColor];
         movingView = [[CombinationMovingView alloc] initWithFrame:CGRectZero];
         movingView.hidden = true;
-        [self addSubview:movingView];
+        
         self.clipsToBounds = YES;
     }
     return self;
@@ -45,6 +46,8 @@
 -(void)setAttributeWithTemplateModel:(PTPPJigsawTemplateModel *)templateModel images:(NSArray *)images{
     self.templateModel = templateModel;
     self.images = images;
+    [self.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    [self addSubview:movingView];
     NSInteger index = 0;
     for(NSMutableArray *maskArray in self.templateModel.maskPointArray){
         NSMutableArray *pointArray = [[NSMutableArray alloc] init];
@@ -331,5 +334,6 @@
     }
     return _popup;
 }
+
 
 @end

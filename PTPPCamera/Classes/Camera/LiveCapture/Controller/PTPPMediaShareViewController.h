@@ -8,6 +8,6 @@
 
 #import "SOBaseViewController.h"
 
-@interface PTPPLiveVideoShareViewController : SOBaseViewController
+@interface PTPPMediaShareViewController : SOBaseViewController
 -(id)initWithImage:(UIImage *)img videoPath:(NSURL *)videoURL;
 @end

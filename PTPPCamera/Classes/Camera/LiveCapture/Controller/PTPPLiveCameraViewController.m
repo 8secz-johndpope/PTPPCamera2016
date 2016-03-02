@@ -5,10 +5,10 @@
 //  Created by CHEN KAIDI on 7/1/2016.
 //  Copyright © 2016 putao. All rights reserved.
 //
-
+#import "DownloadManager.h"
 #import "PTVCTransitionLeftRightManager.h"
 #import "PTPPLiveStickerView.h"
-#import "PTPPLiveVideoShareViewController.h"
+#import "PTPPMediaShareViewController.h"
 #import "PTPPMaterialShopViewController.h"
 #import "PTPPNewHomeViewController.h"
 #import "ELCImagePickerHeader.h"
@@ -104,12 +104,12 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     [self.view addSubview:self.cropMaskBottom];
     [self.view addSubview:self.topControlView];
     [self.view addSubview:self.bottomControlView];
-
+    
     //Start Live camera face detection
     [self setupCameraControlPanel];
     self.cameraCanUse = [PTPPImageUtil checkCameraCanUse];
     self.assetsLibraryCanUse = [PTUtilTool checkALAssetsLibraryCanUse];
-
+    
     self.liveStickerView.hidden = YES;
     UITapGestureRecognizer *singleFingerTap =
     [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap)];
@@ -135,7 +135,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
             image = weakSelf.filterView.image;
         }
         if (weakSelf.liveStickerView.alpha == 0 || (weakSelf.liveStickerView.eyeSticker.isHidden && weakSelf.liveStickerView.mouthSticker.isHidden)) {
-          
+            
             CGFloat widthRatio = image.size.width/(Screenwidth*[UIScreen mainScreen].scale);
             CGFloat heightRatio = image.size.height/(Screenheight*[UIScreen mainScreen].scale);
             //No AR stickers on screen, go to static photo edit process.
@@ -146,7 +146,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
             }
         }else{
             //AR stickers on screen, go to preview video
-         
+            
             PTPPLiveStickerPreviewViewController *liveStickerVC = [[PTPPLiveStickerPreviewViewController alloc] initWithBasePhoto:image mouthSticker:weakSelf.liveStickerView.mouthSticker eyeSticker:weakSelf.liveStickerView.eyeSticker bottomSticker:weakSelf.liveStickerView.bottomSticker faceAngle:weakSelf.liveStickerView.faceAngle];
             [liveStickerVC setCropOption:[[weakSelf.cameraSettings objectForKey:PTPPCameraSettingCrop] integerValue]];
             [weakSelf.navigationController pushViewController:liveStickerVC animated:YES];
@@ -159,6 +159,9 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidFinishLoading:) name:kDownloadDidFinishLoading object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidReceiveData:) name:kDownloadDidReceiveData object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidFail:) name:kDownloadDidFail object:nil];
     [self.navigationController setNavigationBarHidden:YES];
     
     if (!self.detectFaceController.session.isRunning) {
@@ -173,10 +176,10 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 
 -(void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
-    //    [self.detectFaceController stopDetection];
-    //    self.detectFaceController = nil;
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kDownloadDidFinishLoading object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kDownloadDidFail object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kDownloadDidReceiveData object:nil];
     [self.detectFaceController stopRunning];
-    //self.filterView.hidden = YES;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -213,7 +216,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
             return;
         }
     }
-        if (tapShoot) {
+    if (tapShoot) {
         [self cameraShoot];
     }
 }
@@ -252,15 +255,15 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
                 break;
             case PTCameraSettingTimer:
                 [weakSelf.cameraSettings setObject:[NSNumber numberWithInteger:selectedID] forKey:PTPPCameraSettingTimer];
-                 if (selectedID == 0){
+                if (selectedID == 0){
                     [SOAutoHideMessageView showMessage:@"计时器关闭" inView:weakSelf.view];
-                 }else if (selectedID == 1){
-                     [SOAutoHideMessageView showMessage:@"3秒计时器" inView:weakSelf.view];
-                 }else if (selectedID == 2){
-                     [SOAutoHideMessageView showMessage:@"5秒计时器" inView:weakSelf.view];
-                 }else if (selectedID == 3){
-                     [SOAutoHideMessageView showMessage:@"10秒计时器" inView:weakSelf.view];
-                 }
+                }else if (selectedID == 1){
+                    [SOAutoHideMessageView showMessage:@"3秒计时器" inView:weakSelf.view];
+                }else if (selectedID == 2){
+                    [SOAutoHideMessageView showMessage:@"5秒计时器" inView:weakSelf.view];
+                }else if (selectedID == 3){
+                    [SOAutoHideMessageView showMessage:@"10秒计时器" inView:weakSelf.view];
+                }
                 break;
             default:
                 break;
@@ -401,7 +404,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     self.filterScrollView.previousActiveFilterID = self.detectFaceController.activeFilterID;
     [self.filterScrollView setAttributeWithFilterSet:self.filterSet gridSpace:70 immediateEffectApplied:NO];
     self.filterScrollView.filterSelected = ^(NSInteger filterID, BOOL animated){
- 
+        
         weakSelf.detectFaceController.activeFilterID = filterID;
         if (filterID != 0) {
             weakSelf.filterView.hidden = NO;
@@ -410,7 +413,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
         }
     };
     self.filterScrollView.finishBlock = ^(BOOL saveChange){
-            weakSelf.detectFaceController.activeFilterID = weakSelf.filterScrollView.previousActiveFilterID;
+        weakSelf.detectFaceController.activeFilterID = weakSelf.filterScrollView.previousActiveFilterID;
         [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
               initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseIn  animations:^(){
                   weakSelf.filterScrollView.center = CGPointMake(weakSelf.filterScrollView.centerX, Screenheight+weakSelf.filterScrollView.height/2);
@@ -433,6 +436,9 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 
 -(void)toggleLiveStickerOption{
     __weak typeof(self) weakSelf = self;
+    [self.liveStickerScrollView loadNewARStickerData];
+    self.liveStickerScrollView.selectedStickerName = self.selectedARSticker;
+    
     self.liveStickerScrollView.stickerSelected = ^(NSString *stickerName, BOOL isFromBundle){
         weakSelf.liveStickerView.eyeAnimation = nil;
         weakSelf.liveStickerView.mouthAnimation = nil;
@@ -440,19 +446,15 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
         weakSelf.liveStickerView.eyeSticker.animationImages = nil;
         weakSelf.liveStickerView.mouthSticker.animationImages = nil;
         weakSelf.liveStickerView.bottomSticker.animationImages = nil;
-
         if (stickerName != nil) {
             weakSelf.selectedARSticker = stickerName;
-//            if(isFromBundle){
-//                [weakSelf loadLiveStickerFromXMLFile:stickerName];
-//            }else{
-//#warning load from directory
-//            }
-            
             [SOAutoHideMessageView showMessage:@"请将正脸置于取景器内" inView:weakSelf.view];
+            [weakSelf loadLiveStickerWithFileName:stickerName];
         }
     };
-    self.liveStickerScrollView.selectedStickerName = self.selectedARSticker;
+    self.liveStickerScrollView.actionDownload = ^(NSString *sourceURL, NSString *destURL, PTPPMaterialShopStickerItem *item){
+        [weakSelf downloadMaterialFromSourceURL:sourceURL saveAtDestPath:destURL package:item];
+    };
     self.liveStickerScrollView.finishBlock = ^{
         [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
               initialSpringVelocity:0.6 options:UIViewAnimationOptionCurveEaseIn  animations:^(){
@@ -460,9 +462,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
                   weakSelf.bottomControlView.frame = CGRectMake(0, Screenheight-kBottomControlHeight, weakSelf.bottomControlView.width, weakSelf.bottomControlView.height);
               } completion:^(BOOL finished) {
                   [weakSelf.liveStickerScrollView removeFromSuperview];
-                  weakSelf.liveStickerScrollView = nil;
               }];
-
     };
     [self.view addSubview:self.liveStickerScrollView];
     self.liveStickerScrollView.frame = CGRectMake(0, Screenheight, self.liveStickerScrollView.width, self.liveStickerScrollView.height);
@@ -474,13 +474,6 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 }
 
 -(void)toggleJigsawTemplate{
-//    if (!_assetsLibraryCanUse) {
-//        [self albumNotUseTapped];
-//        return;
-//    }
-//    if (self.assetGroups.count>0) {
-//        [self displayMultiPickerForGroup:[self.assetGroups objectAtIndex:0]];
-//    }
     PTPPMaterialShopViewController *shopVC = [[PTPPMaterialShopViewController alloc] init];
     shopVC.activeSection = 2;
     shopVC.hideMenu = YES;
@@ -488,7 +481,38 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     [self.navigationController pushViewController:shopVC animated:YES];
 }
 
+#pragma mark - NSNotifications
+- (void)downloadDidFinishLoading:(NSNotification *)notification{
+    NSLog(@"download complete");
+    Download *download = notification.object;
+    NSString *desPath = nil;
+    
+    desPath = [PTPPLocalFileManager getRootFolderPathForARStickers] ;
+    [PTPPLocalFileManager unzipFileFromPath:download.filename desPath:[desPath stringByAppendingPathComponent:[[download.filename lastPathComponent] stringByDeletingPathExtension]]];
+    [PTPPLocalFileManager writePropertyListTo:ARStickerPlistFile WithPackageID:download.package.packageID fileName:[download.filename lastPathComponent] themeName:download.package.packageName fileSize:download.package.packageSize totalNum:download.package.totalNum coverPic:download.package.coverPic];
+    
+    [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForStaitcStickers]];
+    [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForARStickers]];
+    [PTPPLocalFileManager printListOfFilesAtDirectory:[PTPPLocalFileManager getRootFolderPathForJigsawTemplate]];
+    
+    [self.liveStickerScrollView.collectionView reloadData];
+}
+
+- (void)downloadDidFail:(NSNotification *)notification{
+    NSLog(@"download failed");
+}
+
+- (void)downloadDidReceiveData:(NSNotification *)notification{
+    NSLog(@"download ongoing");
+}
+
+
 #pragma mark Private methods
+
+-(void)downloadMaterialFromSourceURL:(NSString *)sourceURL saveAtDestPath:(NSString *)destPathURL package:(PTPPMaterialShopStickerItem *)package {
+    [[DownloadManager shareManager] addDownloadWithFilename:destPathURL URL:[NSURL URLWithString:sourceURL] package:package];
+    [self.liveStickerScrollView.collectionView reloadData];
+}
 
 -(void)preRenderFilterPreview{
     UIImage *inputImage = [UIImage imageNamed:@"FM_cover_photo.jpg"];
@@ -503,25 +527,26 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     }
 }
 
-
-
-
 //Read Sticker files from local directory
 -(BOOL)loadLiveStickerWithFileName:(NSString *)fileName{
     NSString *downloadFolder = nil;
     NSString *xmlFilePath = nil;
     if (fileName) {
-        downloadFolder = [PTPPLocalFileManager getFolderPathForARStickerName:fileName];
+        downloadFolder = fileName;
         if (!downloadFolder){
             NSLog(@"Sticker not existed");
             return NO;
         }
         //Print list of file in the directory
         [PTPPLocalFileManager printListOfFilesAtDirectory:downloadFolder];
-        
-#warning xml filename will be changed in the future!!!
-        xmlFilePath = [NSString stringWithFormat:@"%@/sample.xml",downloadFolder];
-        
+        NSArray *fileList = [PTPPLocalFileManager getListOfFilePathAtDirectory:downloadFolder];
+        NSLog(@"download folder %@",downloadFolder);
+        for(NSString *filePath in fileList){
+            if ([filePath.pathExtension isEqualToString:@"xml"]) {
+                xmlFilePath = [filePath stringByDeletingPathExtension];
+                NSLog(@"XML:%@",xmlFilePath);
+            }
+        }
     }else{
         NSLog(@"Sticker not existed");
         return NO;
@@ -603,7 +628,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
         self.flashOptionButton.enabled = NO;
         self.flashOptionButton.alpha = 0.5;
     }
-
+    
     switch (flashOption) {
         case 0:
             [self.flashOptionButton setImage:[UIImage imageNamed:@"icon_capture_20_01"] forState:UIControlStateNormal];
@@ -818,7 +843,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
                 
                 UIImageView *imageview = [[UIImageView alloc] initWithImage:image];
                 [imageview setContentMode:UIViewContentModeScaleAspectFit];
-
+                
             } else {
                 NSLog(@"UIImagePickerControllerReferenceURL = %@", dict);
             }

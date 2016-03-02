@@ -32,6 +32,9 @@
 - (void)appendOtherParameters {
     [super appendOtherParameters];
     [self.parameters safeSetObject:self.materialType forKey:@"type"];
+    if (self.maxNum != 0) {
+        [self.parameters safeSetObject:[NSString stringWithFormat:@"%ld",(long)self.maxNum] forKey:@"max_num"];
+    }
 }
 
 - (void)parseResponseData:(NSArray *)data {

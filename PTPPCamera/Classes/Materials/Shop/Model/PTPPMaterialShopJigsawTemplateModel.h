@@ -10,5 +10,6 @@
 
 @interface PTPPMaterialShopJigsawTemplateModel : SOHTTPPageRequestModel
 @property (nonatomic, strong) NSString *materialType;
+@property (nonatomic, assign) NSInteger maxNum;
 + (instancetype)shareModel;
 @end

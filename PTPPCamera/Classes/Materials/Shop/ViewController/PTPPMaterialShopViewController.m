@@ -6,6 +6,7 @@
 //  Copyright © 2016 putao. All rights reserved.
 //
 
+#import "UIScrollView+EmptyDataSet.h"
 #import "ELCImagePickerHeader.h"
 #import "PTPPLocalFileManager.h"
 #import "PTPPMaterialShopViewController.h"
@@ -18,7 +19,6 @@
 #import "PTPPMaterialShopJigsawItemCell.h"
 #import "PTCustomMenuSliderView.h"
 #import "PTPPMaterialManagementBottomView.h"
-#import "PTPPMaterialShopStickerItem.h"
 #import "PTPPMaterialShopStaticStickerModel.h"
 #import "PTPPMaterialShopARStickerModel.h"
 #import "PTPPMaterialShopJigsawTemplateModel.h"
@@ -29,8 +29,9 @@
 #define kCollectionViewEdgePadding 10
 #define kCellSpacing 5
 
-@interface PTPPMaterialShopViewController () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, PTCustomMenuSliderViewDelegate, SOModelDelegate,ELCImagePickerControllerDelegate>
+@interface PTPPMaterialShopViewController () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, PTCustomMenuSliderViewDelegate, SOModelDelegate,ELCImagePickerControllerDelegate, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
 @property (nonatomic, strong) UICollectionView *collectionView;
+@property (nonatomic, strong) UIRefreshControl *refreshControl;
 @property (nonatomic, strong) UICollectionViewFlowLayout *layout;
 @property (nonatomic, strong) PTCustomMenuSliderView *sliderView;
 @property (nonatomic, strong) PTPPMaterialManagementBottomView *bottomView;
@@ -90,13 +91,20 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     [self.navigationController setNavigationBarHidden:NO];
     [self.navigationController.navigationBar setBarTintColor:UIColorFromRGB(0xff5a5d)];
     if (self.proceedToImageEdit) {
-        [self setTitle:@"选择模版" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:18] selector:nil];
+        [self setTitle:@"选择模板" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:18] selector:nil];
     }else{
-        [self setTitle:@"素材中心" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:18] selector:nil];
-        [self showRightItemWithText:@"素材管理" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(toggleMaterialManagement) animation:NO];
+        if (self.proceedToSwapTemplate) {
+            [self setTitle:@"选择模板" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:18] selector:nil];
+            [self showRightItemWithText:@"返回" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(dismissMe) animation:NO];
+        }else{
+            [self setTitle:@"素材中心" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:18] selector:nil];
+            [self showRightItemWithText:@"素材管理" color:[UIColor whiteColor] font:[UIFont systemFontOfSize:14] selector:@selector(toggleMaterialManagement) animation:NO];
+        }
     }
-
-    [self showLeftItemWithImage:[UIImage imageNamed:@"back_white"] selector:@selector(goBack) animation:YES];
+    if (!self.proceedToSwapTemplate) {
+        [self showLeftItemWithImage:[UIImage imageNamed:@"back_white"] selector:@selector(goBack) animation:YES];
+    }
+    
     if (!self.hideMenu) {
         [self.sliderView setAttributeWithItems:@[@"贴纸",@"动态贴图",@"拼图模版"] buttonWidth:Screenwidth/3 themeColor:UIColorFromRGB(0xff5a5d) idleColor:[UIColor grayColor] trackerWidth:20];
         [self.view addSubview:self.sliderView];
@@ -176,9 +184,32 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+-(void)dismissMe{
+    [self dismissViewControllerAnimated:YES completion:^{
+        
+    }];
+}
+
 -(void)toggleMaterialManagement{
     PTPPMaterialManagementListViewController *manageVC = [[PTPPMaterialManagementListViewController alloc] init];
     [self.navigationController pushViewController:manageVC animated:YES];
+}
+
+-(void)startRefresh:(id)sender{
+    switch (self.activeSection) {
+        case 0:
+            [self loadNewStaticStickerData];
+            break;
+        case 1:
+            [self loadNewARStickerData];
+            break;
+        case 2:
+            [self loadNewJigsawTemplateData];
+            break;
+            
+        default:
+            break;
+    }
 }
 
 #pragma mark - Private Methods
@@ -186,6 +217,7 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     if (self.loadingStaticSticker) {
         return;
     }
+    self.collectionView.hidden = YES;
     self.loadingStaticSticker = YES;
     [self.staticStickerArray removeAllObjects];
     [self.staticStickerModel cancelAllRequest];
@@ -207,6 +239,7 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     if (self.loadingARSticker) {
         return;
     }
+    self.collectionView.hidden = YES;
     self.loadingARSticker = YES;
     [self.ARStickerArray removeAllObjects];
     [self.ARStickerModel cancelAllRequest];
@@ -228,10 +261,12 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     if (self.loadingJigsawTemplate) {
         return;
     }
+    self.collectionView.hidden = YES;
     self.loadingJigsawTemplate = YES;
     [self.jigsawTemplateArray removeAllObjects];
     [self.jigsawTemplateModel cancelAllRequest];
     self.jigsawTemplateModel.pageOffset = 10;
+    self.jigsawTemplateModel.maxNum = self.jigsawTemplateFilter;
     self.jigsawTemplateModel.materialType = @"template_pic";
     [self.jigsawTemplateModel reloadData];
     [SVProgressHUD showWithStatus:@"加载中"];
@@ -323,19 +358,19 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     switch (self.activeSection) {
         case 0:
             dataCount = self.staticStickerArray.count;
-            if (!self.staticStickerDataFinished) {
+            if (!self.staticStickerDataFinished && self.staticStickerArray.count!=0) {
                 dataCount += 1;
             }
             break;
         case 1:
             dataCount = self.ARStickerArray.count;
-            if (!self.ARStickerDataFinished) {
+            if (!self.ARStickerDataFinished && self.ARStickerArray.count!=0) {
                 dataCount += 1;
             }
             break;
         case 2:
             dataCount = self.jigsawTemplateArray.count;
-            if (!self.jigsawTemplateDataFinished) {
+            if (!self.jigsawTemplateDataFinished && self.jigsawTemplateArray.count!=0) {
                 dataCount += 1;
             }
             break;
@@ -474,8 +509,8 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
         [self.navigationController pushViewController:stickerDetailVC animated:YES];
     }
     if (self.activeSection == 2) {
+        self.selectedJigsawItem = [self.jigsawTemplateArray safeObjectAtIndex:indexPath.row];
         if (self.proceedToImageEdit) {
-            self.selectedJigsawItem = [self.jigsawTemplateArray safeObjectAtIndex:indexPath.row];
             NSString *jigsawFolder = [[PTPPLocalFileManager getRootFolderPathForJigsawTemplate] stringByAppendingPathComponent:[[PTPPLocalFileManager getFileNameFromPackageID:self.selectedJigsawItem.packageID inDownloadedList:[PTPPLocalFileManager getDownloadedJigsawTemplateList]] stringByDeletingPathExtension]];
             NSArray *fileContents = [PTPPLocalFileManager getListOfFilePathAtDirectory:jigsawFolder];
             NSString *xmlFilePath = nil;
@@ -491,6 +526,13 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
             NSDictionary *resultDict = [PTPPStickerXMLParser dictionaryFromXMLFilePath:xmlFilePath];
             NSArray *parsingDictArray = [[resultDict safeObjectForKey:@"jigsaw"] safeObjectForKey:@"maskList"];
             [self displayMultiPickerForGroup:[ASSETHELPER.assetArray objectAtIndex:0] maxCount:parsingDictArray.count];
+        }
+        if (self.proceedToSwapTemplate) {
+            if (self.templateSwap) {
+                self.templateSwap(self.selectedJigsawItem);
+            }
+            [self dismissViewControllerAnimated:YES completion:^{
+            }];
         }
     }
 }
@@ -547,6 +589,8 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
 
 -(void)model:(SOBaseModel *)model didReceivedData:(id)data userInfo:(id)info{
     [SVProgressHUD dismiss];
+    [self.refreshControl endRefreshing];
+    self.collectionView.hidden = NO;
     if (model == self.staticStickerModel) {
         NSLog(@"Success");
         self.loadingStaticSticker = NO;
@@ -556,6 +600,9 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
 
         }
         [self.staticStickerArray addObjectsFromArray:data];
+        if (self.staticStickerArray.count == 0) {
+            [self.collectionView setContentOffset:CGPointZero];
+        }
         [self.collectionView reloadData];
     }
     if (model == self.ARStickerModel) {
@@ -567,6 +614,9 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
             
         }
         [self.ARStickerArray addObjectsFromArray:data];
+        if (self.ARStickerArray.count == 0) {
+            [self.collectionView setContentOffset:CGPointZero];
+        }
         [self.collectionView reloadData];
     }
     if (model == self.jigsawTemplateModel) {
@@ -578,15 +628,69 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
             
         }
         [self.jigsawTemplateArray addObjectsFromArray:data];
+        if (self.jigsawTemplateArray.count == 0) {
+            [self.collectionView setContentOffset:CGPointZero];
+        }
         [self.collectionView reloadData];
     }
 }
 
 -(void)model:(SOBaseModel *)model didFailedInfo:(id)info error:(id)error{
-    [SVProgressHUD dismiss];
+    [SVProgressHUD dismissWithError:@"网络不太给力" afterDelay:1.0];
+    self.collectionView.hidden = NO;
+    [self.refreshControl endRefreshing];
     self.loadingStaticSticker = NO;
     self.loadingARSticker = NO;
     self.loadingJigsawTemplate = NO;
+}
+
+#pragma mark - DZNEmptyDataSetDelegate / DZNEmptyDataSetSource
+//主提示标题
+
+- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
+{
+    NSString *text = nil;
+    UIFont *font = nil;
+    UIColor *textColor = nil;
+    
+    NSMutableDictionary *attributes = [NSMutableDictionary new];
+    
+    //隐藏上拉刷新
+    
+    text = @"网络不给力 :(";
+    font = [UIFont boldSystemFontOfSize:16.0];
+    textColor = [UIColor grayColor];
+    
+    if (!text) {
+        return nil;
+    }
+    
+    if (font) [attributes setObject:font forKey:NSFontAttributeName];
+    if (textColor) [attributes setObject:textColor forKey:NSForegroundColorAttributeName];
+    
+    return [[NSAttributedString alloc] initWithString:text attributes:attributes];
+}
+
+- (CGFloat)spaceHeightForEmptyDataSet:(UIScrollView *)scrollView
+{
+    return 40.0;
+}
+
+- (UIColor *)backgroundColorForEmptyDataSet:(UIScrollView *)scrollView
+{
+    return [UIColor colorWithHexString:@"e1e1e1"];
+}
+
+
+- (UIImage *)imageForEmptyDataSet:(UIScrollView *)scrollView
+{
+    //需要圆形图片
+    return [UIImage imageNamed:@"img_page_empty"];
+}
+
+- (void)emptyDataSetDidTapView:(UIScrollView *)scrollView {
+    //点击空白 重新请求
+    [self startRefresh:self.refreshControl];
 }
 
 
@@ -608,6 +712,14 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     return _layout;
 }
 
+-(UIRefreshControl *)refreshControl{
+    if (!_refreshControl) {
+        _refreshControl = [[UIRefreshControl alloc] init];
+        [_refreshControl addTarget:self action:@selector(startRefresh:) forControlEvents:UIControlEventValueChanged];
+    }
+    return _refreshControl;
+}
+
 -(UICollectionView *)collectionView{
     if (!_collectionView) {
         _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, Screenwidth, Screenheight-HEIGHT_NAV*2) collectionViewLayout:self.layout];
@@ -617,8 +729,12 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
         [_collectionView registerClass:[PTMaterialShopLoadingCell class] forCellWithReuseIdentifier:PTPPMaterialShopLoadingCellID];
         _collectionView.delegate = self;
         _collectionView.dataSource = self;
+        _collectionView.emptyDataSetDelegate = self;
+        _collectionView.emptyDataSetSource = self;
         _collectionView.backgroundColor = [UIColor clearColor];
         _collectionView.contentInset = UIEdgeInsetsMake(10, 0, 10, 0);
+        [_collectionView addSubview:self.refreshControl];
+        _collectionView.alwaysBounceVertical = YES;
     }
     return _collectionView;
 }

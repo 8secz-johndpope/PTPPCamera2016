@@ -9,5 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface PTMaterialShopLoadingCell : UICollectionViewCell
+@property (nonatomic, strong) UIActivityIndicatorView *loadingView;
 -(void)startAnimating;
 @end

@@ -6,13 +6,13 @@
 //  Copyright © 2016 putao. All rights reserved.
 //
 
-#import "PTPPLiveVideoShareViewController.h"
+#import "PTPPMediaShareViewController.h"
 #import "PTRecommendAppBottomView.h"
 
 #import "PTPPVideoUploadManager.h"
 #import "NSString+Hashes.h"
 #import "SVProgressHUD.h"
-@interface PTPPLiveVideoShareViewController ()<HTTPRequestDelegate>
+@interface PTPPMediaShareViewController ()<HTTPRequestDelegate>
 @property (nonatomic, strong) UIImageView *backgroundImage;
 @property (nonatomic, strong) SOImageTextControl *saveTitleView;
 @property (nonatomic, strong) UIImage *imgShare;
@@ -22,7 +22,7 @@
 @property (nonatomic, strong) PTRecommendAppBottomView *recommendAppView;
 @end
 
-@implementation PTPPLiveVideoShareViewController
+@implementation PTPPMediaShareViewController
 
 -(id)initWithImage:(UIImage *)img videoPath:(NSURL *)videoURL{
     self = [super init];

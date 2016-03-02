@@ -51,6 +51,7 @@
     if ([extension isEqualToString:@"zip"]) {
         ZipArchive *zipArchive  = [[ZipArchive alloc] init];
         [zipArchive UnzipOpenFile:filePath];
+        NSLog(@"unzip file path :%@",despath);
         BOOL unZipSuccess = [zipArchive UnzipFileTo:despath overWrite:YES];
         [zipArchive UnzipCloseFile];
         if (unZipSuccess) {

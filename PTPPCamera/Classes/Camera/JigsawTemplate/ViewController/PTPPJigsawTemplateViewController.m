@@ -7,6 +7,7 @@
 //
 
 #import "PTPPJigsawTemplateViewController.h"
+#import "PTPPMaterialShopViewController.h"
 #import "PTPPLocalFileManager.h"
 #import "PTPPStickerXMLParser.h"
 #import "PTPPJigsawTemplateModel.h"
@@ -20,6 +21,7 @@
 @property (nonatomic, strong) UIImageView *jigsawTemplateView;
 @property (nonatomic, strong) PTPPJigsawView *jigsawView;
 @property (nonatomic, strong) PTPPJigsawTemplateModel *jigsawTemplateModel;
+@property (nonatomic, strong) SOImageTextControl *swapTemplateControl;
 @end
 
 @implementation PTPPJigsawTemplateViewController
@@ -38,7 +40,8 @@
     [self.view addSubview:self.canvasView];
     [self.canvasView addSubview:self.jigsawView];
     [self.canvasView addSubview:self.jigsawTemplateView];
-    
+    [self.view addSubview:self.swapTemplateControl];
+    self.swapTemplateControl.center = CGPointMake(self.view.centerX, Screenheight-self.swapTemplateControl.height/2);
     [self readLocalFileSetting];
     [self updateFrame];
 }
@@ -80,8 +83,28 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+-(void)toggleJigsawTemplate{
+    self.jigsawView.popup.hidden = YES;
+    __weak typeof(self) weakSelf = self;
+    PTPPMaterialShopViewController *shopVC = [[PTPPMaterialShopViewController alloc] init];
+    shopVC.activeSection = 2;
+    shopVC.hideMenu = YES;
+    shopVC.proceedToSwapTemplate = YES;
+    shopVC.jigsawTemplateFilter = self.images.count;
+    shopVC.templateSwap = ^(PTPPMaterialShopStickerItem *item){
+        weakSelf.selectedJigsawItem = item;
+        if ([weakSelf readLocalFileSetting]) {
+            [weakSelf.jigsawView setAttributeWithTemplateModel:weakSelf.jigsawTemplateModel images:weakSelf.images];
+        }
+    };
+    UINavigationController *navi = [[UINavigationController alloc] initWithRootViewController:shopVC];
+    [self presentViewController:navi animated:YES completion:^{
+        
+    }];
+}
+
 #pragma mark - Private Methods
--(void)readLocalFileSetting{
+-(BOOL)readLocalFileSetting{
     NSString *jigsawFolder = [[PTPPLocalFileManager getRootFolderPathForJigsawTemplate] stringByAppendingPathComponent:[[PTPPLocalFileManager getFileNameFromPackageID:self.selectedJigsawItem.packageID inDownloadedList:[PTPPLocalFileManager getDownloadedJigsawTemplateList]] stringByDeletingPathExtension]];
     NSArray *fileContents = [PTPPLocalFileManager getListOfFilePathAtDirectory:jigsawFolder];
     NSString *xmlFilePath = nil;
@@ -92,7 +115,8 @@
     }
     if (!xmlFilePath) {
         NSLog(@"Cannot locate jigsaw template");
-        return;
+        [SVProgressHUD showErrorWithStatus:@"模板不存在" duration:1.0];
+        return NO;
     }
     NSDictionary *resultDict = [PTPPStickerXMLParser dictionaryFromXMLFilePath:xmlFilePath];
     CGFloat width = [[[[resultDict safeObjectForKey:@"jigsaw"] safeObjectForKey:@"width"] safeStringForKey:@"text"] floatValue];
@@ -100,7 +124,7 @@
     CGSize templateSize = CGSizeMake(width, height);
     NSDictionary *parsingDict = [[[resultDict safeObjectForKey:@"jigsaw"] safeObjectForKey:@"maskList"] safeObjectAtIndex:self.images.count-1];
     self.jigsawTemplateModel = [PTPPJigsawTemplateModel initWithDictionary:parsingDict templateSize:templateSize folderPath:jigsawFolder];
-    
+    return YES;
 }
 
 #pragma mark - Getters/Setters
@@ -152,6 +176,21 @@
         _jigsawView.originalVC = self;
     }
     return _jigsawView;
+}
+
+
+-(SOImageTextControl *)swapTemplateControl{
+    if (!_swapTemplateControl) {
+        _swapTemplateControl = [[SOImageTextControl alloc] initWithFrame:CGRectMake(0, 0, 100, 40)];
+        _swapTemplateControl.textLabel.text = @"更换模板";
+        _swapTemplateControl.textLabel.font = [UIFont systemFontOfSize:14];
+        _swapTemplateControl.textLabel.textColor = [UIColor whiteColor];
+        _swapTemplateControl.imageView.image = [UIImage imageNamed:@"icon_capture_20_36"];
+        _swapTemplateControl.imageSize = CGSizeMake(20, 20);
+        _swapTemplateControl.imageAndTextSpace = 10;
+        [_swapTemplateControl addTarget:self action:@selector(toggleJigsawTemplate) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _swapTemplateControl;
 }
 
 @end

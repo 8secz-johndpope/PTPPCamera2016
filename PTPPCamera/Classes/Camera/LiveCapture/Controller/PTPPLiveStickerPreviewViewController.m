@@ -7,7 +7,7 @@
 //
 
 #import "PTPPLiveStickerPreviewViewController.h"
-#import "PTPPLiveVideoShareViewController.h"
+#import "PTPPMediaShareViewController.h"
 #import "SOKit.h"
 
 #import "PTImageSequenceToVideoConverter.h"

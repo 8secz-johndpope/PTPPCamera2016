@@ -9,7 +9,7 @@
 #import "PTMaterialShopLoadingCell.h"
 
 @interface PTMaterialShopLoadingCell ()
-@property (nonatomic, strong) UIActivityIndicatorView *loadingView;
+
 @end
 
 @implementation PTMaterialShopLoadingCell
