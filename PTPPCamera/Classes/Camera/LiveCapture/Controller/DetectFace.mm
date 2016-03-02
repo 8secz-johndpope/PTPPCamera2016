@@ -277,18 +277,18 @@
     CGImageRef imageRef = [self.context createCGImage:outputImage fromRect:outputImage.extent];
     UIImage *newPtImage;
 
-//    CFDataRef m_DataRef;
-//    m_DataRef = CGDataProviderCopyData(CGImageGetDataProvider(imageRef));
-//    UInt8 * m_PixelBuf = (UInt8 *) CFDataGetBytePtr(m_DataRef);
-//    
+    CFDataRef m_DataRef;
+    m_DataRef = CGDataProviderCopyData(CGImageGetDataProvider(imageRef));
+    UInt8 * m_PixelBuf = (UInt8 *) CFDataGetBytePtr(m_DataRef);
+    
 //    NSString* tmpSrcpath =  [NSHomeDirectory() stringByAppendingString:@"/Documents/"];
 //    const char *tmpSrcPtah =  [tmpSrcpath cStringUsingEncoding:NSUTF8StringEncoding];
-//
-//    PTU8* retData = new PTU8[(int)newPtImage.size.width * (int)newPtImage.size.height  *3];//new PTU8[(int)rImage.size.width * (int)rImage.size.height *3];
-//    AutoWhitening(m_PixelBuf, PTSize(newPtImage.size.width, newPtImage.size.height), PT_IMG_RGBA8888, retData, PTSize(newPtImage.size.width, newPtImage.size.height), PT_IMG_BGR888, TRUE);
-//    delete [] retData;
-//    
-//    CFRelease(m_DataRef);
+
+    PTU8* retData = new PTU8[(int)newPtImage.size.width * (int)newPtImage.size.height  *3];
+    AutoWhitening(m_PixelBuf, PTSize(newPtImage.size.width, newPtImage.size.height), PT_IMG_RGBA8888, retData, PTSize(newPtImage.size.width, newPtImage.size.height), PT_IMG_BGR888, TRUE);
+    delete [] retData;
+    
+    CFRelease(m_DataRef);
     
     
     if (self.activeFilterID>0) {

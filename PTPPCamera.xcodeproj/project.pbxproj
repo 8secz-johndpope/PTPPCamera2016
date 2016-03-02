@@ -19,7 +19,6 @@
 		C630EA8E1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.m in Sources */ = {isa = PBXBuildFile; fileRef = C630EA8D1C7FF9FC00C6515C /* ELCImageSelectionBottomPreview.m */; };
 		C630EA951C80533F00C6515C /* PTPPJigsawTemplateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C630EA941C80533F00C6515C /* PTPPJigsawTemplateViewController.m */; };
 		C630EA981C805ABB00C6515C /* PTPPJigsawTemplateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C630EA971C805ABB00C6515C /* PTPPJigsawTemplateModel.m */; };
-		C63154561C8685AA007BC5BC /* whitening.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C63154551C8685AA007BC5BC /* whitening.framework */; };
 		C631548A1C86CB2F007BC5BC /* UMFeedbackLocalizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C63154581C86CB2F007BC5BC /* UMFeedbackLocalizable.strings */; };
 		C631548B1C86CB2F007BC5BC /* libUMFeedback.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C631545A1C86CB2F007BC5BC /* libUMFeedback.a */; };
 		C631548C1C86CB30007BC5BC /* libUMessage_Sdk_1.1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C631545E1C86CB2F007BC5BC /* libUMessage_Sdk_1.1.0.a */; };
@@ -41,6 +40,7 @@
 		C631549C1C86CB30007BC5BC /* libSocialWechat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C63154851C86CB2F007BC5BC /* libSocialWechat.a */; };
 		C631549D1C86CB30007BC5BC /* libWeChatSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C63154861C86CB2F007BC5BC /* libWeChatSDK.a */; };
 		C631549F1C86EA4C007BC5BC /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C631549E1C86EA4C007BC5BC /* Images.xcassets */; };
+		C63154A11C86F973007BC5BC /* whitening.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C63154A01C86F973007BC5BC /* whitening.framework */; };
 		C6338D7A1C8442A000B7320B /* PTPPJigsawView.m in Sources */ = {isa = PBXBuildFile; fileRef = C6338D791C8442A000B7320B /* PTPPJigsawView.m */; };
 		C6433C1C1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */; };
 		C6433C1F1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1E1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m */; };
@@ -987,7 +987,6 @@
 		C630EA941C80533F00C6515C /* PTPPJigsawTemplateViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPJigsawTemplateViewController.m; sourceTree = "<group>"; };
 		C630EA961C805ABB00C6515C /* PTPPJigsawTemplateModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPJigsawTemplateModel.h; sourceTree = "<group>"; };
 		C630EA971C805ABB00C6515C /* PTPPJigsawTemplateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPJigsawTemplateModel.m; sourceTree = "<group>"; };
-		C63154551C8685AA007BC5BC /* whitening.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = whitening.framework; sourceTree = "<group>"; };
 		C63154591C86CB2F007BC5BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/UMFeedbackLocalizable.strings; sourceTree = "<group>"; };
 		C631545A1C86CB2F007BC5BC /* libUMFeedback.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libUMFeedback.a; sourceTree = "<group>"; };
 		C631545B1C86CB2F007BC5BC /* UMFeedback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UMFeedback.h; sourceTree = "<group>"; };
@@ -1029,6 +1028,7 @@
 		C63154881C86CB2F007BC5BC /* WXApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXApi.h; sourceTree = "<group>"; };
 		C63154891C86CB2F007BC5BC /* WXApiObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXApiObject.h; sourceTree = "<group>"; };
 		C631549E1C86EA4C007BC5BC /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		C63154A01C86F973007BC5BC /* whitening.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = whitening.framework; sourceTree = "<group>"; };
 		C6338D781C8442A000B7320B /* PTPPJigsawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPJigsawView.h; sourceTree = "<group>"; };
 		C6338D791C8442A000B7320B /* PTPPJigsawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPJigsawView.m; sourceTree = "<group>"; };
 		C6433C1A1C72BFC900AF82AD /* PTPPStaticImageEditViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPStaticImageEditViewController.h; sourceTree = "<group>"; };
@@ -2430,8 +2430,8 @@
 				C647BABA1C7180A600E596EA /* libsqlite3.0.tbd in Frameworks */,
 				C647BDD41C718E5100E596EA /* ShareSDKUI.framework in Frameworks */,
 				C647BABB1C7180A600E596EA /* libsqlite3.tbd in Frameworks */,
-				C63154561C8685AA007BC5BC /* whitening.framework in Frameworks */,
 				C647BDD01C718E5100E596EA /* ShareSDK.framework in Frameworks */,
+				C63154A11C86F973007BC5BC /* whitening.framework in Frameworks */,
 				C647BAB71C71809D00E596EA /* libz.tbd in Frameworks */,
 				C647BAB51C71808300E596EA /* MobileCoreServices.framework in Frameworks */,
 				C647BAB31C71807C00E596EA /* AudioToolbox.framework in Frameworks */,
@@ -2717,7 +2717,7 @@
 		C647BAAB1C71802B00E596EA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C63154551C8685AA007BC5BC /* whitening.framework */,
+				C63154A01C86F973007BC5BC /* whitening.framework */,
 				C647BDE71C7191AA00E596EA /* AdSupport.framework */,
 				C647BAD61C7180FF00E596EA /* AssetsLibrary.framework */,
 				C647BAD41C7180F900E596EA /* CoreImage.framework */,

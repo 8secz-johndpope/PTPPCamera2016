@@ -51,6 +51,15 @@
     [self layoutSubviews];
 }
 
+-(void)toggleAction{
+    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:self.urlScheme]]) {
+        //App installed
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:self.urlScheme]];
+    }else{
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:self.appStoreLink]];
+    }
+}
+
 -(void)layoutSubviews{
     [super layoutSubviews];
     self.appIcon.frame = CGRectMake(20, self.height/2-self.appIcon.height/2, self.appIcon.width, self.appIcon.height);
@@ -84,11 +93,12 @@
 
 -(UIButton *)actionButton{
     if (!_actionButton) {
-        _actionButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 70, 30)];
+        _actionButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 90, 30)];
         _actionButton.backgroundColor = UIColorFromRGB(0xff5a5d);
         _actionButton.layer.cornerRadius = 5;
         _actionButton.layer.masksToBounds = YES;
         [_actionButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_actionButton addTarget:self action:@selector(toggleAction) forControlEvents:UIControlEventTouchUpInside];
     }
     return _actionButton;
 }
