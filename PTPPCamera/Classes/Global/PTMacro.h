@@ -50,11 +50,8 @@
 
 // noti
 #define NOTI_POST(name)             [[NSNotificationCenter defaultCenter] postNotificationName:(name) object:nil];
-#define NOTI_UPDATE_BADGE           @"updateBadge"     //有新的通知
-#define NOTI_USER_LOGOUT            @"userLogout"      //退出
-#define NOTI_FIRST_INSTALL          @"firstInstallApp" //第一次安装应用
-
-#define NOTI_CREATE_LIST_REFRESH    @"PTCreateListRefreshNotification" //创造列表刷新
+#define kLiveCameraAlbumButtonTapped    @"kLiveCameraAlbumButtonTapped"
+#define kLiveCameraJigsawButtonTapped   @"kLiveCameraJigsawButtonTapped"
 
 //红点大小
 #define WIDTH_POINT_NOR     17

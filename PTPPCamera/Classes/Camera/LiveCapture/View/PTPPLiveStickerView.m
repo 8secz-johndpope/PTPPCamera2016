@@ -38,6 +38,10 @@
     return self;
 }
 
+-(BOOL)hasStickers{
+    return self.mouthAnimation || self.eyeAnimation || self.bottomAnimation;
+}
+
 -(void)fixRotationForStaticFaceDetection{
     //self.foregroundView.transform = CGAffineTransformMakeRotation((1/180.0*M_PI));
 }

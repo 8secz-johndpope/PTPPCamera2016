@@ -355,6 +355,44 @@
     return dic;
 }
 
+-(NSString *)getFilterNameFromIndex:(NSInteger)index{
+    switch (index) {
+        case 0:
+            return @"原始";
+            break;
+        case 1:
+            return @"白亮晨曦";
+            break;
+        case 2:
+            return @"盛夏光年";
+            break;
+        case 3:
+            return @"静水流深";
+            break;
+        case 4:
+            return @"闪亮登场";
+            break;
+        case 5:
+            return @"指尖流年";
+            break;
+        case 6:
+            return @"陌上花开";
+            break;
+        case 7:
+            return @"白露未晞";
+            break;
+        case 8:
+            return @"温暖如玉";
+            break;
+        case 9:
+            return @"一米阳光";
+            break;
+        default:
+            break;
+    }
+
+    return @"";
+}
 
 - (void)startDetection
 {

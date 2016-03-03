@@ -28,6 +28,7 @@ typedef void(^FinishShoot)(UIImage *image);
 -(void)stopRunning;
 - (void) turnTorchOn:(NSInteger)mode;
 -(void)blinkTorch:(BOOL)state;
+-(NSString *)getFilterNameFromIndex:(NSInteger)index;
 -(void)swapCameraPosition:(UIImagePickerControllerCameraDevice)cameraPosition;
 + (CGRect)convertFrame:(CGRect)originalFrame previewBox:(CGRect)previewBox forVideoBox:(CGRect)videoBox isMirrored:(BOOL)isMirrored;
 

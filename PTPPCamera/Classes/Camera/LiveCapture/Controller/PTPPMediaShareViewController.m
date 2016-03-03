@@ -176,7 +176,27 @@ static NSString *PTShareMediaTypeVideo = @"PTShareMediaTypeVideo";
 }
 
 -(void)didTapActionOption:(UIButton *)actionButton{
-    
+    UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, [UIScreen mainScreen].scale);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    [self.view.layer renderInContext:context];
+    UIImage *screenShot = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    switch (actionButton.tag) {
+        case 0:
+            [self.navigationController popToRootViewControllerAnimated:NO];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kLiveCameraAlbumButtonTapped object:screenShot];
+            break;
+        case 1:
+            [self.navigationController popToRootViewControllerAnimated:YES];
+            break;
+        case 2:
+            [self.navigationController popToRootViewControllerAnimated:NO];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kLiveCameraJigsawButtonTapped object:screenShot];
+            
+            break;
+        default:
+            break;
+    }
 }
 
 -(void)didTapShareOption:(UIButton *)shareButton{

@@ -35,7 +35,11 @@
 #define kFilterDataLength 10
 #define kStickerScale 2
 
-@interface PTPPLiveCameraViewController ()<DetectFaceDelegate,UIViewControllerTransitioningDelegate, NSXMLParserDelegate, PTPPNewHomeProtocol, ELCImagePickerControllerDelegate>
+@interface PTPPLiveCameraViewController ()<DetectFaceDelegate,UIViewControllerTransitioningDelegate, NSXMLParserDelegate, PTPPNewHomeProtocol, ELCImagePickerControllerDelegate>{
+    CGFloat lastScale;
+}
+
+@property (nonatomic, strong) UIImageView *coverImageView;
 
 @property (nonatomic, copy) NSArray *chosenImages;
 @property (strong, nonatomic) DetectFace *detectFaceController;
@@ -95,6 +99,9 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(albumTapped:) name:kLiveCameraAlbumButtonTapped object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toggleJigsawTemplate:) name:kLiveCameraJigsawButtonTapped object:nil];
+    
     [self disableAdjustsScrollView];
     self.transitionManager = [[PTVCTransitionLeftRightManager alloc]init];
     [self.view addSubview:self.previewView];
@@ -104,8 +111,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     [self.view addSubview:self.cropMaskBottom];
     [self.view addSubview:self.topControlView];
     [self.view addSubview:self.bottomControlView];
-    
-    //Start Live camera face detection
+    [self.view addSubview:self.coverImageView];
     [self setupCameraControlPanel];
     self.cameraCanUse = [PTPPImageUtil checkCameraCanUse];
     self.assetsLibraryCanUse = [PTUtilTool checkALAssetsLibraryCanUse];
@@ -121,10 +127,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     
-    //[self loadLiveStickerWithFileName:@"demo"];
-    //[self loadLiveStickerFromXMLFile:@"axfl"];
     __weak typeof(self) weakSelf = self;
-    
     self.detectFaceController.finishShoot = ^(UIImage *image){
         if (weakSelf.detectFaceController.cameraPosition == UIImagePickerControllerCameraDeviceFront) {
             image = [[UIImage alloc] initWithCGImage: image.CGImage
@@ -146,7 +149,6 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
             }
         }else{
             //AR stickers on screen, go to preview video
-            
             PTPPLiveStickerPreviewViewController *liveStickerVC = [[PTPPLiveStickerPreviewViewController alloc] initWithBasePhoto:image mouthSticker:weakSelf.liveStickerView.mouthSticker eyeSticker:weakSelf.liveStickerView.eyeSticker bottomSticker:weakSelf.liveStickerView.bottomSticker faceAngle:weakSelf.liveStickerView.faceAngle];
             [liveStickerVC setCropOption:[[weakSelf.cameraSettings objectForKey:PTPPCameraSettingCrop] integerValue]];
             [weakSelf.navigationController pushViewController:liveStickerVC animated:YES];
@@ -155,6 +157,85 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     };
     [self.detectFaceController startDetection];
     [self preRenderFilterPreview];
+    
+    [self addCameraGestures];
+}
+
+-(void)addCameraGestures{
+    UIPinchGestureRecognizer *pinchGesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinch:)];
+    [self.previewView addGestureRecognizer:pinchGesture];
+    
+    UISwipeGestureRecognizer *rightRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(rightSwipeHandle:)];
+    rightRecognizer.direction = UISwipeGestureRecognizerDirectionRight;
+    [rightRecognizer setNumberOfTouchesRequired:1];
+    [self.previewView addGestureRecognizer:rightRecognizer];
+
+    
+    UISwipeGestureRecognizer *leftRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(leftSwipeHandle:)];
+    leftRecognizer.direction = UISwipeGestureRecognizerDirectionLeft;
+    [leftRecognizer setNumberOfTouchesRequired:1];
+    [self.previewView addGestureRecognizer:leftRecognizer];
+
+}
+
+- (void)handlePinch:(UIPinchGestureRecognizer *)recognizer {
+
+    if ([self.liveStickerView hasStickers]) {
+        return;
+    }
+    if([recognizer state] == UIGestureRecognizerStateBegan) {
+        // Reset the last scale, necessary if there are multiple objects with different scales
+        lastScale = [recognizer scale];
+    }
+    
+    if ([recognizer state] == UIGestureRecognizerStateBegan ||
+        [recognizer state] == UIGestureRecognizerStateChanged) {
+        
+        CGFloat currentScale = [[[recognizer view].layer valueForKeyPath:@"transform.scale"] floatValue];
+        
+        // Constants to adjust the max/min values of zoom
+        const CGFloat kMaxScale = 3.0;
+        const CGFloat kMinScale = 1.0;
+        
+        CGFloat newScale = 1 -  (lastScale - [recognizer scale]);
+        newScale = MIN(newScale, kMaxScale / currentScale);
+        newScale = MAX(newScale, kMinScale / currentScale);
+        CGAffineTransform transform = CGAffineTransformScale([[recognizer view] transform], newScale, newScale);
+        [recognizer view].transform = transform;
+        self.filterView.transform = transform;
+        lastScale = [recognizer scale];  // Store the previous scale factor for the next pinch gesture call
+    }
+}
+
+- (void)rightSwipeHandle:(UISwipeGestureRecognizer*)gestureRecognizer
+{
+    if (self.detectFaceController.activeFilterID>0) {
+        self.detectFaceController.activeFilterID--;
+    }else{
+        self.detectFaceController.activeFilterID = self.filterSet.count-1;
+    }
+    
+    if (self.detectFaceController.activeFilterID != 0) {
+        self.filterView.hidden = NO;
+    }else{
+        self.filterView.hidden = YES;
+    }
+    [SOAutoHideMessageView showMessage:[self.detectFaceController getFilterNameFromIndex:self.detectFaceController.activeFilterID] inView:self.view];
+}
+
+- (void)leftSwipeHandle:(UISwipeGestureRecognizer*)gestureRecognizer
+{
+    if (self.detectFaceController.activeFilterID<self.filterSet.count-1) {
+        self.detectFaceController.activeFilterID++;
+    }else{
+        self.detectFaceController.activeFilterID = 0;
+    }
+    if (self.detectFaceController.activeFilterID != 0) {
+        self.filterView.hidden = NO;
+    }else{
+        self.filterView.hidden = YES;
+    }
+    [SOAutoHideMessageView showMessage:[self.detectFaceController getFilterNameFromIndex:self.detectFaceController.activeFilterID] inView:self.view];
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -162,6 +243,8 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidFinishLoading:) name:kDownloadDidFinishLoading object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidReceiveData:) name:kDownloadDidReceiveData object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadDidFail:) name:kDownloadDidFail object:nil];
+    
+    
     [self.navigationController setNavigationBarHidden:YES];
     
     if (!self.detectFaceController.session.isRunning) {
@@ -179,7 +262,13 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kDownloadDidFinishLoading object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kDownloadDidFail object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kDownloadDidReceiveData object:nil];
+    
     [self.detectFaceController stopRunning];
+}
+
+-(void)viewDidDisappear:(BOOL)animated{
+    [super viewDidDisappear:animated];
+    self.coverImageView.hidden = YES;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -450,6 +539,9 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
             weakSelf.selectedARSticker = stickerName;
             [SOAutoHideMessageView showMessage:@"请将正脸置于取景器内" inView:weakSelf.view];
             [weakSelf loadLiveStickerWithFileName:stickerName];
+            weakSelf.previewView.transform = CGAffineTransformIdentity;
+            weakSelf.filterView.transform = CGAffineTransformIdentity;
+            lastScale = 1.0;
         }
     };
     self.liveStickerScrollView.actionDownload = ^(NSString *sourceURL, NSString *destURL, PTPPMaterialShopStickerItem *item){
@@ -473,7 +565,11 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
           } completion:^(BOOL finished) {}];
 }
 
--(void)toggleJigsawTemplate{
+-(void)toggleJigsawTemplate:(NSNotification *)notification{
+    if ([notification isKindOfClass:[NSNotification class]]) {
+        self.coverImageView.image = notification.object;
+        self.coverImageView.hidden = NO;
+    }
     PTPPMaterialShopViewController *shopVC = [[PTPPMaterialShopViewController alloc] init];
     shopVC.activeSection = 2;
     shopVC.hideMenu = YES;
@@ -738,8 +834,12 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     });
 }
 
-- (void)albumTapped
+- (void)albumTapped:(NSNotification *)notification
 {
+    if ([notification isKindOfClass:[NSNotification class]]) {
+        self.coverImageView.image = notification.object;
+        self.coverImageView.hidden = NO;
+    }
     if (!_assetsLibraryCanUse) {
         [self albumNotUseTapped];
         return;
@@ -867,9 +967,18 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
 
 #pragma mark - Getters/Setters
 
+-(UIImageView *)coverImageView{
+    if (!_coverImageView) {
+        _coverImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, Screenwidth, Screenheight)];
+        _coverImageView.hidden = YES;
+    }
+    return _coverImageView;
+}
+
 -(PTPPLiveStickerView *)liveStickerView{
     if (!_liveStickerView) {
         _liveStickerView = [[PTPPLiveStickerView alloc] initWithFrame:self.previewView.bounds];
+        _liveStickerView.userInteractionEnabled = NO;
     }
     return _liveStickerView;
 }
@@ -952,6 +1061,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
         _filterView = [[UIImageView alloc] initWithFrame:self.view.bounds];
         _filterView.contentMode = UIViewContentModeScaleAspectFill;
         _filterView.hidden = YES;
+        _filterView.userInteractionEnabled = NO;
     }
     return _filterView;
 }
@@ -1036,7 +1146,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
         _cameraRollButton.imageView.layer.cornerRadius = 4;
         _cameraRollButton.contentEdgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
         _cameraRollButton.clipsToBounds = YES;
-        [_cameraRollButton addTarget:self action:@selector(albumTapped) forControlEvents:UIControlEventTouchUpInside];
+        [_cameraRollButton addTarget:self action:@selector(albumTapped:) forControlEvents:UIControlEventTouchUpInside];
         _cameraRollButton.imageView.backgroundColor = [UIColor colorWithHexString:@"222222"];
     }
     return _cameraRollButton;
@@ -1074,7 +1184,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     if (!_jigsawButton) {
         _jigsawButton = [[UIButton alloc] initWithFrame:CGRectMake(Screenwidth/5*4, (kBottomControlHeight-Screenwidth/5)/2, Screenwidth/5, Screenwidth/5)];
         [_jigsawButton setImage:[UIImage imageNamed:@"icon_capture_20_17"] forState:UIControlStateNormal];
-        [_jigsawButton addTarget:self action:@selector(toggleJigsawTemplate) forControlEvents:UIControlEventTouchUpInside];
+        [_jigsawButton addTarget:self action:@selector(toggleJigsawTemplate:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _jigsawButton;
 }
