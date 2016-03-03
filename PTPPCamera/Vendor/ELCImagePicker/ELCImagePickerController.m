@@ -15,39 +15,46 @@
 #import <MobileCoreServices/UTCoreTypes.h>
 #import "ELCConsole.h"
 
+@interface ELCImagePickerController ()
+@property (nonatomic, strong) ELCAlbumPickerController *albumPicker;
+@end
+
 @implementation ELCImagePickerController
 
 //Using auto synthesizers
 
 - (id)initImagePicker
 {
-    ELCAlbumPickerController *albumPicker = [[ELCAlbumPickerController alloc] initWithStyle:UITableViewStylePlain];
-    
-    self = [super initWithRootViewController:albumPicker];
+
+    self = [super init];
     if (self) {
         self.maximumImagesCount = 4;
         self.returnsImage = YES;
         self.returnsOriginalImage = YES;
-        [albumPicker setParent:self];
+        [self albumPicker];
+        //[self.albumPicker setParent:self];
         self.mediaTypes = @[(NSString *)kUTTypeImage];
     }
     return self;
 }
 
-- (id)initWithRootViewController:(UIViewController *)rootViewController
-{
-
-    self = [super initWithRootViewController:rootViewController];
-    if (self) {
-        self.maximumImagesCount = 4;
-        self.returnsImage = YES;
-    }
-    return self;
-}
+//- (id)initWithRootViewController:(UIViewController *)rootViewController
+//{
+//
+//    self = [super initWithRootViewController:rootViewController];
+//    if (self) {
+//        self.maximumImagesCount = 4;
+//        self.returnsImage = YES;
+//    }
+//    return self;
+//}
 
 - (ELCAlbumPickerController *)albumPicker
 {
-    return self.viewControllers[0];
+    if (_albumPicker) {
+        _albumPicker = [[ELCAlbumPickerController alloc] initWithStyle:UITableViewStylePlain];
+    }
+    return _albumPicker;
 }
 
 - (void)setMediaTypes:(NSArray *)mediaTypes
@@ -69,17 +76,18 @@
 
 - (BOOL)shouldSelectAsset:(ELCAsset *)asset previousCount:(NSUInteger)previousCount
 {
-    BOOL shouldSelect = previousCount < self.maximumImagesCount;
-    if (!shouldSelect) {
-        NSString *title = [NSString stringWithFormat:NSLocalizedString(@"最多只能上传%d张照片", nil), self.maximumImagesCount];
-       // NSString *message = [NSString stringWithFormat:NSLocalizedString(@"You can only send %d photos at a time.", nil), self.maximumImagesCount];
-        [[[UIAlertView alloc] initWithTitle:title
-                                    message:nil
-                                   delegate:nil
-                          cancelButtonTitle:nil
-                          otherButtonTitles:NSLocalizedString(@"好", nil), nil] show];
-    }
-    return shouldSelect;
+//    BOOL shouldSelect = previousCount < self.maximumImagesCount;
+//    if (!shouldSelect) {
+//        NSString *title = [NSString stringWithFormat:NSLocalizedString(@"最多只能上传%d张照片", nil), self.maximumImagesCount];
+//       // NSString *message = [NSString stringWithFormat:NSLocalizedString(@"You can only send %d photos at a time.", nil), self.maximumImagesCount];
+//        [[[UIAlertView alloc] initWithTitle:title
+//                                    message:nil
+//                                   delegate:nil
+//                          cancelButtonTitle:nil
+//                          otherButtonTitles:NSLocalizedString(@"好", nil), nil] show];
+//    }
+//    return shouldSelect;
+    return YES;
 }
 
 - (BOOL)shouldDeselectAsset:(ELCAsset *)asset previousCount:(NSUInteger)previousCount;
@@ -142,7 +150,10 @@
 	if (_imagePickerDelegate != nil && [_imagePickerDelegate respondsToSelector:@selector(elcImagePickerController:didFinishPickingMediaWithInfo:)]) {
 		[_imagePickerDelegate performSelector:@selector(elcImagePickerController:didFinishPickingMediaWithInfo:) withObject:self withObject:returnArray];
 	} else {
-        [self popToRootViewControllerAnimated:NO];
+        //[self popToRootViewControllerAnimated:NO];
+        if (self.navigationController) {
+            [self.navigationController popViewControllerAnimated:YES];
+        }
     }
 }
 

@@ -294,7 +294,7 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     tablePicker.immediateReturn = NO;
     tablePicker.selectionPreviewMode = YES;
     tablePicker.maxCount = maxCount;
-    ELCImagePickerController *elcPicker = [[ELCImagePickerController alloc] initWithRootViewController:tablePicker];
+    ELCImagePickerController *elcPicker = [[ELCImagePickerController alloc] init];
     elcPicker.imagePickerDelegate = self;
     elcPicker.returnsOriginalImage = YES; //Only return the fullScreenImage, not the fullResolutionImage
     elcPicker.returnsImage = YES; //Return UIimage if YES. If NO, only return asset location information
@@ -305,7 +305,7 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
     tablePicker.assetGroup = group;
     [tablePicker.assetGroup setAssetsFilter:[ALAssetsFilter allPhotos]];
     
-    [self presentViewController:elcPicker animated:YES completion:nil];
+    [self.navigationController pushViewController:tablePicker animated:YES];
 }
 
 #pragma mark ELCImagePickerControllerDelegate Methods
@@ -313,29 +313,12 @@ static NSString *PTPPMaterialShopLoadingCellID = @"PTPPMaterialShopLoadingCellID
 - (void)elcImagePickerController:(ELCImagePickerController *)picker didFinishPickingMediaWithInfo:(NSArray *)info
 {
     [self dismissViewControllerAnimated:YES completion:nil];
-    
-    NSMutableArray *images = [NSMutableArray arrayWithCapacity:[info count]];
-    for (NSDictionary *dict in info) {
-        if ([dict objectForKey:UIImagePickerControllerMediaType] == ALAssetTypePhoto){
-            if ([dict objectForKey:UIImagePickerControllerOriginalImage]){
-                UIImage* image=[dict objectForKey:UIImagePickerControllerOriginalImage];
-                [images addObject:image];
-                
-                UIImageView *imageview = [[UIImageView alloc] initWithImage:image];
-                [imageview setContentMode:UIViewContentModeScaleAspectFit];
-                
-            } else {
-                NSLog(@"UIImagePickerControllerReferenceURL = %@", dict);
-            }
-        }
-    }
-    
-    self.chosenImages = images;
-    if (self.chosenImages.count>0) {
+
+    if (info.count>0) {
         if (self.proceedToImageEdit) {
             //Go to jigsaw template
             PTPPJigsawTemplateViewController *jigsawTemplateVC = [[PTPPJigsawTemplateViewController alloc] init];
-            jigsawTemplateVC.images = self.chosenImages;
+            jigsawTemplateVC.images = info;
             jigsawTemplateVC.selectedJigsawItem = self.selectedJigsawItem;
             [self.navigationController pushViewController:jigsawTemplateVC animated:YES];
         }

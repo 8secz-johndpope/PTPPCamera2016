@@ -45,8 +45,8 @@
 	
     UIBarButtonItem *doneButtonItem = nil;
     //if (self.immediateReturn) {
-        doneButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStyleDone target:self action:@selector(doneAction:)];
-//        
+//        doneButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStyleDone target:self action:@selector(doneAction:)];
+//
 //    }else{
 //        doneButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneAction:)];
 //    }
@@ -65,16 +65,25 @@
     [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
     [self.navigationController.navigationBar setTintColor:[UIColor whiteColor]];
     
-    if (self.selectionPreviewMode) {
-        [self.navigationController.view addSubview:self.bottomPreview];
-        [self.bottomPreview setAttributeWithMaxCount:self.maxCount];
-    }
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:NO];
     self.columns = self.view.bounds.size.width / 80;
+    if (self.selectionPreviewMode) {
+        [self.navigationController.view addSubview:self.bottomPreview];
+        [self.bottomPreview setAttributeWithMaxCount:self.maxCount];
+        self.bottomPreview.center = CGPointMake(self.bottomPreview.centerX, Screenheight+self.bottomPreview.height/2);
+        [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
+              initialSpringVelocity:0.6 options:UIViewAnimationOptionAllowUserInteraction animations:^{
+            self.bottomPreview.center = CGPointMake(self.bottomPreview.centerX, Screenheight-self.bottomPreview.height/2);
+        } completion:^(BOOL finished) {
+            
+        }];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -82,6 +91,13 @@
     [super viewWillDisappear:animated];
     [[ELCConsole mainConsole] removeAllIndex];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:ALAssetsLibraryChangedNotification object:nil];
+    [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:1
+          initialSpringVelocity:0.6 options:UIViewAnimationOptionAllowUserInteraction animations:^{
+              self.bottomPreview.center = CGPointMake(self.bottomPreview.centerX, Screenheight+self.bottomPreview.height/2);
+          } completion:^(BOOL finished) {
+              [self.bottomPreview removeFromSuperview];
+          }];
+    
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation

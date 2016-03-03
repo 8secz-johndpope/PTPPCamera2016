@@ -23,6 +23,7 @@
 @property (nonatomic, strong) PTPPJigsawView *jigsawView;
 @property (nonatomic, strong) PTPPJigsawTemplateModel *jigsawTemplateModel;
 @property (nonatomic, strong) SOImageTextControl *swapTemplateControl;
+@property (nonatomic, assign) BOOL firstLoadFinished;
 @end
 
 @implementation PTPPJigsawTemplateViewController
@@ -45,6 +46,7 @@
     self.swapTemplateControl.center = CGPointMake(self.view.centerX, Screenheight-self.swapTemplateControl.height/2);
     [self readLocalFileSetting];
     [self updateFrame];
+    
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -54,7 +56,18 @@
 
 -(void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
+    self.jigsawView.popup.hidden = YES;
     [self.navigationController setNavigationBarHidden:NO];
+}
+
+-(void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (!self.firstLoadFinished) {
+            [self.jigsawView setAttributeWithTemplateModel:self.jigsawTemplateModel images:self.images];
+            self.firstLoadFinished = YES;
+        }
+    });
 }
 
 - (void)didReceiveMemoryWarning {
@@ -71,7 +84,6 @@
     self.jigsawTemplateView.frame = self.canvasView.bounds;
     self.jigsawTemplateView.image = self.jigsawTemplateModel.baseImage;
     self.jigsawView.frame = self.canvasView.bounds;
-    [self.jigsawView setAttributeWithTemplateModel:self.jigsawTemplateModel images:self.images];
 }
 
 
@@ -201,5 +213,6 @@
     }
     return _swapTemplateControl;
 }
+
 
 @end

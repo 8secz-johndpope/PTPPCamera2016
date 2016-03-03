@@ -19,6 +19,7 @@
 @interface PTPPMediaShareViewController ()<UMSocialUIDelegate,HTTPRequestDelegate>
 @property (nonatomic, strong) UIImageView *backgroundImage;
 @property (nonatomic, strong) SOImageTextControl *saveTitleView;
+@property (nonatomic, strong) UILabel *shareTitle;
 @property (nonatomic, strong) UIImage *imgShare;
 @property (nonatomic, strong) NSURL *videoURL;
 @property (nonatomic, assign) NSInteger shareOption;
@@ -61,6 +62,7 @@ static NSString *PTShareMediaTypeVideo = @"PTShareMediaTypeVideo";
     [self addCustomNavigationBar];
     [self.view addSubview:self.saveTitleView];
     [self addShareOptionView];
+    [self addWhereToGoView];
     [self.view addSubview:self.recommendAppView];
 }
 
@@ -95,9 +97,41 @@ static NSString *PTShareMediaTypeVideo = @"PTShareMediaTypeVideo";
     [self.view addSubview:navBar];
 }
 
+-(void)addWhereToGoView{
+    //美化，拍照，拼图
+    for (NSInteger i=0; i<3; i++) {
+        SOImageTextControl *actionButton = [[SOImageTextControl alloc] initWithFrame:CGRectMake(i*(Screenwidth/3), self.saveTitleView.bottom+45, Screenwidth/3, Screenwidth/3/1.5)];
+        actionButton.tag = i;
+        actionButton.imageSize = CGSizeMake(50, 50);
+        actionButton.imagePosition = SOImagePositionTop;
+        actionButton.textLabel.textColor = [UIColor grayColor];
+        actionButton.textLabel.font = [UIFont systemFontOfSize:14];
+        actionButton.textLabel.textAlignment = NSTextAlignmentCenter;
+        switch (i) {
+            case 0:
+                actionButton.imageView.image = [UIImage imageNamed:@"icon_50_01"];
+                actionButton.textLabel.text = @"美化";
+                break;
+            case 1:
+                actionButton.imageView.image = [UIImage imageNamed:@"icon_50_02"];
+                actionButton.textLabel.text = @"拍照";
+                break;
+            case 2:
+                actionButton.imageView.image = [UIImage imageNamed:@"icon_50_03"];
+                actionButton.textLabel.text = @"拼图";
+                break;
+            default:
+                break;
+        }
+        [actionButton addTarget:self action:@selector(didTapActionOption:) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:actionButton];
+    }
+}
+
 -(void)addShareOptionView{
+    //分享给好友
     for (NSInteger i=0; i<4; i++) {
-        SOImageTextControl *shareButton = [[SOImageTextControl alloc] initWithFrame:CGRectMake(i*(Screenwidth/4), Screenheight/2-Screenwidth/4/2, Screenwidth/4, Screenwidth/4)];
+        SOImageTextControl *shareButton = [[SOImageTextControl alloc] initWithFrame:CGRectMake(i*(Screenwidth/4), self.recommendAppView.top-40-Screenwidth/4, Screenwidth/4, Screenwidth/4)];
         shareButton.tag = i;
         shareButton.imageSize = CGSizeMake(40, 40);
         shareButton.imagePosition = SOImagePositionTop;
@@ -128,6 +162,8 @@ static NSString *PTShareMediaTypeVideo = @"PTShareMediaTypeVideo";
         [shareButton addTarget:self action:@selector(didTapShareOption:) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:shareButton];
     }
+    [self.view addSubview:self.shareTitle];
+    self.shareTitle.frame = CGRectMake(0, self.recommendAppView.top-40-Screenwidth/4-20-self.shareTitle.height, self.shareTitle.width, self.shareTitle.height);
 }
 
 #pragma mark - Touch events
@@ -137,6 +173,10 @@ static NSString *PTShareMediaTypeVideo = @"PTShareMediaTypeVideo";
 
 -(void)shootAgain{
     [self.navigationController popToRootViewControllerAnimated:YES];
+}
+
+-(void)didTapActionOption:(UIButton *)actionButton{
+    
 }
 
 -(void)didTapShareOption:(UIButton *)shareButton{
@@ -308,6 +348,16 @@ static NSString *PTShareMediaTypeVideo = @"PTShareMediaTypeVideo";
         _saveTitleView.textLabel.textColor = [[UIColor blackColor] colorWithAlphaComponent:0.6];
     }
     return _saveTitleView;
+}
+
+-(UILabel *)shareTitle{
+    if (!_shareTitle) {
+        _shareTitle = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, Screenwidth, [UIFont systemFontOfSize:14].lineHeight)];
+        _shareTitle.textAlignment = NSTextAlignmentCenter;
+        _shareTitle.text = @"分享给好友";
+        _shareTitle.textColor = [UIColor colorWithHexString:@"959595"];
+    }
+    return _shareTitle;
 }
 
 -(PTRecommendAppBottomView *)recommendAppView{

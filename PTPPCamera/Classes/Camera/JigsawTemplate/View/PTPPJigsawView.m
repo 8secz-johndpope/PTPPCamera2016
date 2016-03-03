@@ -55,11 +55,6 @@
             CGPoint point = [self getPointFromString:pointStr];
             CGFloat ratio = templateModel.imageSize.width/self.width;
             CGPoint newPoint = CGPointMake(point.x/ratio, point.y/ratio);
-//            UIView *dot = [[UIView alloc] initWithFrame:CGRectMake(newPoint.x-5, newPoint.y-5, 10, 10)];
-//            dot.layer.cornerRadius = 5;
-//            dot.layer.masksToBounds = YES;
-//            dot.backgroundColor = [UIColor redColor];
-//            [self addSubview:dot];
             [pointArray addObject:[NSValue valueWithCGPoint:newPoint]];
         }
         CGRect boundingRect = [self getBoundingRectFromPointArray:pointArray];
@@ -79,15 +74,24 @@
         }
         [path closePath];
         
-//        PTPPJigsawCell *cell = [[PTPPJigsawCell alloc] initWithFrame:boundingRect];
-//        [cell setAttributeWithImage:[images safeObjectAtIndex:index] maskPointArray:pointArray];
-//        [self addSubview:cell];
-        
         CombinationImageView *elementView = [[CombinationImageView alloc] initWithFrame:boundingRect];
         elementView.tag = index+1000;           //self 视图tag默认为0
         elementView.realCellArea = path;
-        [elementView setImageViewData:[images safeObjectAtIndex:index]];
+        NSDictionary *imageInfo = [images safeObjectAtIndex:index];
+        if ([imageInfo objectForKey:UIImagePickerControllerMediaType] == ALAssetTypePhoto){
+            if ([imageInfo objectForKey:UIImagePickerControllerOriginalImage]){
+                UIImage* image=[imageInfo objectForKey:UIImagePickerControllerOriginalImage];
+                [elementView setImageViewData:image];
+            } else {
+                NSLog(@"UIImagePickerControllerReferenceURL = %@", imageInfo);
+            }
+        }
+        
         [self addSubview:elementView];
+        elementView.alpha = 0.0;
+        [UIView animateWithDuration:0.3 animations:^{
+            elementView.alpha = 1.0;
+        }];
         if (images.count>1) {
             UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(photoLongPressed:)];
             longPress.numberOfTouchesRequired = 1;
@@ -278,7 +282,7 @@
     tablePicker.singleSelection = YES;
     tablePicker.immediateReturn = YES;
     
-    ELCImagePickerController *elcPicker = [[ELCImagePickerController alloc] initWithRootViewController:tablePicker];
+    ELCImagePickerController *elcPicker = [[ELCImagePickerController alloc] init];
     elcPicker.maximumImagesCount = 1;
     elcPicker.imagePickerDelegate = self;
     elcPicker.returnsOriginalImage = YES; //Only return the fullScreenImage, not the fullResolutionImage
@@ -290,12 +294,12 @@
     tablePicker.assetGroup = group;
     [tablePicker.assetGroup setAssetsFilter:[ALAssetsFilter allPhotos]];
     
-    [self.originalVC presentViewController:elcPicker animated:YES completion:nil];
+    [self.originalVC.navigationController pushViewController:tablePicker animated:YES];
 }
 
 - (void)elcImagePickerController:(ELCImagePickerController *)picker didFinishPickingMediaWithInfo:(NSArray *)info
 {
-    [self.originalVC dismissViewControllerAnimated:YES completion:nil];
+    [self.originalVC.navigationController popViewControllerAnimated:YES];
     
     NSMutableArray *images = [NSMutableArray arrayWithCapacity:[info count]];
     for (NSDictionary *dict in info) {

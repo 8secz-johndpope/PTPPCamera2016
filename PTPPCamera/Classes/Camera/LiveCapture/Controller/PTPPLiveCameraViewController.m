@@ -755,7 +755,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     tablePicker.singleSelection = YES;
     tablePicker.immediateReturn = YES;
     
-    ELCImagePickerController *elcPicker = [[ELCImagePickerController alloc] initWithRootViewController:tablePicker];
+    ELCImagePickerController *elcPicker = [[ELCImagePickerController alloc] init];
     elcPicker.maximumImagesCount = 1;
     elcPicker.imagePickerDelegate = self;
     elcPicker.returnsOriginalImage = YES; //Only return the fullScreenImage, not the fullResolutionImage
@@ -767,7 +767,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     tablePicker.assetGroup = group;
     [tablePicker.assetGroup setAssetsFilter:[ALAssetsFilter allPhotos]];
     
-    [self presentViewController:elcPicker animated:YES completion:nil];
+    [self.navigationController pushViewController:tablePicker animated:YES];
 }
 
 

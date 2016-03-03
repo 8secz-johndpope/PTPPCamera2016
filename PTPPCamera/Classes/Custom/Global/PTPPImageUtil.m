@@ -103,10 +103,10 @@
 + (UIImage *)getThumbnailFromALAsset:(ALAsset *)asset{
     CGImageRef thumbnailRef = asset.thumbnail;
     UIImageOrientation orientation = UIImageOrientationUp;
-    NSNumber *orientationValue = [asset valueForProperty:@"ALAssetPropertyOrientation"];
-    if (orientationValue != nil) {
-        orientation = [orientationValue intValue];
-    }
+//    NSNumber *orientationValue = [asset valueForProperty:@"ALAssetPropertyOrientation"];
+//    if (orientationValue != nil) {
+//        orientation = [orientationValue intValue];
+//    }
     UIImage *img = [self convertUIImageFromCGImageRef:thumbnailRef orientation:orientation];
     return img;
 }
