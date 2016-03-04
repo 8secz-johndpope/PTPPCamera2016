@@ -34,17 +34,17 @@
     [self.session setSessionPreset:AVCaptureSessionPresetHigh];
     
     // Select a video device, make an input
-    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    self.device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     
     //in real app you would use camera that user chose
     if([UIImagePickerController isCameraDeviceAvailable:self.cameraPosition]) {
         for (AVCaptureDevice *d in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
             if (self.cameraPosition == UIImagePickerControllerCameraDeviceFront) {
                 if ([d position] == AVCaptureDevicePositionFront)
-                    device = d;
+                    self.device = d;
             }else{
                 if ([d position] == AVCaptureDevicePositionBack)
-                    device = d;
+                    self.device = d;
             }
             
         }
@@ -53,7 +53,7 @@
         exit(0);
     
     NSError *error = nil;
-    AVCaptureDeviceInput *deviceInput = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
+    AVCaptureDeviceInput *deviceInput = [AVCaptureDeviceInput deviceInputWithDevice:self.device error:&error];
     if(error != nil)
     {
         exit(0);
@@ -81,11 +81,11 @@
     if ([self.session canAddOutput:self.imageDataOutput]) {
         [self.session addOutput:self.imageDataOutput];
     }
-    if ( YES == [device lockForConfiguration:NULL] )
+    if ( YES == [self.device lockForConfiguration:NULL] )
     {
-        [device setActiveVideoMaxFrameDuration:CMTimeMake(10, 300)];
-        [device setActiveVideoMinFrameDuration:CMTimeMake(10, 300)];
-        [device unlockForConfiguration];
+        [self.device setActiveVideoMaxFrameDuration:CMTimeMake(10, 300)];
+        [self.device setActiveVideoMinFrameDuration:CMTimeMake(10, 300)];
+        [self.device unlockForConfiguration];
         
     }
     [[self.videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:NO];
@@ -228,6 +228,7 @@
     if ([self.session canAddInput:deviceInput]) {
         [self.session addInput:deviceInput];
     }
+    self.device = device;
 }
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection

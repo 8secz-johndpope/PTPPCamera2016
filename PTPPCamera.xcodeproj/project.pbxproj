@@ -48,6 +48,7 @@
 		C631549F1C86EA4C007BC5BC /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C631549E1C86EA4C007BC5BC /* Images.xcassets */; };
 		C63154A11C86F973007BC5BC /* whitening.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C63154A01C86F973007BC5BC /* whitening.framework */; };
 		C6338D7A1C8442A000B7320B /* PTPPJigsawView.m in Sources */ = {isa = PBXBuildFile; fileRef = C6338D791C8442A000B7320B /* PTPPJigsawView.m */; };
+		C6359D621C8924F700556CD6 /* UIImage+vImageScaling.m in Sources */ = {isa = PBXBuildFile; fileRef = C6359D611C8924F700556CD6 /* UIImage+vImageScaling.m */; };
 		C6433C1C1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */; };
 		C6433C1F1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C1E1C72C66E00AF82AD /* PTPPStaticImageEditToolBar.m */; };
 		C6433C221C72F40300AF82AD /* PTFilterManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C6433C211C72F40300AF82AD /* PTFilterManager.m */; };
@@ -1043,6 +1044,8 @@
 		C63154A01C86F973007BC5BC /* whitening.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = whitening.framework; sourceTree = "<group>"; };
 		C6338D781C8442A000B7320B /* PTPPJigsawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPJigsawView.h; sourceTree = "<group>"; };
 		C6338D791C8442A000B7320B /* PTPPJigsawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPJigsawView.m; sourceTree = "<group>"; };
+		C6359D601C8924F700556CD6 /* UIImage+vImageScaling.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+vImageScaling.h"; sourceTree = "<group>"; };
+		C6359D611C8924F700556CD6 /* UIImage+vImageScaling.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+vImageScaling.m"; sourceTree = "<group>"; };
 		C6433C1A1C72BFC900AF82AD /* PTPPStaticImageEditViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPStaticImageEditViewController.h; sourceTree = "<group>"; };
 		C6433C1B1C72BFC900AF82AD /* PTPPStaticImageEditViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPPStaticImageEditViewController.m; sourceTree = "<group>"; };
 		C6433C1D1C72C66D00AF82AD /* PTPPStaticImageEditToolBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPPStaticImageEditToolBar.h; sourceTree = "<group>"; };
@@ -3258,6 +3261,8 @@
 				C647BC5B1C718C4B00E596EA /* UIImageView+PTCopy.m */,
 				C6681E801C7C5F54009BC942 /* UIImage+Rotation.h */,
 				C6681E811C7C5F54009BC942 /* UIImage+Rotation.m */,
+				C6359D601C8924F700556CD6 /* UIImage+vImageScaling.h */,
+				C6359D611C8924F700556CD6 /* UIImage+vImageScaling.m */,
 				C647BC5C1C718C4B00E596EA /* UIScrollView+BlurCover.h */,
 				C647BC5D1C718C4B00E596EA /* UIScrollView+BlurCover.m */,
 				C647BC5E1C718C4B00E596EA /* UITabBar+badge.h */,
@@ -5498,6 +5503,7 @@
 				C647BCDE1C718C4B00E596EA /* PTNavigationController.m in Sources */,
 				C647C8B61C71C40200E596EA /* NoiseFilter.m in Sources */,
 				C647BF841C71BBBB00E596EA /* GPUImageCrosshatchFilter.m in Sources */,
+				C6359D621C8924F700556CD6 /* UIImage+vImageScaling.m in Sources */,
 				C647BC2A1C7181BE00E596EA /* SOBaseTableViewController.m in Sources */,
 				C647BFE71C71BBBB00E596EA /* GPUImageShiTomasiFeatureDetectionFilter.m in Sources */,
 				C647BFF11C71BBBB00E596EA /* GPUImageSphereRefractionFilter.m in Sources */,

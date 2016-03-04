@@ -15,6 +15,7 @@ typedef void(^FinishShoot)(UIImage *image);
 
 @interface DetectFace : NSObject
 @property (nonatomic, weak) id delegate;
+@property (nonatomic, strong) AVCaptureDevice *device;
 @property (nonatomic, strong) AVCaptureSession *session;
 @property (nonatomic, assign) UIImagePickerControllerCameraDevice cameraPosition;
 @property (nonatomic, strong) NSArray *filters;

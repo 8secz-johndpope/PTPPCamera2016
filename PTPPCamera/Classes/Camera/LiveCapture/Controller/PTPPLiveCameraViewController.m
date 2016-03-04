@@ -30,6 +30,7 @@
 #import "PTPPLocalFileManager.h"
 #import "PTPPImageUtil.h"
 #import "PTFilterManager.h"
+#import "UIImage+vImageScaling.h"
 
 #define kFilterScrollHeight 130
 #define kFilterDataLength 10
@@ -130,9 +131,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     __weak typeof(self) weakSelf = self;
     self.detectFaceController.finishShoot = ^(UIImage *image){
         if (weakSelf.detectFaceController.cameraPosition == UIImagePickerControllerCameraDeviceFront) {
-            image = [[UIImage alloc] initWithCGImage: image.CGImage
-                                               scale: 1.0
-                                         orientation: UIImageOrientationUpMirrored];
+            image = [PTPPImageUtil image:image flip:0];
         }
         if (!weakSelf.filterView.hidden){
             image = weakSelf.filterView.image;
@@ -141,7 +140,11 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
             
             CGFloat widthRatio = image.size.width/(Screenwidth*[UIScreen mainScreen].scale);
             CGFloat heightRatio = image.size.height/(Screenheight*[UIScreen mainScreen].scale);
+            
             //No AR stickers on screen, go to static photo edit process.
+//            CGFloat currentScale = weakSelf.previewView.transform.a;
+//            image = [image vImageScaledImageWithSize:CGSizeMake(image.size.width*currentScale, image.size.height*currentScale)];
+//            image = [PTPPImageUtil croppIngimageByImageName:image toRect:CGRectMake((Screenwidth*lastScale-Screenwidth)/2, (Screenheight*lastScale-Screenheight)/2, Screenwidth*currentScale, Screenheight*currentScale)];
             image = [PTPPImageUtil croppIngimageByImageName:image toRect:CGRectMake(0, self.cropMaskTop.bottom*heightRatio, Screenwidth*widthRatio, self.cropMaskBottom.top*heightRatio-self.cropMaskTop.bottom*heightRatio)];
             PTPPStaticImageEditViewController *imageEditVC = [[PTPPStaticImageEditViewController alloc] initWithBasePhoto:image];
             if (weakSelf.navigationController) {
@@ -183,6 +186,7 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     if ([self.liveStickerView hasStickers]) {
         return;
     }
+    const CGFloat pinchVelocityDividerFactor = 20.0f;
     if([recognizer state] == UIGestureRecognizerStateBegan) {
         // Reset the last scale, necessary if there are multiple objects with different scales
         lastScale = [recognizer scale];
@@ -191,18 +195,22 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
     if ([recognizer state] == UIGestureRecognizerStateBegan ||
         [recognizer state] == UIGestureRecognizerStateChanged) {
         
-        CGFloat currentScale = [[[recognizer view].layer valueForKeyPath:@"transform.scale"] floatValue];
-        
         // Constants to adjust the max/min values of zoom
         const CGFloat kMaxScale = 3.0;
         const CGFloat kMinScale = 1.0;
         
-        CGFloat newScale = 1 -  (lastScale - [recognizer scale]);
-        newScale = MIN(newScale, kMaxScale / currentScale);
-        newScale = MAX(newScale, kMinScale / currentScale);
-        CGAffineTransform transform = CGAffineTransformScale([[recognizer view] transform], newScale, newScale);
-        [recognizer view].transform = transform;
-        self.filterView.transform = transform;
+        NSError *error = nil;
+        if ([self.detectFaceController.device lockForConfiguration:&error]) {
+            CGFloat desiredZoomFactor = self.detectFaceController.device.videoZoomFactor + atan2f(recognizer.velocity, pinchVelocityDividerFactor);
+            if (desiredZoomFactor>kMaxScale) {
+                desiredZoomFactor = kMaxScale;
+            }
+            // Check if desiredZoomFactor fits required range from 1.0 to activeFormat.videoMaxZoomFactor
+            self.detectFaceController.device.videoZoomFactor = MAX(kMinScale, MIN(desiredZoomFactor, self.detectFaceController.device.activeFormat.videoMaxZoomFactor));
+            [self.detectFaceController.device unlockForConfiguration];
+        } else {
+            NSLog(@"error: %@", error);
+        }
         lastScale = [recognizer scale];  // Store the previous scale factor for the next pinch gesture call
     }
 }
@@ -539,8 +547,11 @@ static NSString *PTPPCameraSettingCameraPosition = @"PTPPCameraSettingCameraPosi
             weakSelf.selectedARSticker = stickerName;
             [SOAutoHideMessageView showMessage:@"请将正脸置于取景器内" inView:weakSelf.view];
             [weakSelf loadLiveStickerWithFileName:stickerName];
-            weakSelf.previewView.transform = CGAffineTransformIdentity;
-            weakSelf.filterView.transform = CGAffineTransformIdentity;
+            NSError *error;
+            if ([weakSelf.detectFaceController.device lockForConfiguration:&error]) {
+                weakSelf.detectFaceController.device.videoZoomFactor = 1;
+                [weakSelf.detectFaceController.device unlockForConfiguration];
+            }
             lastScale = 1.0;
         }
     };
